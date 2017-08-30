@@ -32,10 +32,15 @@ mbc <- function(..., times=5, input, post, target) {#browser()
     }
   }
   browser()
-  times_df <- plyr::adply(runtimes, 1, function(x) data.frame(min=min(x), med=median(x), mean=mean(x), max=max(x)), .id = 'Func')
+  times_df <-
+    if (times > 5) {
+      plyr::adply(runtimes, 1, function(x) data.frame(min=min(x), med=median(x), mean=mean(x), max=max(x)), .id = 'Func')
+    } else {
+      plyr::adply(runtimes, 1, function(x) {sx <- sort(x); c((sx), mean=mean(x))}, .id = 'Func')
+    }
   if (!missing(post)) {
     post_df <- plyr::adply(postout, c(1,3), function(x) data.frame(min=min(x), med=median(x), mean=mean(x), max=max(x)), .id = c('Func','Stat'))
-    return(list(times_df, post_df))
+    return(list('Run times'=times_df, 'Output'=post_df))
   }
   times_df
 }
