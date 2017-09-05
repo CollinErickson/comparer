@@ -9,6 +9,7 @@
 #' @examples
 #' m1 <- mbc(function(x) {Sys.sleep(rexp(1, 30));mean(x)}, function(x) {Sys.sleep(rexp(1, 5));median(x)}, input=runif(100))
 #' mbc(function(x) {Sys.sleep(rexp(1, 30));mean(x)}, function(x) {Sys.sleep(rexp(1, 5));median(x)}, input=runif(100), post=function(x){c(x+1, 12)})
+#' mbc(function(x) {Sys.sleep(rexp(1, 30));mean(x)+runif(1)}, function(x) {Sys.sleep(rexp(1, 5));median(x)+runif(1)}, input=runif(100), post=function(x){c(x+1, 12)}, times=3)
 mbc <- function(..., times=5, input, post, target) {#browser()
   dots <- list(...)
   n <- length(dots)
@@ -44,7 +45,9 @@ mbc <- function(..., times=5, input, post, target) {#browser()
     } else {
       post_df <- plyr::adply(postout, c(1,3), function(x) {sx <- sort(x); c((sx), mean=mean(x))}, .id = c('Func','Stat'))
     }
-    return(list('Run times'=times_df, 'Output'=post_df))
+    t1 <- list('Run times'=times_df, 'Output'=post_df)
+    class(t1) <- c("mbc", class(t1))
+    return(t1)
   }
   times_df
 }
