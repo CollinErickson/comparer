@@ -51,3 +51,8 @@ mbc <- function(..., times=5, input, post, target) {#browser()
   }
   times_df
 }
+
+
+plot.mbc <- function(x, ...) {
+  stripchart(x[['Run times']])
+}
