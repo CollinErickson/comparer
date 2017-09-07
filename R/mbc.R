@@ -56,3 +56,11 @@ mbc <- function(..., times=5, input, post, target) {#browser()
 plot.mbc <- function(x, ...) {
   stripchart(x[['Run times']])
 }
+
+print.mbc <- function(x, ...) {#browser()
+  nam <- names(x)
+  if ('Run times' %in% nam) {
+    print(x$`Run times`)
+  }
+  print(x$Output)
+}
