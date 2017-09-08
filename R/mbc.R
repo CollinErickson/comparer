@@ -41,11 +41,11 @@ mbc <- function(..., times=5, input, post, target) {#browser()
     }
   if (!missing(post)) {
     if (times > 5) {
-      post_df <- plyr::adply(postout, c(1,3), function(x) data.frame(min=min(x), med=median(x), mean=mean(x), max=max(x)), .id = c('Func','Stat'))
+      post_df_disp <- plyr::adply(postout, c(1,3), function(x) data.frame(min=min(x), med=median(x), mean=mean(x), max=max(x)), .id = c('Func','Stat'))
     } else {
-      post_df <- plyr::adply(postout, c(1,3), function(x) {sx <- sort(x); c((sx), mean=mean(x))}, .id = c('Func','Stat'))
+      post_df_disp <- plyr::adply(postout, c(1,3), function(x) {sx <- sort(x); c((sx), mean=mean(x))}, .id = c('Func','Stat'))
     }
-    t1 <- list('Run times'=times_df, 'Output'=post_df)
+    t1 <- list('Run times'=times_df, 'Output'=postout, 'Output_disp'=post_df_disp)
     class(t1) <- c("mbc", class(t1))
     return(t1)
   }
