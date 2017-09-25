@@ -46,8 +46,10 @@ mbc <- function(..., times=5, input, inputi, post, target) {#browser()
       }
     }
   }
-  browser()
-  times_df <-
+  # browser()
+  out_list <- list()
+  class(out_list) <- c("mbc", class(out_list))
+  out_list$Run_times <-
     if (times > 5) {
       plyr::adply(runtimes, 1, function(x) data.frame(min=min(x), med=median(x), mean=mean(x), max=max(x)), .id = 'Func')
     } else {
@@ -59,11 +61,13 @@ mbc <- function(..., times=5, input, inputi, post, target) {#browser()
     } else {
       post_df_disp <- plyr::adply(postout, c(1,3), function(x) {sx <- sort(x); c((sx), mean=mean(x))}, .id = c('Func','Stat'))
     }
-    t1 <- list('Run times'=times_df, 'Output'=postout, 'Output_disp'=post_df_disp)
-    class(t1) <- c("mbc", class(t1))
-    return(t1)
+    # t1 <- list('Run times'=times_df, 'Output'=postout, 'Output_disp'=post_df_disp)
+    # class(t1) <- c("mbc", class(t1))
+    # return(t1)
+    out_list$Output <- postout
+    out_list$Output_disp <- post_df_disp
   }
-  times_df
+  out_list
 }
 
 
