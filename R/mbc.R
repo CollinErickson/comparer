@@ -4,15 +4,24 @@
 #' @param times Number of times to run
 #' @param input Object to be passed as input to each function
 #' @param inputi Function to be called with the replicate number then passed to each function.
+#' @param post Function to post-process results.
+#' @param target Values the functions are expected to (approximately) return.
+#' @importFrom stats median
 #'
 #' @return Data frame of comparison results
 #' @export
 #'
 #' @examples
-#' m1 <- mbc(function(x) {Sys.sleep(rexp(1, 30));mean(x)}, function(x) {Sys.sleep(rexp(1, 5));median(x)}, input=runif(100))
-#' mbc(function(x) {Sys.sleep(rexp(1, 30));mean(x)}, function(x) {Sys.sleep(rexp(1, 5));median(x)}, input=runif(100), post=function(x){c(x+1, 12)})
-#' mbc(function(x) {Sys.sleep(rexp(1, 30));mean(x)+runif(1)}, function(x) {Sys.sleep(rexp(1, 5));median(x)+runif(1)}, input=runif(100), post=function(x){c(x+1, 12)}, times=3)
-#' m1 <- mbc(function() {x <- runif(100);Sys.sleep(rexp(1, 30));mean(x)}, function() {x <- runif(100);Sys.sleep(rexp(1, 5));median(x)})
+#' m1 <- mbc(function(x) {Sys.sleep(rexp(1, 30));mean(x)},
+#'   function(x) {Sys.sleep(rexp(1, 5));median(x)}, input=runif(100))
+#' mbc(function(x) {Sys.sleep(rexp(1, 30));mean(x)},
+#'   function(x) {Sys.sleep(rexp(1, 5));median(x)}, input=runif(100),
+#'   post=function(x){c(x+1, 12)})
+#' mbc(function(x) {Sys.sleep(rexp(1, 30));mean(x)+runif(1)},
+#'   function(x) {Sys.sleep(rexp(1, 5));median(x)+runif(1)}, input=runif(100),
+#'   post=function(x){c(x+1, 12)}, times=3)
+#' m1 <- mbc(function() {x <- runif(100);Sys.sleep(rexp(1, 30));mean(x)},
+#'   function() {x <- runif(100);Sys.sleep(rexp(1, 5));median(x)})
 mbc <- function(..., times=5, input, inputi, post, target) {#browser()
   dots <- list(...)
   n <- length(dots)
@@ -71,14 +80,39 @@ mbc <- function(..., times=5, input, inputi, post, target) {#browser()
 }
 
 
+#' Plot mbc class
+#'
+#' @param x Object of class mbc
+#' @param ... Additional parameters
+#' @importFrom graphics stripchart
+#'
+#' @return None
+#' @export
+#'
+#' @examples
+#' m1 <- mbc(function(x) {Sys.sleep(rexp(1, 30));mean(x)},
+#'   function(x) {Sys.sleep(rexp(1, 5));median(x)}, input=runif(100))
+#' plot(m1)
 plot.mbc <- function(x, ...) {
-  stripchart(x[['Run times']])
+  stripchart(x$Run_times)
 }
 
+#' Print mbc class
+#'
+#' @param x Object of class mbc
+#' @param ... Additional parameters
+#'
+#' @return None
+#' @export
+#'
+#' @examples
+#' m1 <- mbc(function(x) {Sys.sleep(rexp(1, 30));mean(x)},
+#'   function(x) {Sys.sleep(rexp(1, 5));median(x)}, input=runif(100))
+#' print(m1)
 print.mbc <- function(x, ...) {#browser()
   nam <- names(x)
-  if ('Run times' %in% nam) {
-    print(x$`Run times`)
+  if ('Run_times' %in% nam) {
+    print(x$Run_times)
   }
   print(x$Output)
 }

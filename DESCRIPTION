@@ -12,3 +12,4 @@ Encoding: UTF-8
 LazyData: true
 Imports: R6
 Suggests: plyr
+RoxygenNote: 6.0.1
