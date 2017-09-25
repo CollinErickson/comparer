@@ -2,6 +2,8 @@
 #'
 #' @param ... Functions to run
 #' @param times Number of times to run
+#' @param input Object to be passed as input to each function
+#' @param inputi Function to be called with the replicate number then passed to each function.
 #'
 #' @return Data frame of comparison results
 #' @export
@@ -10,7 +12,8 @@
 #' m1 <- mbc(function(x) {Sys.sleep(rexp(1, 30));mean(x)}, function(x) {Sys.sleep(rexp(1, 5));median(x)}, input=runif(100))
 #' mbc(function(x) {Sys.sleep(rexp(1, 30));mean(x)}, function(x) {Sys.sleep(rexp(1, 5));median(x)}, input=runif(100), post=function(x){c(x+1, 12)})
 #' mbc(function(x) {Sys.sleep(rexp(1, 30));mean(x)+runif(1)}, function(x) {Sys.sleep(rexp(1, 5));median(x)+runif(1)}, input=runif(100), post=function(x){c(x+1, 12)}, times=3)
-mbc <- function(..., times=5, input, post, target) {#browser()
+#' m1 <- mbc(function() {x <- runif(100);Sys.sleep(rexp(1, 30));mean(x)}, function() {x <- runif(100);Sys.sleep(rexp(1, 5));median(x)})
+mbc <- function(..., times=5, input, inputi, post, target) {#browser()
   dots <- list(...)
   n <- length(dots)
   runtimes <- matrix(NA, n, times)
@@ -18,9 +21,20 @@ mbc <- function(..., times=5, input, post, target) {#browser()
   # if (!missing(post)) {postout <- array(data = NA, dim = c(n, times, post_length))} #rep(list(rep(list(NA),times)), n)}
   for (i in 1:n) {
     for (j in 1:times) {
-      runtime <- system.time(
-        out <- dots[[i]](input)
-      )
+      # See if there is input to each
+      if (!missing(input)) { # Single input for all
+        runtime <- system.time(
+          out <- dots[[i]](input)
+        )
+      } else if (!missing(inputi)) { # Different input for each rep
+        runtime <- system.time(
+          out <- dots[[i]](inputi(j))
+        )
+      } else {
+        runtime <- system.time(
+          out <- dots[[i]]()
+        )
+      }
       runtimes[i, j] <- runtime['elapsed']
       outs[[i]][[j]] <- out
       if (!missing(post)) {
