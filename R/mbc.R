@@ -29,7 +29,7 @@
 #' # No input
 #' m1 <- mbc(function() {x <- runif(100);Sys.sleep(rexp(1, 30));mean(x)},
 #'   function() {x <- runif(100);Sys.sleep(rexp(1, 5));median(x)})
-mbc <- function(..., times=5, input=NULL, inputi=NULL, post, target) {#browser()
+mbc <- function(..., times=5, input=NULL, inputi=NULL, post, target, metric="rmse") {#browser()
   if (!is.null(input) && !is.null(inputi)) {
     stop("input and inputi should not both be given in")
   }
@@ -77,8 +77,19 @@ mbc <- function(..., times=5, input=NULL, inputi=NULL, post, target) {#browser()
       }
       runtimes[i, j] <- runtime['elapsed']
       outs[[i]][[j]] <- out
-      if (!missing(post)) {
-        po <- post(out)
+      if (!missing(post) || !missing(target)) {
+        # Run post if given
+        if (!missing(post)) {
+          po <- post(out)
+        } else {
+          po <- out
+        }
+        # Run
+        if (!missing(target)) {
+          if (metric == "rmse") {
+            po <- sqrt(mean((po - target)^2))
+          } else {stop("Only metric recognized is rmse")}
+        }
         if (i==1 && j==1) { # Initialize once we know length
           postout <- array(data = NA, dim = c(n, times, length(po)))
           dimnames(postout)[[1]] <- fnames
@@ -104,7 +115,7 @@ mbc <- function(..., times=5, input=NULL, inputi=NULL, post, target) {#browser()
     }
 
   # Run post to post process
-  if (!missing(post)) {
+  if (!missing(post) || !missing(target)) {
     if (times > 5) {
       post_df_disp <- plyr::adply(postout, c(1,3), function(x) data.frame(min=min(x), med=median(x), mean=mean(x), max=max(x)), .id = c('Func','Stat'))
     } else {
@@ -122,9 +133,11 @@ mbc <- function(..., times=5, input=NULL, inputi=NULL, post, target) {#browser()
       # Convert data to array
       postout <- array(data = NA, dim = c(n, times, len))
       dimnames(postout)[[1]] <- fnames
-      for (i in 1:n) {
-        for (j in 1:times) {
-          postout[i, j, ] <- outs[[i]][[j]]
+      if (class(outs[[1]][[1]]) %in% c("numeric", "character")) {
+        for (i in 1:n) {
+          for (j in 1:times) {
+            postout[i, j, ] <- outs[[i]][[j]]
+          }
         }
       }
       # Post-process
