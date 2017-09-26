@@ -6,6 +6,7 @@
 #' @param inputi Function to be called with the replicate number then passed to each function.
 #' @param post Function to post-process results.
 #' @param target Values the functions are expected to (approximately) return.
+#' @param metric Metric used to compare output values to target.
 #' @importFrom stats median
 #'
 #' @return Data frame of comparison results
@@ -25,7 +26,8 @@
 #'   function(x) {Sys.sleep(rexp(1, 5));median(x)+runif(1)}, input=runif(100),
 #'   post=function(x){c(x+1, 12)}, times=30)
 #' # Name one function and post
-#' mbc(function(x) {mean(x)+runif(1)},  a1=function(x) {median(x)+runif(1)}, input=runif(100),  post=function(x){c(rr=x+1, gg=12)}, times=30)
+#' mbc(function(x) {mean(x)+runif(1)},  a1=function(x) {median(x)+runif(1)},
+#'   input=runif(100),  post=function(x){c(rr=x+1, gg=12)}, times=30)
 #' # No input
 #' m1 <- mbc(function() {x <- runif(100);Sys.sleep(rexp(1, 30));mean(x)},
 #'   function() {x <- runif(100);Sys.sleep(rexp(1, 5));median(x)})
@@ -87,7 +89,8 @@ mbc <- function(..., times=5, input=NULL, inputi=NULL, post, target, metric="rms
         # Run
         if (!missing(target)) {
           if (metric == "rmse") {
-            po <- sqrt(mean((po - target)^2))
+            targetj <- if (is.function(target)) {target(j)} else if (is.list(target)) {target[[j]]} else {target}
+            po <- c(rmse=sqrt(mean((po - targetj)^2)))
           } else {stop("Only metric recognized is rmse")}
         }
         if (i==1 && j==1) { # Initialize once we know length
@@ -133,7 +136,7 @@ mbc <- function(..., times=5, input=NULL, inputi=NULL, post, target, metric="rms
       # Convert data to array
       postout <- array(data = NA, dim = c(n, times, len))
       dimnames(postout)[[1]] <- fnames
-      if (class(outs[[1]][[1]]) %in% c("numeric", "character")) {
+      if (class(outs[[1]][[1]]) %in% c("numeric", "character", "logical")) {
         for (i in 1:n) {
           for (j in 1:times) {
             postout[i, j, ] <- outs[[i]][[j]]
@@ -147,6 +150,10 @@ mbc <- function(..., times=5, input=NULL, inputi=NULL, post, target, metric="rms
         } else {
           post_df_disp <- plyr::adply(postout, c(1,3), function(x) {sx <- sort(x); c((sx), mean=mean(x))}, .id = c('Func','Stat'))
         }
+      } else if (is.logical(postout)) {
+        # post_df_disp <- plyr::adply(postout, c(1,3), table, .id = c('Func','Stat'))
+        post_df_disp <- plyr::adply(postout, c(1,3), function(x) {tr <- sum(x);c('TRUE'=tr,'FALSE'=times-tr)}, .id = c('Func','Stat'))
+
       } else {
         post_df_disp <- postout
       }
