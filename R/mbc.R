@@ -12,14 +12,21 @@
 #' @export
 #'
 #' @examples
+#' # input given, no post
 #' m1 <- mbc(function(x) {Sys.sleep(rexp(1, 30));mean(x)},
 #'   function(x) {Sys.sleep(rexp(1, 5));median(x)}, input=runif(100))
+#' m1
+#' # input given with post
 #' mbc(function(x) {Sys.sleep(rexp(1, 30));mean(x)},
 #'   function(x) {Sys.sleep(rexp(1, 5));median(x)}, input=runif(100),
 #'   post=function(x){c(x+1, 12)})
-#' mbc(function(x) {Sys.sleep(rexp(1, 30));mean(x)+runif(1)},
+#' # input given with post, 30 times
+#' mbc(function(x) {Sys.sleep(rexp(1, 3));mean(x)+runif(1)},
 #'   function(x) {Sys.sleep(rexp(1, 5));median(x)+runif(1)}, input=runif(100),
-#'   post=function(x){c(x+1, 12)}, times=3)
+#'   post=function(x){c(x+1, 12)}, times=30)
+#' # Name one function and post
+#' mbc(function(x) {mean(x)+runif(1)},  a1=function(x) {median(x)+runif(1)}, input=runif(100),  post=function(x){c(rr=x+1, gg=12)}, times=30)
+#' # No input
 #' m1 <- mbc(function() {x <- runif(100);Sys.sleep(rexp(1, 30));mean(x)},
 #'   function() {x <- runif(100);Sys.sleep(rexp(1, 5));median(x)})
 mbc <- function(..., times=5, input=NULL, inputi=NULL, post, target) {#browser()
@@ -31,8 +38,10 @@ mbc <- function(..., times=5, input=NULL, inputi=NULL, post, target) {#browser()
   n <- length(dots)
 
   fnames <- names(dots)
+  if (is.null(fnames)) {fnames <- rep("", n)}
   fnoname <- which(fnames == "")
-  fnames[fnoname] <- paste0("f", fnoname)
+  if (length(fnoname) > 0) {fnames[fnoname] <- paste0("f", fnoname)}
+  if (length(fnames) == 1) {fnames <- list(fnames)}
 
   # Create objects to hold output data
   runtimes <- matrix(NA, n, times)
@@ -72,6 +81,8 @@ mbc <- function(..., times=5, input=NULL, inputi=NULL, post, target) {#browser()
         po <- post(out)
         if (i==1 && j==1) { # Initialize once we know length
           postout <- array(data = NA, dim = c(n, times, length(po)))
+          dimnames(postout)[[1]] <- fnames
+          if (!is.null(names(po))) {dimnames(postout)[[3]] <- names(po)}
         }
         postout[i,j,] <- po
       }
@@ -79,15 +90,20 @@ mbc <- function(..., times=5, input=NULL, inputi=NULL, post, target) {#browser()
   }
   # browser()
 
-  # Create list to retun, set to class mbc so S3 methods can be used
+  # Create list to return, set to class mbc so S3 methods can be used
   out_list <- list()
   class(out_list) <- c("mbc", class(out_list))
+
+  # Process run times
   out_list$Run_times <-
     if (times > 5) {
-      plyr::adply(runtimes, 1, function(x) data.frame(min=min(x), med=median(x), mean=mean(x), max=max(x)), .id = 'Function')
+      # plyr::adply(runtimes, 1, function(x) data.frame(min=min(x), med=median(x), mean=mean(x), max=max(x)), .id = 'Function')
+      plyr::adply(runtimes, 1, summary, .id = 'Function')
     } else {
       plyr::adply(runtimes, 1, function(x) {sx <- sort(x); c((sx), mean=mean(x))}, .id = 'Function')
     }
+
+  # Run post to post process
   if (!missing(post)) {
     if (times > 5) {
       post_df_disp <- plyr::adply(postout, c(1,3), function(x) data.frame(min=min(x), med=median(x), mean=mean(x), max=max(x)), .id = c('Func','Stat'))
@@ -105,16 +121,21 @@ mbc <- function(..., times=5, input=NULL, inputi=NULL, post, target) {#browser()
     if (all(lengths == len)) { # Try to auto-post-process
       # Convert data to array
       postout <- array(data = NA, dim = c(n, times, len))
+      dimnames(postout)[[1]] <- fnames
       for (i in 1:n) {
         for (j in 1:times) {
           postout[i, j, ] <- outs[[i]][[j]]
         }
       }
       # Post-process
-      if (times > 5) {
-        post_df_disp <- plyr::adply(postout, c(1,3), function(x) data.frame(min=min(x), med=median(x), mean=mean(x), max=max(x)), .id = c('Func','Stat'))
+      if (is.numeric(postout)) {
+        if (times > 5) {
+          post_df_disp <- plyr::adply(postout, c(1,3), function(x) data.frame(min=min(x), med=median(x), mean=mean(x), max=max(x)), .id = c('Func','Stat'))
+        } else {
+          post_df_disp <- plyr::adply(postout, c(1,3), function(x) {sx <- sort(x); c((sx), mean=mean(x))}, .id = c('Func','Stat'))
+        }
       } else {
-        post_df_disp <- plyr::adply(postout, c(1,3), function(x) {sx <- sort(x); c((sx), mean=mean(x))}, .id = c('Func','Stat'))
+        post_df_disp <- postout
       }
       # Set outputs
       out_list$RawOutput <- outs
@@ -167,7 +188,10 @@ print.mbc <- function(x, ...) {#browser()
     cat("Run times (sec)\n")
     print(x$Run_times)
   }
-  if ('Output' %in% nam) {
+  if ('Output_disp' %in% nam) {
+    cat("Output summary\n")
+    print(x$Output_disp)
+  } else if ('Output' %in% nam) {
     if (is.data.frame(x$Output) || is.numeric(x$Output)) { # Only print df, not list
       cat("\nOutput \n")
       print(x$Output)
