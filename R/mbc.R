@@ -55,11 +55,14 @@ mbc <- function(..., times=5, input=NULL, inputi=NULL, post, target, metric="rms
   for (j in 1:times) {
     # Get input for replicate if inputi given
     if (!is.null(inputi)) {
+      paired <- TRUE # Same inputs so pair them
       if (is.function(inputi)) {
         input <- inputi(j)
       } else {
         input <- inputi[[j]]
       }
+    } else {
+      paired <- FALSE
     }
     # Loop over each function
     for (i in 1:n) {
@@ -114,15 +117,54 @@ mbc <- function(..., times=5, input=NULL, inputi=NULL, post, target, metric="rms
       # plyr::adply(runtimes, 1, function(x) data.frame(min=min(x), med=median(x), mean=mean(x), max=max(x)), .id = 'Function')
       plyr::adply(runtimes, 1, summary, .id = 'Function')
     } else {
-      plyr::adply(runtimes, 1, function(x) {sx <- sort(x); c((sx), mean=mean(x))}, .id = 'Function')
+      plyr::adply(runtimes, 1, function(x) {sx <- sort(x); c(Sort=(sx), mean=mean(x))}, .id = 'Function')
     }
 
   # Run post to post process
   if (!missing(post) || !missing(target)) {
     if (times > 5) {
       post_df_disp <- plyr::adply(postout, c(1,3), function(x) data.frame(min=min(x), med=median(x), mean=mean(x), max=max(x)), .id = c('Func','Stat'))
+      if (paired) {
+        if (n > 1) {
+          for (i1 in 1:(n-1)) {
+            for (i2 in (i1+1):n) {
+              for (istat in 1:(dim(postout)[3])) {
+                labeli <- paste0(dimnames(postout)[[1]][i1],'-',dimnames(postout)[[1]][i2])
+                diffs <- postout[i1,,istat] - postout[i2,,istat]
+                statname <- dimnames(postout)[[3]][istat]
+                comp12 <- data.frame(Func=labeli, Stat=statname, min=min(diffs), med=median(diffs), mean=mean(diffs), max=max(diffs))
+                # names(comp12)[3:(3+length(diffs)-1)] <- paste0("V", 1:(length(diffs)))
+                # print(comp12)
+                post_df_disp <- rbind(post_df_disp, comp12)
+              }
+            }
+          }
+        }
+      } else {
+
+      }
     } else {
-      post_df_disp <- plyr::adply(postout, c(1,3), function(x) {sx <- sort(x); c((sx), mean=mean(x))}, .id = c('Func','Stat'))
+      if (paired) { # Don't sort if paired, get differences
+        post_df_disp <- plyr::adply(postout, c(1,3), function(x) {c(x, mean=mean(x))}, .id = c('Func','Stat'))
+        if (n > 1) {
+          for (i1 in 1:(n-1)) {
+            for (i2 in (i1+1):n) {
+              for (istat in 1:(dim(postout)[3])) {
+                labeli <- paste0(dimnames(postout)[[1]][i1],'-',dimnames(postout)[[1]][i2])
+                diffs <- postout[i1,,istat] - postout[i2,,istat]
+                statname <- dimnames(postout)[[3]][istat]
+                comp12 <- data.frame(Func=labeli, Stat=statname, t(diffs), mean=mean(diffs))
+                names(comp12)[3:(3+length(diffs)-1)] <- paste0("V", 1:(length(diffs)))
+                # print(comp12)
+                post_df_disp <- rbind(post_df_disp, comp12)
+              }
+            }
+          }
+        }
+
+      } else { # If not paired/ordered, then sort them
+        post_df_disp <- plyr::adply(postout, c(1,3), function(x) {sx <- sort(x); c(Sort=(sx), mean=mean(x))}, .id = c('Func','Stat'))
+      }
     }
     out_list$RawOutput <- outs
     out_list$Output <- postout
@@ -148,7 +190,7 @@ mbc <- function(..., times=5, input=NULL, inputi=NULL, post, target, metric="rms
         if (times > 5) {
           post_df_disp <- plyr::adply(postout, c(1,3), function(x) data.frame(min=min(x), med=median(x), mean=mean(x), max=max(x)), .id = c('Func','Stat'))
         } else {
-          post_df_disp <- plyr::adply(postout, c(1,3), function(x) {sx <- sort(x); c((sx), mean=mean(x))}, .id = c('Func','Stat'))
+          post_df_disp <- plyr::adply(postout, c(1,3), function(x) {sx <- sort(x); c(Sort=(sx), mean=mean(x))}, .id = c('Func','Stat'))
         }
       } else if (is.logical(postout)) {
         # post_df_disp <- plyr::adply(postout, c(1,3), table, .id = c('Func','Stat'))

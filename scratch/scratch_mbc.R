@@ -42,6 +42,14 @@ mbc(function(){sample(c(T,F), 5, replace=T)})
 mbc(lm=function(X) {lm(y ~ X1 + X2, data=X)$coeff}, input=input, target=function(i){c(0,b)})
 mbc(lm=function(X) {lm(y ~ X1 + X2, data=X)$coeff}, input=input, target=list(c(0,b),c(0,b)+1,c(0,b)+2,c(0,b)+1,c(0,b)))
 
+# Try inputi so paired and not sorted
+mbc(lm1=function(X) {lm(y ~ X1 + X2, data=X)$coeff},
+    lm2=function(X) {X$y <- X$y + runif(length(y),0,0.1);lm(y ~ X1 + X2, data=X)$coeff},
+    inputi=function(i){ii <- input; ii$y <- ii$y + i; ii}, target=c(0,b))
+mbc(lm1=function(X) {lm(y ~ X1 + X2, data=X)$coeff},
+    lm2=function(X) {X$y <- X$y + runif(length(y),0,0.1);lm(y ~ X1 + X2, data=X)$coeff},
+    lm3=function(X) {X$y <- X$y + runif(length(y),0,1);lm(y ~ X1 + X2, data=X)$coeff},
+    inputi=function(i){ii <- input; ii$y <- ii$y + i; ii}, target=c(0,b))
 
 
 debugonce(mbc)
