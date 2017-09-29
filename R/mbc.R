@@ -31,12 +31,13 @@
 #' # No input
 #' m1 <- mbc(function() {x <- runif(100);Sys.sleep(rexp(1, 30));mean(x)},
 #'   function() {x <- runif(100);Sys.sleep(rexp(1, 5));median(x)})
-mbc <- function(..., times=5, input=NULL, inputi=NULL, post, target, metric="rmse") {#browser()
+mbc <- function(..., times=5, input=NULL, inputi=NULL, post, target, targetin, metric="rmse", paired) {#browser()
   if (!is.null(input) && !is.null(inputi)) {
     stop("input and inputi should not both be given in")
   }
   # dots are the functiosn to run, n is the number of functions
-  dots <- list(...)
+  # dots <- list(...)
+  dots <- exprs <- as.list(match.call(expand.dots = FALSE)$`...`)
   n <- length(dots)
 
   fnames <- names(dots)
@@ -55,22 +56,35 @@ mbc <- function(..., times=5, input=NULL, inputi=NULL, post, target, metric="rms
   for (j in 1:times) {
     # Get input for replicate if inputi given
     if (!is.null(inputi)) {
-      paired <- TRUE # Same inputs so pair them
+      if (missing(paired)) {paired <- TRUE} # Same inputs so pair them
       if (is.function(inputi)) {
         input <- inputi(j)
       } else {
         input <- inputi[[j]]
       }
     } else {
-      paired <- FALSE
+      if (missing(paired)) {paired <- FALSE} # Inputs not paired so don't pair unless told to
     }
+
+    # Make input a list/env, this will cause trouble
+    if (!is.list(input) && !is.environment(input)) {
+      input <- list(x=input)
+    }
+
     # Loop over each function
-    for (i in 1:n) {
+    for (i in 1:n) {#browser()
       # See if there is input to each
       if (!missing(input)) { # Single input for all
         runtime <- system.time(
-          out <- dots[[i]](input)
+          # out <- dots[[i]](input) # Old version, required functions
+          out <- eval(dots[[i]], envir=input)
         )
+        if (is.function(out)) {print("Trying second time")
+          runtime <- system.time(
+            # out <- out(input)
+            out <- do.call(out, input)
+          )
+        }
       # } else if (!missing(inputi)) { # Different input for each rep
       #   runtime <- system.time(
       #     out <- dots[[i]](inputi(j))
@@ -89,10 +103,25 @@ mbc <- function(..., times=5, input=NULL, inputi=NULL, post, target, metric="rms
         } else {
           po <- out
         }
+        if (!missing(targetin)) { # If targetin in given, use predict function
+          # if (any(exists(paste0("predict.",class(po))))) {
+            if (is.function(targetin)) {
+              targetinj <- targetin(j)
+            } else if (is.list(targetin) && !is.data.frame(targetin)) {
+              targetinj <- targetin[[j]]
+            } else {
+              targetinj <- targetin
+            }
+            po <- predict(po, targetinj)
+          # }
+        }
         # Run
         if (!missing(target)) {
-          if (metric == "rmse") {
-            targetj <- if (is.function(target)) {target(j)} else if (is.list(target)) {target[[j]]} else {target}
+          if (metric == "rmse") {#browser()
+            targetj <- if (is.function(target)) {target(j)}
+                       else if (is.list(target)) {target[[j]]}
+                       else if (is.character(target) && !is.character(po)) {input[[target]]}
+                       else {target}
             po <- c(rmse=sqrt(mean((po - targetj)^2)))
           } else {stop("Only metric recognized is rmse")}
         }

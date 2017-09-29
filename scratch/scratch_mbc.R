@@ -51,5 +51,8 @@ mbc(lm1=function(X) {lm(y ~ X1 + X2, data=X)$coeff},
     lm3=function(X) {X$y <- X$y + runif(length(y),0,1);lm(y ~ X1 + X2, data=X)$coeff},
     inputi=function(i){ii <- input; ii$y <- ii$y + i; ii}, target=c(0,b))
 
+# Try to give in expression
+mbc(mean(x), inputi=function(i){runif(10)})
+
 
 debugonce(mbc)
