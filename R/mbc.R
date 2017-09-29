@@ -135,10 +135,16 @@ mbc <- function(..., times=5, input=NULL, inputi=NULL, post, target, metric="rms
                 comp12 <- data.frame(Func=labeli, Stat=statname, min=min(diffs), med=median(diffs), mean=mean(diffs), max=max(diffs))
                 # names(comp12)[3:(3+length(diffs)-1)] <- paste0("V", 1:(length(diffs)))
                 # print(comp12)
-                post_df_disp <- rbind(post_df_disp, comp12)
+                # post_df_disp <- rbind(post_df_disp, comp12)
+                if (i1 == 1 && i2 == 2) {
+                  comp_df <- comp12
+                } else {
+                  comp_df <- rbind(comp_df, comp12)
+                }
               }
             }
           }
+          out_list$Compare <- comp_df
         }
       } else {
 
@@ -156,10 +162,16 @@ mbc <- function(..., times=5, input=NULL, inputi=NULL, post, target, metric="rms
                 comp12 <- data.frame(Func=labeli, Stat=statname, t(diffs), mean=mean(diffs))
                 names(comp12)[3:(3+length(diffs)-1)] <- paste0("V", 1:(length(diffs)))
                 # print(comp12)
-                post_df_disp <- rbind(post_df_disp, comp12)
+                # post_df_disp <- rbind(post_df_disp, comp12)
+                if (i1 == 1 && i2 == 2) {
+                  comp_df <- comp12
+                } else {
+                  comp_df <- rbind(comp_df, comp12)
+                }
               }
             }
           }
+          out_list$Compare <- comp_df
         }
 
       } else { # If not paired/ordered, then sort them
@@ -258,5 +270,9 @@ print.mbc <- function(x, ...) {#browser()
       cat("\nOutput \n")
       print(x$Output)
     }
+  }
+  if ("Compare" %in% nam) {
+    cat("\nCompare\n")
+    print(x$Compare)
   }
 }
