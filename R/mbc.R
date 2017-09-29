@@ -131,8 +131,9 @@ mbc <- function(..., times=5, input=NULL, inputi=NULL, post, target, metric="rms
               for (istat in 1:(dim(postout)[3])) {
                 labeli <- paste0(dimnames(postout)[[1]][i1],'-',dimnames(postout)[[1]][i2])
                 diffs <- postout[i1,,istat] - postout[i2,,istat]
+                ttest_diffs <- t.test(diffs)
                 statname <- dimnames(postout)[[3]][istat]
-                comp12 <- data.frame(Func=labeli, Stat=statname, min=min(diffs), med=median(diffs), mean=mean(diffs), max=max(diffs))
+                comp12 <- data.frame(Func=labeli, Stat=statname, min=min(diffs), med=median(diffs), mean=mean(diffs), max=max(diffs), t=ttest_diffs$statistic, p=ttest_diffs$p.value)
                 # names(comp12)[3:(3+length(diffs)-1)] <- paste0("V", 1:(length(diffs)))
                 # print(comp12)
                 # post_df_disp <- rbind(post_df_disp, comp12)
@@ -158,8 +159,9 @@ mbc <- function(..., times=5, input=NULL, inputi=NULL, post, target, metric="rms
               for (istat in 1:(dim(postout)[3])) {
                 labeli <- paste0(dimnames(postout)[[1]][i1],'-',dimnames(postout)[[1]][i2])
                 diffs <- postout[i1,,istat] - postout[i2,,istat]
+                ttest_diffs <- t.test(diffs)
                 statname <- dimnames(postout)[[3]][istat]
-                comp12 <- data.frame(Func=labeli, Stat=statname, t(diffs), mean=mean(diffs))
+                comp12 <- data.frame(Func=labeli, Stat=statname, t(diffs), mean=mean(diffs), t=ttest_diffs$statistic, p=ttest_diffs$p.value)
                 names(comp12)[3:(3+length(diffs)-1)] <- paste0("V", 1:(length(diffs)))
                 # print(comp12)
                 # post_df_disp <- rbind(post_df_disp, comp12)
