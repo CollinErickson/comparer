@@ -4,6 +4,7 @@
 #' @param times Number of times to run
 #' @param input Object to be passed as input to each function
 #' @param inputi Function to be called with the replicate number then passed to each function.
+#' @param evaluator An expression that the ... expressions will be passed as "." for evaluation.
 #' @param post Function to post-process results.
 #' @param target Values the functions are expected to (approximately) return.
 #' @param targetin Values that will be given to the result of the run to produce output.
@@ -33,13 +34,13 @@
 #' # No input
 #' m1 <- mbc(function() {x <- runif(100);Sys.sleep(rexp(1, 30));mean(x)},
 #'   function() {x <- runif(100);Sys.sleep(rexp(1, 5));median(x)})
-mbc <- function(..., times=5, input, inputi, post, target, targetin, metric="rmse", paired) {#browser()
+mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin, metric="rmse", paired) {#browser()
   if (!missing(input) && !missing(inputi)) {
     stop("input and inputi should not both be given in")
   }
   # dots are the functiosn to run, n is the number of functions
   # dots <- list(...)
-  dots <- exprs <- as.list(match.call(expand.dots = FALSE)$`...`)
+  dots <- as.list(match.call(expand.dots = FALSE)$`...`)
   n <- length(dots)
 
   fnames <- names(dots)
@@ -80,15 +81,31 @@ mbc <- function(..., times=5, input, inputi, post, target, targetin, metric="rms
     for (i in 1:n) {#browser()
       # See if there is input to each
       if (!missing(input)) { # Single input for all
-        runtime <- system.time(
-          # out <- dots[[i]](input) # Old version, required functions
-          out <- eval(dots[[i]], envir=input)
-        )
-        if (is.function(out)) {print("Trying second time")
+        if (missing(evaluator)) { # Run as normal
           runtime <- system.time(
-            # out <- out(input)
-            out <- do.call(out, input)
+            # out <- dots[[i]](input) # Old version, required functions
+            out <- eval(dots[[i]], envir=input)
           )
+          if (is.function(out)) {print("Trying second time")
+            runtime <- system.time(
+              # out <- out(input)
+              out <- do.call(out, input)
+            )
+          }
+        } else { # dots are input to evaluator to be evaluated
+          # browser()
+          expr_evaluator <- match.call(expand.dots = FALSE)$`evaluator`
+          input$. <- eval(dots[[i]], envir=input)
+          runtime <- system.time(
+            # out <- dots[[i]](input) # Old version, required functions
+            out <- eval(expr_evaluator, envir=input)
+          )
+          if (is.function(out)) {print("Trying second time")
+            runtime <- system.time(
+              # out <- out(input)
+              out <- do.call(out, input)
+            )
+          }
         }
       # } else if (!missing(inputi)) { # Different input for each rep
       #   runtime <- system.time(
@@ -138,7 +155,15 @@ mbc <- function(..., times=5, input, inputi, post, target, targetin, metric="rms
                        else if (is.character(target) && !is.character(po)) {input[[target]]}
                        else {target}
             po <- c(rmse=sqrt(mean((po - targetj)^2)))
-          } else {stop("Only metric recognized is rmse")}
+          } else if (metric == "t") {#browser()
+              targetj <- if (is.function(target)) {target(j)}
+              else if (is.list(target)) {target[[j]]}
+              else if (is.character(target) && !is.character(po)) {input[[target]]}
+              else {target}
+              po.t <- (po$mean - targetj) / po$se
+              po <- summary(po.t) #c(mean=mean(po.t)) # rmse=sqrt(mean((po - targetj)^2)))
+              names(po) <- paste0("", names(po), " t")
+          } else {stop("Only metric recognized are rmse and t")}
         }
         if (i==1 && j==1) { # Initialize once we know length
           postout <- array(data = NA, dim = c(n, times, length(po)))
@@ -311,7 +336,12 @@ print.mbc <- function(x, ...) {#browser()
   }
   if ('Output_disp' %in% nam) {
     cat("Output summary\n")
-    print(x$Output_disp)
+    if (length(unique(x$Output_disp$Stat)) > 1) { # If more than 1 stat, print separately by function
+      tp <- plyr::dlply(x$Output_disp, 'Func', identity)
+      suppress <- lapply(tp, print)
+    } else {
+      print(x$Output_disp)
+    }
   } else if ('Output' %in% nam) {
     if (is.data.frame(x$Output) || is.numeric(x$Output)) { # Only print df, not list
       cat("\nOutput \n")

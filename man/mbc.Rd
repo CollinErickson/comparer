@@ -4,8 +4,8 @@
 \alias{mbc}
 \title{Microbenchmark compare}
 \usage{
-mbc(..., times = 5, input, inputi, post, target, targetin, metric = "rmse",
-  paired)
+mbc(..., times = 5, input, inputi, evaluator, post, target, targetin,
+  metric = "rmse", paired)
 }
 \arguments{
 \item{...}{Functions to run}
@@ -15,6 +15,8 @@ mbc(..., times = 5, input, inputi, post, target, targetin, metric = "rmse",
 \item{input}{Object to be passed as input to each function}
 
 \item{inputi}{Function to be called with the replicate number then passed to each function.}
+
+\item{evaluator}{An expression that the ... expressions will be passed as "." for evaluation.}
 
 \item{post}{Function to post-process results.}
 
