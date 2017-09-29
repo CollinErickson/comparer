@@ -6,8 +6,10 @@
 #' @param inputi Function to be called with the replicate number then passed to each function.
 #' @param post Function to post-process results.
 #' @param target Values the functions are expected to (approximately) return.
+#' @param targetin Values that will be given to the result of the run to produce output.
 #' @param metric Metric used to compare output values to target.
-#' @importFrom stats median
+#' @param paired Should the results be paired for comparison?
+#' @importFrom stats median predict t.test
 #'
 #' @return Data frame of comparison results
 #' @export
@@ -31,8 +33,8 @@
 #' # No input
 #' m1 <- mbc(function() {x <- runif(100);Sys.sleep(rexp(1, 30));mean(x)},
 #'   function() {x <- runif(100);Sys.sleep(rexp(1, 5));median(x)})
-mbc <- function(..., times=5, input=NULL, inputi=NULL, post, target, targetin, metric="rmse", paired) {#browser()
-  if (!is.null(input) && !is.null(inputi)) {
+mbc <- function(..., times=5, input, inputi, post, target, targetin, metric="rmse", paired) {#browser()
+  if (!missing(input) && !missing(inputi)) {
     stop("input and inputi should not both be given in")
   }
   # dots are the functiosn to run, n is the number of functions
@@ -55,7 +57,7 @@ mbc <- function(..., times=5, input=NULL, inputi=NULL, post, target, targetin, m
   # Loop over each replicate
   for (j in 1:times) {
     # Get input for replicate if inputi given
-    if (!is.null(inputi)) {
+    if (!missing(inputi)) {
       if (missing(paired)) {paired <- TRUE} # Same inputs so pair them
       if (is.function(inputi)) {
         input <- inputi(j)
@@ -67,7 +69,7 @@ mbc <- function(..., times=5, input=NULL, inputi=NULL, post, target, targetin, m
     }
 
     # Make input a list/env, this will cause trouble
-    if (!is.list(input) && !is.environment(input)) {
+    if (!missing(input) && !is.list(input) && !is.environment(input)) {
       input <- list(x=input)
     }
 
@@ -90,9 +92,19 @@ mbc <- function(..., times=5, input=NULL, inputi=NULL, post, target, targetin, m
       #     out <- dots[[i]](inputi(j))
       #   )
       } else { # No input at all
+        # runtime <- system.time(
+        #   out <- dots[[i]]()
+        # )
         runtime <- system.time(
-          out <- dots[[i]]()
+          # out <- dots[[i]](input) # Old version, required functions
+          out <- eval(dots[[i]], envir=parent.frame())
         )
+        if (is.function(out)) {print("Trying second time 2")
+          runtime <- system.time(
+            # out <- out(input)
+            out <- out() #do.call(out, input)
+          )
+        }
       }
       runtimes[i, j] <- runtime['elapsed']
       outs[[i]][[j]] <- out
@@ -179,7 +191,7 @@ mbc <- function(..., times=5, input=NULL, inputi=NULL, post, target, targetin, m
       } else {
 
       }
-    } else {
+    } else {#browser()
       if (paired) { # Don't sort if paired, get differences
         post_df_disp <- plyr::adply(postout, c(1,3), function(x) {c(x, mean=mean(x))}, .id = c('Func','Stat'))
         if (n > 1) {
@@ -212,21 +224,21 @@ mbc <- function(..., times=5, input=NULL, inputi=NULL, post, target, targetin, m
     out_list$RawOutput <- outs
     out_list$Output <- postout
     out_list$Output_disp <- post_df_disp
-  } else {
+  } else {#browser()
     # Check if all outs have same length, then convert to df if small enough just as postprocessing would
     #  in case single return value already is post
     lengths <- sapply(outs, function(listi) {sapply(listi, length)})
     len <- lengths[[1]]
-    if (all(lengths == len)) { # Try to auto-post-process
+    if (all(lengths == len) && any(class(outs[[1]][[1]]) %in% c("numeric", "character", "logical"))) { # Try to auto-post-process
       # Convert data to array
       postout <- array(data = NA, dim = c(n, times, len))
       dimnames(postout)[[1]] <- fnames
-      if (class(outs[[1]][[1]]) %in% c("numeric", "character", "logical")) {
+      # if (class(outs[[1]][[1]]) %in% c("numeric", "character", "logical")) {
         for (i in 1:n) {
           for (j in 1:times) {
             postout[i, j, ] <- outs[[i]][[j]]
           }
-        }
+        # }
       }
       # Post-process
       if (is.numeric(postout)) {

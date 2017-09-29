@@ -4,8 +4,8 @@
 \alias{mbc}
 \title{Microbenchmark compare}
 \usage{
-mbc(..., times = 5, input = NULL, inputi = NULL, post, target,
-  metric = "rmse")
+mbc(..., times = 5, input, inputi, post, target, targetin, metric = "rmse",
+  paired)
 }
 \arguments{
 \item{...}{Functions to run}
@@ -19,6 +19,12 @@ mbc(..., times = 5, input = NULL, inputi = NULL, post, target,
 \item{post}{Function to post-process results.}
 
 \item{target}{Values the functions are expected to (approximately) return.}
+
+\item{targetin}{Values that will be given to the result of the run to produce output.}
+
+\item{metric}{Metric used to compare output values to target.}
+
+\item{paired}{Should the results be paired for comparison?}
 }
 \value{
 Data frame of comparison results
@@ -40,7 +46,8 @@ mbc(function(x) {Sys.sleep(rexp(1, 3));mean(x)+runif(1)},
   function(x) {Sys.sleep(rexp(1, 5));median(x)+runif(1)}, input=runif(100),
   post=function(x){c(x+1, 12)}, times=30)
 # Name one function and post
-mbc(function(x) {mean(x)+runif(1)},  a1=function(x) {median(x)+runif(1)}, input=runif(100),  post=function(x){c(rr=x+1, gg=12)}, times=30)
+mbc(function(x) {mean(x)+runif(1)},  a1=function(x) {median(x)+runif(1)},
+  input=runif(100),  post=function(x){c(rr=x+1, gg=12)}, times=30)
 # No input
 m1 <- mbc(function() {x <- runif(100);Sys.sleep(rexp(1, 30));mean(x)},
   function() {x <- runif(100);Sys.sleep(rexp(1, 5));median(x)})
