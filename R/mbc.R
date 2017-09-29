@@ -54,6 +54,9 @@ mbc <- function(..., times=5, input, inputi, post, target, targetin, metric="rms
   outs <- rep(list(rep(list(NA),times)), n)
   # if (!missing(post)) {postout <- array(data = NA, dim = c(n, times, post_length))} #rep(list(rep(list(NA),times)), n)}
 
+  # Create a progress bar to show progress
+  pb <- progress::progress_bar$new(total=times*n)
+  pb$tick(0)
   # Loop over each replicate
   for (j in 1:times) {
     # Get input for replicate if inputi given
@@ -144,7 +147,8 @@ mbc <- function(..., times=5, input, inputi, post, target, targetin, metric="rms
         }
         postout[i,j,] <- po
       }
-    }
+      pb$tick() # tick progress bar
+    } # end for i in 1:n
   }
   # browser()
 
