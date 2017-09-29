@@ -163,7 +163,16 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin, 
               po.t <- (po$mean - targetj) / po$se
               po <- summary(po.t) #c(mean=mean(po.t)) # rmse=sqrt(mean((po - targetj)^2)))
               names(po) <- paste0("", names(po), " t")
-          } else {stop("Only metric recognized are rmse and t")}
+          } else if (metric == "mis90") {#browser()
+            targetj <- if (is.function(target)) {target(j)}
+            else if (is.list(target)) {target[[j]]}
+            else if (is.character(target) && !is.character(po)) {input[[target]]}
+            else {target}
+            po.mis <- 3.28 * po$se + 20 * pmax(0, po$mean - targetj - 1.64 * po$se) + 20 * pmax(0, -po$mean + targetj - 1.64 * po$se)
+            # po.t <- (po$mean - targetj) / po$se
+            po <- mean(po.mis) # summary(po.t) #c(mean=mean(po.t)) # rmse=sqrt(mean((po - targetj)^2)))
+            names(po) <- paste0("", names(po), " t")
+          } else {stop("Only metric recognized are rmse and t and mis90")}
         }
         if (i==1 && j==1) { # Initialize once we know length
           postout <- array(data = NA, dim = c(n, times, length(po)))
