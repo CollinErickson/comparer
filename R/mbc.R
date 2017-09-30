@@ -169,7 +169,9 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin, 
               else if (is.list(target)) {target[[j]]}
               else if (is.character(target) && !is.character(po)) {input[[target]]}
               else {target}
-              po.t <- (po$mean - targetj) / po$se
+              po.mean <- if ("fit" %in% names(po)) po$fit else if ("mean" %in% names(po)) po$mean else {stop("Can't get fit/mean from post/out")}
+              po.se <- po$se
+              po.t <- (po.mean - targetj) / po.se
               po.tsum <- summary(po.t) #c(mean=mean(po.t)) # rmse=sqrt(mean((po - targetj)^2)))
               names(po.tsum) <- paste0("", names(po.tsum), " t")
               po.metric <- c(po.metric, po.tsum)
@@ -179,7 +181,9 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin, 
             else if (is.list(target)) {target[[j]]}
             else if (is.character(target) && !is.character(po)) {input[[target]]}
             else {target}
-            po.mis <- 3.28 * po$se + 20 * pmax(0, po$mean - targetj - 1.64 * po$se) + 20 * pmax(0, -po$mean + targetj - 1.64 * po$se)
+            po.mean <- if ("fit" %in% names(po)) po$fit else if ("mean" %in% names(po)) po$mean else {stop("Can't get fit/mean from post/out")}
+            po.se <- po$se
+            po.mis <- 3.28 * po.se + 20 * pmax(0, po.mean - targetj - 1.64 * po.se) + 20 * pmax(0, -po.mean + targetj - 1.64 * po.se)
             # po.t <- (po$mean - targetj) / po$se
             po.mismean <- c(mis90=mean(po.mis)) # summary(po.t) #c(mean=mean(po.t)) # rmse=sqrt(mean((po - targetj)^2)))
             # names(po) <- paste0("", names(po), " mis90")
