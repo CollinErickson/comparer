@@ -34,7 +34,7 @@
 #' # No input
 #' m1 <- mbc(function() {x <- runif(100);Sys.sleep(rexp(1, 30));mean(x)},
 #'   function() {x <- runif(100);Sys.sleep(rexp(1, 5));median(x)})
-mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin, io, metric="rmse", paired) {browser()
+mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin, metric="rmse", paired) {#browser()
   if (!missing(input) && !missing(inputi)) {
     stop("input and inputi should not both be given in")
   }
@@ -65,7 +65,7 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin, 
       if (missing(paired)) {paired <- TRUE} # Same inputs so pair them
       inputi_expr <- match.call(expand.dots = FALSE)$`inputi`
       if (substr(as.character(inputi_expr[1]),1,1) == "{") {
-        browser()
+        # browser()
         input <- new.env()
         eval(inputi_expr, input)
       } else if (is.function(inputi)) {
@@ -93,7 +93,7 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin, 
             # out <- dots[[i]](input) # Old version, required functions
             out <- eval(dots[[i]], envir=input)
           )
-          if (is.function(out)) {print("Trying second time")
+          if (is.function(out)) {#print("Trying second time")
             runtime <- system.time(
               # out <- out(input)
               out <- do.call(out, input)
