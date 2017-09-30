@@ -24,7 +24,7 @@ mbc(..., times = 5, input, inputi, evaluator, post, target, targetin,
 
 \item{targetin}{Values that will be given to the result of the run to produce output.}
 
-\item{metric}{Metric used to compare output values to target.}
+\item{metric}{c("rmse", "t", "mis90") Metric used to compare output values to target.}
 
 \item{paired}{Should the results be paired for comparison?}
 }

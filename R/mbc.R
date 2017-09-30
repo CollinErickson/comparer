@@ -8,7 +8,7 @@
 #' @param post Function to post-process results.
 #' @param target Values the functions are expected to (approximately) return.
 #' @param targetin Values that will be given to the result of the run to produce output.
-#' @param metric Metric used to compare output values to target.
+#' @param metric c("rmse", "t", "mis90") Metric used to compare output values to target.
 #' @param paired Should the results be paired for comparison?
 #' @importFrom stats median predict t.test
 #'
@@ -34,7 +34,7 @@
 #' # No input
 #' m1 <- mbc(function() {x <- runif(100);Sys.sleep(rexp(1, 30));mean(x)},
 #'   function() {x <- runif(100);Sys.sleep(rexp(1, 5));median(x)})
-mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin, metric="rmse", paired) {#browser()
+mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin, io, metric="rmse", paired) {browser()
   if (!missing(input) && !missing(inputi)) {
     stop("input and inputi should not both be given in")
   }
@@ -63,10 +63,17 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin, 
     # Get input for replicate if inputi given
     if (!missing(inputi)) {
       if (missing(paired)) {paired <- TRUE} # Same inputs so pair them
-      if (is.function(inputi)) {
+      inputi_expr <- match.call(expand.dots = FALSE)$`inputi`
+      if (substr(as.character(inputi_expr[1]),1,1) == "{") {
+        browser()
+        input <- new.env()
+        eval(inputi_expr, input)
+      } else if (is.function(inputi)) {
         input <- inputi(j)
-      } else {
+      } else if (is.list(inputi)) {
         input <- inputi[[j]]
+      } else {
+        stop("inputi not recognized")
       }
     } else {
       if (missing(paired)) {paired <- FALSE} # Inputs not paired so don't pair unless told to
@@ -149,30 +156,37 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin, 
         }
         # Run
         if (!missing(target)) {
-          if (metric == "rmse") {#browser()
+          po.metric <- c()
+          if ("rmse" %in% metric) {#browser()
             targetj <- if (is.function(target)) {target(j)}
                        else if (is.list(target)) {target[[j]]}
                        else if (is.character(target) && !is.character(po)) {input[[target]]}
                        else {target}
-            po <- c(rmse=sqrt(mean((po - targetj)^2)))
-          } else if (metric == "t") {#browser()
+            po.metric <- c(po.metric, rmse=sqrt(mean((po - targetj)^2)))
+          }
+          if ("t" %in% metric) {#browser()
               targetj <- if (is.function(target)) {target(j)}
               else if (is.list(target)) {target[[j]]}
               else if (is.character(target) && !is.character(po)) {input[[target]]}
               else {target}
               po.t <- (po$mean - targetj) / po$se
-              po <- summary(po.t) #c(mean=mean(po.t)) # rmse=sqrt(mean((po - targetj)^2)))
-              names(po) <- paste0("", names(po), " t")
-          } else if (metric == "mis90") {#browser()
+              po.tsum <- summary(po.t) #c(mean=mean(po.t)) # rmse=sqrt(mean((po - targetj)^2)))
+              names(po.tsum) <- paste0("", names(po.tsum), " t")
+              po.metric <- c(po.metric, po.tsum)
+          }
+          if ("mis90" %in% metric) {#browser()
             targetj <- if (is.function(target)) {target(j)}
             else if (is.list(target)) {target[[j]]}
             else if (is.character(target) && !is.character(po)) {input[[target]]}
             else {target}
             po.mis <- 3.28 * po$se + 20 * pmax(0, po$mean - targetj - 1.64 * po$se) + 20 * pmax(0, -po$mean + targetj - 1.64 * po$se)
             # po.t <- (po$mean - targetj) / po$se
-            po <- mean(po.mis) # summary(po.t) #c(mean=mean(po.t)) # rmse=sqrt(mean((po - targetj)^2)))
-            names(po) <- paste0("", names(po), " t")
-          } else {stop("Only metric recognized are rmse and t and mis90")}
+            po.mismean <- c(mis90=mean(po.mis)) # summary(po.t) #c(mean=mean(po.t)) # rmse=sqrt(mean((po - targetj)^2)))
+            # names(po) <- paste0("", names(po), " mis90")
+            po.metric <- c(po.metric, po.mismean)
+          }
+          #else {stop("Only metric recognized are rmse and t and mis90")}
+          po <- po.metric
         }
         if (i==1 && j==1) { # Initialize once we know length
           postout <- array(data = NA, dim = c(n, times, length(po)))
