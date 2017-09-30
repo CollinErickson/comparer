@@ -4,3 +4,4 @@ scratch
 ^\.travis\.yml$
 ^README\.Rmd$
 ^README-.*\.png$
+^codecov\.yml$

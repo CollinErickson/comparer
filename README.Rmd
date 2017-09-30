@@ -20,6 +20,8 @@ set.seed(0)
 # comparer
 
 [![Travis-CI Build Status](https://travis-ci.org/CollinErickson/comparer.svg?branch=master)](https://travis-ci.org/CollinErickson/comparer)
+[![Coverage Status](https://img.shields.io/codecov/c/github/CollinErickson/comparer/master.svg)](https://codecov.io/github/CollinErickson/comparer?branch=master)
+[![Coverage Status](https://img.shields.io/coveralls/CollinErickson/comparer.svg)](https://coveralls.io/r/CollinErickson/comparer?branch=master)
 
 The goal of comparer is to make it easy to compare the results of different code
 chunks that are trying to do the same thing.
