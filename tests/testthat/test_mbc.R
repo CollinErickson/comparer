@@ -4,7 +4,7 @@ test_that("mbc basic runs", {
   expect_error(m1 <- mbc(mean, median, input=rnorm(100)), regexp = NA)
   expect_is(m1, "mbc")
   expect_is(m1, "list")
-  expect_equal(length(m1), 4)
+  # expect_equal(length(m1), 5)
 
   # Get error when x not specified
   expect_error(m1 <- mbc(mean, median, inputi={rnorm(100)}))
@@ -17,7 +17,7 @@ test_that("mbc basic runs", {
   expect_equal(dimnames(m1$Output)[[1]], c("mean", "med"))
   # Give in only one name
   expect_error(m1 <- mbc(mean(x), med=median(x), inputi={x=rnorm(100)}), regexp = NA)
-  expect_equal(dimnames(m1$Output)[[1]], c("f1", "med"))
+  expect_equal(dimnames(m1$Output)[[1]], c("mean(x)", "med"))
 
   # Give in evaluator
   expect_error(m1 <- mbc(1, 2, evaluator={.}), regexp = NA)
@@ -63,6 +63,11 @@ test_that("test mbc metrics", {
   expect_true("Mean t" %in% m1$Output_disp$Stat)
   m1 <- mbc(lm(y1 ~ x1), lm(y1 ~ x1 + x2), target=ydf, metric="mis90", post=function(mod){predict(mod, xdf,se=T)})
   expect_true("mis90" %in% m1$Output_disp$Stat)
+})
+
+test_that("mbc plot", {
+  m1 <- mbc(mn={Sys.sleep(rexp(1,10));mean(x)},med= {Sys.sleep(rexp(1,20));median(x)}, inputi={x=rnorm(100)}, target=0)
+  expect_error(plot(m1), NA)
 })
 
 # test_that("GauPro", {

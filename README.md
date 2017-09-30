@@ -3,7 +3,7 @@
 comparer
 ========
 
-[![Travis-CI Build Status](https://travis-ci.org/CollinErickson/comparer.svg?branch=master)](https://travis-ci.org/CollinErickson/comparer) [![Coverage Status](https://img.shields.io/codecov/c/github/CollinErickson/comparer/master.svg)](https://codecov.io/github/CollinErickson/comparer?branch=master) [![Coverage Status](https://img.shields.io/coveralls/CollinErickson/comparer.svg)](https://coveralls.io/r/CollinErickson/comparer?branch=master)
+[![Travis-CI Build Status](https://travis-ci.org/CollinErickson/comparer.svg?branch=master)](https://travis-ci.org/CollinErickson/comparer) <!-- [![Coverage Status](https://img.shields.io/codecov/c/github/CollinErickson/comparer/master.svg)](https://codecov.io/github/CollinErickson/comparer?branch=master) --> [![Coverage Status](https://codecov.io/gh/CollinErickson/comparer/branch/master/graph/badge.svg)](https://codecov.io/github/CollinErickson/comparer?branch=master) <!-- [![Coverage Status](https://img.shields.io/coveralls/CollinErickson/comparer.svg)](https://coveralls.io/r/CollinErickson/comparer?branch=master) --> [![Coverage Status](https://coveralls.io/repos/github/CollinErickson/comparer/badge.svg?branch=master)](https://coveralls.io/github/CollinErickson/comparer?branch=master)
 
 The goal of comparer is to make it easy to compare the results of different code chunks that are trying to do the same thing. The R package `microbenchmark` is great for comparing the speed of code, but there's no way to compare their ouput to see which is more accurate.
 
@@ -29,13 +29,16 @@ Suppose you want to see how the mean and median of a sample of 100 randomly gene
 library(comparer)
 mbc(mean, median, input=rexp(100))
 #> Run times (sec)
-#>   Function Sort1 Sort2 Sort3 Sort4 Sort5 mean
-#> 1       f1     0     0     0     0     0    0
-#> 2       f2     0     0     0     0     0    0
+#>   Function Sort1 Sort2 Sort3 Sort4 Sort5 mean sd
+#> 1     mean     0     0     0     0     0    0  0
+#> 2   median     0     0     0     0     0    0  0
 #> Output summary
-#>   Func Stat     Sort1     Sort2     Sort3     Sort4     Sort5      mean
-#> 1   f1    1 1.0321470 1.0321470 1.0321470 1.0321470 1.0321470 1.0321470
-#> 2   f2    1 0.8087696 0.8087696 0.8087696 0.8087696 0.8087696 0.8087696
+#>     Func Stat     Sort1     Sort2     Sort3     Sort4     Sort5      mean
+#> 1   mean    1 1.0321470 1.0321470 1.0321470 1.0321470 1.0321470 1.0321470
+#> 2 median    1 0.8087696 0.8087696 0.8087696 0.8087696 0.8087696 0.8087696
+#>   sd
+#> 1  0
+#> 2  0
 ```
 
 To get the data to be generated for each trial, use the `inputi` argument to set a variable that the functions call. The arguments `mean(x)` and `median(x)` are captured as expressions, as is `{x=rexp(100)}` for `inputi`. Note that you must put brackets around the value of `inputi` if it is an expression or it will give an error. You can see that the values are now different for each trial.
@@ -44,11 +47,14 @@ To get the data to be generated for each trial, use the `inputi` argument to set
 ## Regenerate the data each time.
 mbc(mean(x), median(x), inputi={x=rexp(100)})
 #> Run times (sec)
-#>   Function Sort1 Sort2 Sort3 Sort4 Sort5 mean
-#> 1       f1     0     0     0     0     0    0
-#> 2       f2     0     0     0     0     0    0
+#>    Function Sort1 Sort2 Sort3 Sort4 Sort5 mean sd
+#> 1   mean(x)     0     0     0     0     0    0  0
+#> 2 median(x)     0     0     0     0     0    0  0
 #> Output summary
-#>   Func Stat     Sort1     Sort2     Sort3     Sort4     Sort5      mean
-#> 1   f1    1 0.8813966 0.9069863 0.9513831 0.9890381 1.2063718 0.9870352
-#> 2   f2    1 0.6404516 0.6488801 0.6836623 0.7563764 0.7901115 0.7038964
+#>        Func Stat     Sort1     Sort2     Sort3     Sort4     Sort5
+#> 1   mean(x)    1 0.8813966 0.9069863 0.9513831 0.9890381 1.2063718
+#> 2 median(x)    1 0.6404516 0.6488801 0.6836623 0.7563764 0.7901115
+#>        mean         sd
+#> 1 0.9870352 0.12937442
+#> 2 0.7038964 0.06642411
 ```

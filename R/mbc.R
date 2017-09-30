@@ -10,7 +10,7 @@
 #' @param targetin Values that will be given to the result of the run to produce output.
 #' @param metric c("rmse", "t", "mis90") Metric used to compare output values to target.
 #' @param paired Should the results be paired for comparison?
-#' @importFrom stats median predict t.test
+#' @importFrom stats median predict t.test sd
 #'
 #' @return Data frame of comparison results
 #' @export
@@ -46,7 +46,8 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin, 
   fnames <- names(dots)
   if (is.null(fnames)) {fnames <- rep("", n)}
   fnoname <- which(fnames == "")
-  if (length(fnoname) > 0) {fnames[fnoname] <- paste0("f", fnoname)}
+  # if (length(fnoname) > 0) {fnames[fnoname] <- paste0("f", fnoname)}
+  if (length(fnoname) > 0) {fnames[fnoname] <- unlist(lapply(dots, function(ss) {paste0(trimws(deparse(ss)), collapse=' ')}))[fnoname]}
   if (length(fnames) == 1) {fnames <- list(fnames)}
 
   # Create objects to hold output data
@@ -209,18 +210,19 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin, 
   class(out_list) <- c("mbc", class(out_list))
 
   # Process run times
+  out_list$Raw_Run_times <- runtimes
   out_list$Run_times <-
     if (times > 5) {
       # plyr::adply(runtimes, 1, function(x) data.frame(min=min(x), med=median(x), mean=mean(x), max=max(x)), .id = 'Function')
       plyr::adply(runtimes, 1, summary, .id = 'Function')
     } else {
-      plyr::adply(runtimes, 1, function(x) {sx <- sort(x); c(Sort=(sx), mean=mean(x))}, .id = 'Function')
+      plyr::adply(runtimes, 1, function(x) {sx <- unname(sort(x)); c(Sort=(sx), mean=mean(x), sd=sd(x))}, .id = 'Function')
     }
 
   # Run post to post process
   if (!missing(post) || !missing(target)) {
     if (times > 5) {
-      post_df_disp <- plyr::adply(postout, c(1,3), function(x) data.frame(min=min(x), med=median(x), mean=mean(x), max=max(x)), .id = c('Func','Stat'))
+      post_df_disp <- plyr::adply(postout, c(1,3), function(x) data.frame(min=min(x), med=median(x), mean=mean(x), max=max(x), sd=sd(x)), .id = c('Func','Stat'))
       if (paired) {
         if (n > 1) {
           for (i1 in 1:(n-1)) {
@@ -230,7 +232,7 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin, 
                 diffs <- postout[i1,,istat] - postout[i2,,istat]
                 ttest_diffs <- t.test(diffs)
                 statname <- dimnames(postout)[[3]][istat]
-                comp12 <- data.frame(Func=labeli, Stat=statname, min=min(diffs), med=median(diffs), mean=mean(diffs), max=max(diffs), t=ttest_diffs$statistic, p=ttest_diffs$p.value)
+                comp12 <- data.frame(Func=labeli, Stat=statname, min=min(diffs), med=median(diffs), mean=mean(diffs), max=max(diffs), sd=sd(diffs), t=ttest_diffs$statistic, p=ttest_diffs$p.value)
                 # names(comp12)[3:(3+length(diffs)-1)] <- paste0("V", 1:(length(diffs)))
                 # print(comp12)
                 # post_df_disp <- rbind(post_df_disp, comp12)
@@ -247,18 +249,22 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin, 
       } else {
 
       }
-    } else {#browser()
+    } else { # times <= 5
       if (paired) { # Don't sort if paired, get differences
         post_df_disp <- plyr::adply(postout, c(1,3), function(x) {c(x, mean=mean(x))}, .id = c('Func','Stat'))
-        if (n > 1) {
+        if (n > 1 && times > 1) {
           for (i1 in 1:(n-1)) {
             for (i2 in (i1+1):n) {
               for (istat in 1:(dim(postout)[3])) {
                 labeli <- paste0(dimnames(postout)[[1]][i1],'-',dimnames(postout)[[1]][i2])
                 diffs <- postout[i1,,istat] - postout[i2,,istat]
-                ttest_diffs <- t.test(diffs)
+                if (sd(diffs) > 0) {
+                  ttest_diffs <- t.test(diffs)
+                } else {
+                  ttest_diffs <- data.frame(statistic=NA, p.value=NA)
+                }
                 statname <- dimnames(postout)[[3]][istat]
-                comp12 <- data.frame(Func=labeli, Stat=statname, t(diffs), mean=mean(diffs), t=ttest_diffs$statistic, p=ttest_diffs$p.value)
+                comp12 <- data.frame(Func=labeli, Stat=statname, t(diffs), mean=mean(diffs), sd=sd(diffs), t=ttest_diffs$statistic, p=ttest_diffs$p.value)
                 names(comp12)[3:(3+length(diffs)-1)] <- paste0("V", 1:(length(diffs)))
                 # print(comp12)
                 # post_df_disp <- rbind(post_df_disp, comp12)
@@ -274,7 +280,7 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin, 
         }
 
       } else { # If not paired/ordered, then sort them
-        post_df_disp <- plyr::adply(postout, c(1,3), function(x) {sx <- sort(x); c(Sort=(sx), mean=mean(x))}, .id = c('Func','Stat'))
+        post_df_disp <- plyr::adply(postout, c(1,3), function(x) {sx <- sort(x); c(Sort=(sx), mean=mean(x), sd=sd(x))}, .id = c('Func','Stat'))
       }
     }
     out_list$RawOutput <- outs
@@ -299,9 +305,9 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin, 
       # Post-process
       if (is.numeric(postout)) {
         if (times > 5) {
-          post_df_disp <- plyr::adply(postout, c(1,3), function(x) data.frame(min=min(x), med=median(x), mean=mean(x), max=max(x)), .id = c('Func','Stat'))
+          post_df_disp <- plyr::adply(postout, c(1,3), function(x) data.frame(min=min(x), med=median(x), mean=mean(x), max=max(x), sd=sd(x)), .id = c('Func','Stat'))
         } else {
-          post_df_disp <- plyr::adply(postout, c(1,3), function(x) {sx <- sort(x); c(Sort=(sx), mean=mean(x))}, .id = c('Func','Stat'))
+          post_df_disp <- plyr::adply(postout, c(1,3), function(x) {sx <- sort(x); c(Sort=(sx), mean=mean(x), sd=sd(x))}, .id = c('Func','Stat'))
         }
       } else if (is.logical(postout)) {
         # post_df_disp <- plyr::adply(postout, c(1,3), table, .id = c('Func','Stat'))
@@ -340,7 +346,11 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin, 
 #'   function(x) {Sys.sleep(rexp(1, 5));median(x)}, input=runif(100))
 #' plot(m1)
 plot.mbc <- function(x, ...) {
-  stripchart(x$Run_times)
+  # stripchart(x$Run_times)
+  stripchart(as.data.frame(t(x$Raw_Run_times)), main="Run times", xlab="Seconds")
+  for (i in 1:dim(x$Output)[3]) {
+    stripchart(as.data.frame(t(x$Output[,,i])), main=dimnames(x$Output)[[3]][i])
+  }
 }
 
 #' Print mbc class
