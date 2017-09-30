@@ -25,12 +25,12 @@
 #'   function(x) {Sys.sleep(rexp(1, 5));median(x)}, input=runif(100),
 #'   post=function(x){c(x+1, 12)})
 #' # input given with post, 30 times
-#' mbc(function(x) {Sys.sleep(rexp(1, 3));mean(x)+runif(1)},
-#'   function(x) {Sys.sleep(rexp(1, 5));median(x)+runif(1)}, input=runif(100),
-#'   post=function(x){c(x+1, 12)}, times=30)
+#' mbc(function(x) {Sys.sleep(rexp(1, 30));mean(x)+runif(1)},
+#'   function(x) {Sys.sleep(rexp(1, 50));median(x)+runif(1)}, input=runif(100),
+#'   post=function(x){c(x+1, 12)}, times=10)
 #' # Name one function and post
 #' mbc(function(x) {mean(x)+runif(1)},  a1=function(x) {median(x)+runif(1)},
-#'   input=runif(100),  post=function(x){c(rr=x+1, gg=12)}, times=30)
+#'   input=runif(100),  post=function(x){c(rr=x+1, gg=12)}, times=10)
 #' # No input
 #' m1 <- mbc(function() {x <- runif(100);Sys.sleep(rexp(1, 30));mean(x)},
 #'   function() {x <- runif(100);Sys.sleep(rexp(1, 5));median(x)})
@@ -67,7 +67,7 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin, 
       inputi_expr <- match.call(expand.dots = FALSE)$`inputi`
       if (substr(as.character(inputi_expr[1]),1,1) == "{") {
         # browser()
-        input <- new.env()
+        input <- new.env(parent = parent.frame())
         eval(inputi_expr, input)
       } else if (is.function(inputi)) {
         input <- inputi(j)
@@ -108,7 +108,7 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin, 
             # out <- dots[[i]](input) # Old version, required functions
             out <- eval(expr_evaluator, envir=input)
           )
-          if (is.function(out)) {print("Trying second time")
+          if (is.function(out)) {#print("Trying second time")
             runtime <- system.time(
               # out <- out(input)
               out <- do.call(out, input)
@@ -123,15 +123,33 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin, 
         # runtime <- system.time(
         #   out <- dots[[i]]()
         # )
-        runtime <- system.time(
-          # out <- dots[[i]](input) # Old version, required functions
-          out <- eval(dots[[i]], envir=parent.frame())
-        )
-        if (is.function(out)) {print("Trying second time 2")
+        if (missing(evaluator)) {
           runtime <- system.time(
-            # out <- out(input)
-            out <- out() #do.call(out, input)
+            # out <- dots[[i]](input) # Old version, required functions
+            out <- eval(dots[[i]], envir=parent.frame())
           )
+          if (is.function(out)) {print("Trying second time 2")
+            runtime <- system.time(
+              # out <- out(input)
+              out <- out() #do.call(out, input)
+            )
+          }
+        } else { # Use evaluator, dots are input to evaluator to be evaluated
+          # browser()
+          # This time there is no input, so create it
+          input <- new.env()
+          expr_evaluator <- match.call(expand.dots = FALSE)$`evaluator`
+          input$. <- eval(dots[[i]]) #, envir=input)
+          runtime <- system.time(
+            # out <- dots[[i]](input) # Old version, required functions
+            out <- eval(expr_evaluator, envir=input)
+          )
+          if (is.function(out)) {#print("Trying second time")
+            runtime <- system.time(
+              # out <- out(input)
+              out <- do.call(out, input)
+            )
+          }
         }
       }
       runtimes[i, j] <- runtime['elapsed']

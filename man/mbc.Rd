@@ -44,12 +44,12 @@ mbc(function(x) {Sys.sleep(rexp(1, 30));mean(x)},
   function(x) {Sys.sleep(rexp(1, 5));median(x)}, input=runif(100),
   post=function(x){c(x+1, 12)})
 # input given with post, 30 times
-mbc(function(x) {Sys.sleep(rexp(1, 3));mean(x)+runif(1)},
-  function(x) {Sys.sleep(rexp(1, 5));median(x)+runif(1)}, input=runif(100),
-  post=function(x){c(x+1, 12)}, times=30)
+mbc(function(x) {Sys.sleep(rexp(1, 30));mean(x)+runif(1)},
+  function(x) {Sys.sleep(rexp(1, 50));median(x)+runif(1)}, input=runif(100),
+  post=function(x){c(x+1, 12)}, times=10)
 # Name one function and post
 mbc(function(x) {mean(x)+runif(1)},  a1=function(x) {median(x)+runif(1)},
-  input=runif(100),  post=function(x){c(rr=x+1, gg=12)}, times=30)
+  input=runif(100),  post=function(x){c(rr=x+1, gg=12)}, times=10)
 # No input
 m1 <- mbc(function() {x <- runif(100);Sys.sleep(rexp(1, 30));mean(x)},
   function() {x <- runif(100);Sys.sleep(rexp(1, 5));median(x)})
