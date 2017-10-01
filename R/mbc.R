@@ -33,7 +33,7 @@
 #'   input=runif(100),  post=function(x){c(rr=x+1, gg=12)}, times=10)
 #' # No input
 #' m1 <- mbc(function() {x <- runif(100);Sys.sleep(rexp(1, 30));mean(x)},
-#'   function() {x <- runif(100);Sys.sleep(rexp(1, 5));median(x)})
+#'   function() {x <- runif(100);Sys.sleep(rexp(1, 50));median(x)})
 mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin, metric="rmse", paired) {#browser()
   if (!missing(input) && !missing(inputi)) {
     stop("input and inputi should not both be given in")
@@ -128,7 +128,7 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin, 
             # out <- dots[[i]](input) # Old version, required functions
             out <- eval(dots[[i]], envir=parent.frame())
           )
-          if (is.function(out)) {print("Trying second time 2")
+          if (is.function(out)) {#print("Trying second time 2")
             runtime <- system.time(
               # out <- out(input)
               out <- out() #do.call(out, input)
@@ -181,7 +181,8 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin, 
                        else if (is.list(target)) {target[[j]]}
                        else if (is.character(target) && !is.character(po)) {input[[target]]}
                        else {target}
-            po.metric <- c(po.metric, rmse=sqrt(mean((po - targetj)^2)))
+            po.mean <- if ("fit" %in% names(po)) po$fit else if ("mean" %in% names(po)) po$mean else {po}
+            po.metric <- c(po.metric, rmse=sqrt(mean((po.mean - targetj)^2)))
           }
           if ("t" %in% metric) {#browser()
               targetj <- if (is.function(target)) {target(j)}

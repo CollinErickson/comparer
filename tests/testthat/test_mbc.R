@@ -64,6 +64,14 @@ test_that("test mbc metrics", {
   expect_error(print(m1), NA)
   m1 <- mbc(lm(y1 ~ x1), lm(y1 ~ x1 + x2), target=ydf, metric="mis90", post=function(mod){predict(mod, xdf,se=T)})
   expect_true("mis90" %in% m1$Output_disp$Stat)
+
+  # t and mis90
+  m1 <- mbc(lm(y1 ~ x1), lm(y1 ~ x1 + x2), target=ydf, metric=c("t","mis90"), post=function(mod){predict(mod, xdf,se=T)})
+  expect_true(("mis90" %in% m1$Output_disp$Stat) && "Mean t" %in% m1$Output_disp$Stat)
+
+  m1 <- mbc(lm(y1 ~ x1), lm(y1 ~ x1 + x2), target=ydf, metric=c("rmse","mis90"), post=function(mod){predict(mod, xdf,se=T)})
+  expect_true(("mis90" %in% m1$Output_disp$Stat) && "rmse" %in% m1$Output_disp$Stat)
+
 })
 
 test_that("mbc plot", {

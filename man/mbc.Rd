@@ -52,5 +52,5 @@ mbc(function(x) {mean(x)+runif(1)},  a1=function(x) {median(x)+runif(1)},
   input=runif(100),  post=function(x){c(rr=x+1, gg=12)}, times=10)
 # No input
 m1 <- mbc(function() {x <- runif(100);Sys.sleep(rexp(1, 30));mean(x)},
-  function() {x <- runif(100);Sys.sleep(rexp(1, 5));median(x)})
+  function() {x <- runif(100);Sys.sleep(rexp(1, 50));median(x)})
 }
