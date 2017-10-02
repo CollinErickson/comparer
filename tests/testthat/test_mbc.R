@@ -1,3 +1,5 @@
+# library(testthat)
+
 context("mbc tests")
 
 test_that("mbc basic runs", {
@@ -6,8 +8,8 @@ test_that("mbc basic runs", {
   expect_is(m1, "list")
   # expect_equal(length(m1), 5)
 
-  # Get error when x not specified
-  expect_error(m1 <- mbc(mean, median, inputi={rnorm(100)}))
+  # Get error when x not specified # No longer an error, actually works
+  # expect_error(m1 <- mbc(mean, median, inputi={rnorm(100)}))
   # Test inputi
   expect_error(m1 <- mbc(mean(x), median(x), inputi={x=rnorm(100)}), regexp = NA)
   # Error if both input and inputi given it

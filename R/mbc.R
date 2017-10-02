@@ -59,24 +59,37 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin, 
   # Create a progress bar to show progress
   pb <- progress::progress_bar$new(total=times*n)
   pb$tick(0)
+
   # Loop over each replicate
   for (j in 1:times) {
+
     # Get input for replicate if inputi given
     if (!missing(inputi)) {
       if (missing(paired)) {paired <- TRUE} # Same inputs so pair them
+
+      # Try to parse inputi, first check for expression.
+      # If first char is "{", then it is
       inputi_expr <- match.call(expand.dots = FALSE)$`inputi`
       if (substr(as.character(inputi_expr[1]),1,1) == "{") {
         # browser()
         input <- new.env(parent = parent.frame())
-        eval(inputi_expr, input)
-      } else if (is.function(inputi)) {
+        inputi_expr_out <- eval(inputi_expr, input)
+        if (length(ls(input)) == 0) { # Store the output in input
+          input$inputi_expr_out <- inputi_expr_out
+        }
+      } else if (is.function(inputi)) { # Next see if it is a function
         input <- inputi(j)
-      } else if (is.list(inputi)) {
+      } else if (is.list(inputi)) { # Or a list
         input <- inputi[[j]]
-      } else {
-        stop("inputi not recognized")
+      } else { # Otherwise it is an expression, so do same as above.
+        # stop("inputi not recognized")
+        input <- new.env(parent = parent.frame())
+        inputi_expr_out <- eval(inputi_expr, input)
+        if (length(ls(input)) == 0) { # Store the output in input
+          input$inputi_expr_out <- inputi_expr_out
+        }
       }
-    } else {
+    } else { # inputi not given, so not paired
       if (missing(paired)) {paired <- FALSE} # Inputs not paired so don't pair unless told to
     }
 
@@ -86,21 +99,31 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin, 
     }
 
     # Loop over each function
-    for (i in 1:n) {#browser()
+    for (i in 1:n) { # browser()
+
       # See if there is input to each
       if (!missing(input)) { # Single input for all
-        if (missing(evaluator)) { # Run as normal
+        if (missing(evaluator)) { # Run as normal if no evaluator given
           runtime <- system.time(
             # out <- dots[[i]](input) # Old version, required functions
             out <- eval(dots[[i]], envir=input)
           )
           if (is.function(out)) {#print("Trying second time")
-            runtime <- system.time(
-              # out <- out(input)
-              out <- do.call(out, input)
-            )
+            if (is.environment(input)) { # Try to run as function
+              input <- as.list(input)
+            }
+            if ("inputi_expr_out" %in% names(input) && length(list) == 1) {
+              runtime <- system.time(
+                out <- out(input$inputi_expr_out)
+              )
+            } else {
+              runtime <- system.time(
+                # out <- out(input)
+                out <- do.call(out, input)
+              )
+            }
           }
-        } else { # dots are input to evaluator to be evaluated
+        } else { # evaluator is given, call it on each dots as argument .
           # browser()
           expr_evaluator <- match.call(expand.dots = FALSE)$`evaluator`
           input$. <- eval(dots[[i]], envir=input)
@@ -152,8 +175,12 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin, 
           }
         }
       }
+
+      # Save runtime and out
       runtimes[i, j] <- runtime['elapsed']
       outs[[i]][[j]] <- out
+
+      # Run post-processing if post or target given
       if (!missing(post) || !missing(target)) {
         # Run post if given
         if (!missing(post)) {
