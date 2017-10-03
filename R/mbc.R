@@ -293,13 +293,14 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin, 
                     ttest_diffs <- t.test(postout[i1,,istat], postout[i2,,istat], paired=FALSE)
                     # labeli <- ttest_diffs$data.name
                   } else {
-                    ttest_diffs <- data.frame(statistic=NA, p.value=NA, conf.int=c(NA,NA))
+                    ttest_diffs <- list(statistic=NA, p.value=NA, conf.int=c(NA,NA))
                   }
                   labeli <- paste0(dimnames(postout)[[1]][i1],' vs ',dimnames(postout)[[1]][i2])
                   statname <- dimnames(postout)[[3]][istat]
+                  if (is.null(statname)) {statname <- istat}
                   comp12 <- data.frame(Func=labeli, Stat=statname, conf.low=ttest_diffs$conf.int[1], conf.up=ttest_diffs$conf.int[2], t=ttest_diffs$statistic, p=ttest_diffs$p.value)
                 }
-                if (i1 == 1 && i2 == 2) {
+                if (i1 == 1 && i2 == 2 && istat == 1) {
                   comp_df <- comp12
                 } else {
                   comp_df <- rbind(comp_df, comp12)
@@ -314,7 +315,7 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin, 
       }
     } else { # times <= 5
       if (paired || !paired) { # Don't sort if paired, get differences
-        post_df_disp <- plyr::adply(postout, c(1,3), function(x) {c(x, mean=mean(x))}, .id = c('Func','Stat'))
+        post_df_disp <- plyr::adply(postout, c(1,3), function(x) {c(x, mean=mean(x), sd=sd(x))}, .id = c('Func','Stat'))
         if (n > 1 && times > 1) {
           for (i1 in 1:(n-1)) {
             for (i2 in (i1+1):n) {
@@ -337,13 +338,14 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin, 
                     ttest_diffs <- t.test(postout[i1,,istat], postout[i2,,istat], paired=FALSE)
                     # labeli <- ttest_diffs$data.name
                   } else {
-                    ttest_diffs <- data.frame(statistic=NA, p.value=NA, conf.int=c(NA,NA))
+                    ttest_diffs <- list(statistic=NA, p.value=NA, conf.int=c(NA,NA))
                   }
                   labeli <- paste0(dimnames(postout)[[1]][i1],' vs ',dimnames(postout)[[1]][i2])
                   statname <- dimnames(postout)[[3]][istat]
+                  if (is.null(statname)) {statname <- istat}
                   comp12 <- data.frame(Func=labeli, Stat=statname, conf.low=ttest_diffs$conf.int[1], conf.up=ttest_diffs$conf.int[2], t=ttest_diffs$statistic, p=ttest_diffs$p.value)
                 }
-                if (i1 == 1 && i2 == 2) {
+                if (i1 == 1 && i2 == 2 && istat == 1) {
                   comp_df <- comp12
                 } else {
                   comp_df <- rbind(comp_df, comp12)
