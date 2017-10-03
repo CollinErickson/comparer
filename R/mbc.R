@@ -269,19 +269,36 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin, 
   if (!missing(post) || !missing(target)) {
     if (times > 5) {
       post_df_disp <- plyr::adply(postout, c(1,3), function(x) data.frame(min=min(x), med=median(x), mean=mean(x), max=max(x), sd=sd(x)), .id = c('Func','Stat'))
-      if (paired) {
+      if (paired || !paired) { # Used to only compared, now do both, there's an if(paired) below
         if (n > 1) {
           for (i1 in 1:(n-1)) {
             for (i2 in (i1+1):n) {
-              for (istat in 1:(dim(postout)[3])) {
-                labeli <- paste0(dimnames(postout)[[1]][i1],'-',dimnames(postout)[[1]][i2])
-                diffs <- postout[i1,,istat] - postout[i2,,istat]
-                ttest_diffs <- t.test(diffs)
-                statname <- dimnames(postout)[[3]][istat]
-                comp12 <- data.frame(Func=labeli, Stat=statname, min=min(diffs), med=median(diffs), mean=mean(diffs), max=max(diffs), sd=sd(diffs), t=ttest_diffs$statistic, p=ttest_diffs$p.value)
-                # names(comp12)[3:(3+length(diffs)-1)] <- paste0("V", 1:(length(diffs)))
-                # print(comp12)
-                # post_df_disp <- rbind(post_df_disp, comp12)
+              for (istat in 1:(dim(postout)[3])) { #browser()
+                if (paired) {
+                  labeli <- paste0(dimnames(postout)[[1]][i1],'-',dimnames(postout)[[1]][i2])
+                  diffs <- postout[i1,,istat] - postout[i2,,istat]
+                  if (sd(diffs) > 0) {
+                    ttest_diffs <- t.test(diffs)
+                  } else {
+                    ttest_diffs <- data.frame(statistic=NA, p.value=NA)
+                  }
+                  ttest_diffs <- t.test(diffs)
+                  statname <- dimnames(postout)[[3]][istat]
+                  comp12 <- data.frame(Func=labeli, Stat=statname, min=min(diffs), med=median(diffs), mean=mean(diffs), max=max(diffs), sd=sd(diffs), t=ttest_diffs$statistic, p=ttest_diffs$p.value)
+                  # names(comp12)[3:(3+length(diffs)-1)] <- paste0("V", 1:(length(diffs)))
+                  # print(comp12)
+                  # post_df_disp <- rbind(post_df_disp, comp12)
+                } else { # Not paired, do unpaired t-test
+                  if (sd(postout[i1,,istat]) > 0 || sd(postout[i2,,istat]) > 0) {
+                    ttest_diffs <- t.test(postout[i1,,istat], postout[i2,,istat], paired=FALSE)
+                    # labeli <- ttest_diffs$data.name
+                  } else {
+                    ttest_diffs <- data.frame(statistic=NA, p.value=NA, conf.int=c(NA,NA))
+                  }
+                  labeli <- paste0(dimnames(postout)[[1]][i1],' vs ',dimnames(postout)[[1]][i2])
+                  statname <- dimnames(postout)[[3]][istat]
+                  comp12 <- data.frame(Func=labeli, Stat=statname, conf.low=ttest_diffs$conf.int[1], conf.up=ttest_diffs$conf.int[2], t=ttest_diffs$statistic, p=ttest_diffs$p.value)
+                }
                 if (i1 == 1 && i2 == 2) {
                   comp_df <- comp12
                 } else {
@@ -296,24 +313,36 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin, 
 
       }
     } else { # times <= 5
-      if (paired) { # Don't sort if paired, get differences
+      if (paired || !paired) { # Don't sort if paired, get differences
         post_df_disp <- plyr::adply(postout, c(1,3), function(x) {c(x, mean=mean(x))}, .id = c('Func','Stat'))
         if (n > 1 && times > 1) {
           for (i1 in 1:(n-1)) {
             for (i2 in (i1+1):n) {
               for (istat in 1:(dim(postout)[3])) {
-                labeli <- paste0(dimnames(postout)[[1]][i1],'-',dimnames(postout)[[1]][i2])
-                diffs <- postout[i1,,istat] - postout[i2,,istat]
-                if (sd(diffs) > 0) {
-                  ttest_diffs <- t.test(diffs)
-                } else {
-                  ttest_diffs <- data.frame(statistic=NA, p.value=NA)
+                if (paired) {
+                  labeli <- paste0(dimnames(postout)[[1]][i1],'-',dimnames(postout)[[1]][i2])
+                  diffs <- postout[i1,,istat] - postout[i2,,istat]
+                  if (sd(diffs) > 0) {
+                    ttest_diffs <- t.test(diffs)
+                  } else {
+                    ttest_diffs <- data.frame(statistic=NA, p.value=NA)
+                  }
+                  statname <- dimnames(postout)[[3]][istat]
+                  comp12 <- data.frame(Func=labeli, Stat=statname, t(diffs), mean=mean(diffs), sd=sd(diffs), t=ttest_diffs$statistic, p=ttest_diffs$p.value)
+                  names(comp12)[3:(3+length(diffs)-1)] <- paste0("V", 1:(length(diffs)))
+                  # print(comp12)
+                  # post_df_disp <- rbind(post_df_disp, comp12)
+                } else { # not paired, do unpaired t-test
+                  if (sd(postout[i1,,istat]) > 0 || sd(postout[i2,,istat]) > 0) {
+                    ttest_diffs <- t.test(postout[i1,,istat], postout[i2,,istat], paired=FALSE)
+                    # labeli <- ttest_diffs$data.name
+                  } else {
+                    ttest_diffs <- data.frame(statistic=NA, p.value=NA, conf.int=c(NA,NA))
+                  }
+                  labeli <- paste0(dimnames(postout)[[1]][i1],' vs ',dimnames(postout)[[1]][i2])
+                  statname <- dimnames(postout)[[3]][istat]
+                  comp12 <- data.frame(Func=labeli, Stat=statname, conf.low=ttest_diffs$conf.int[1], conf.up=ttest_diffs$conf.int[2], t=ttest_diffs$statistic, p=ttest_diffs$p.value)
                 }
-                statname <- dimnames(postout)[[3]][istat]
-                comp12 <- data.frame(Func=labeli, Stat=statname, t(diffs), mean=mean(diffs), sd=sd(diffs), t=ttest_diffs$statistic, p=ttest_diffs$p.value)
-                names(comp12)[3:(3+length(diffs)-1)] <- paste0("V", 1:(length(diffs)))
-                # print(comp12)
-                # post_df_disp <- rbind(post_df_disp, comp12)
                 if (i1 == 1 && i2 == 2) {
                   comp_df <- comp12
                 } else {
@@ -332,7 +361,7 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin, 
     out_list$RawOutput <- outs
     out_list$Output <- postout
     out_list$Output_disp <- post_df_disp
-  } else {#browser()
+  } else { # No post or target
     # Check if all outs have same length, then convert to df if small enough just as postprocessing would
     #  in case single return value already is post
     lengths <- sapply(outs, function(listi) {sapply(listi, length)})
@@ -418,7 +447,7 @@ print.mbc <- function(x, ...) {#browser()
     print(x$Run_times)
   }
   if ('Output_disp' %in% nam) {
-    cat("Output summary\n")
+    cat("\nOutput summary\n")
     if (length(unique(x$Output_disp$Stat)) > 1) { # If more than 1 stat, print separately by function
       tp <- plyr::dlply(x$Output_disp, 'Func', identity)
       suppress <- lapply(tp, print)
