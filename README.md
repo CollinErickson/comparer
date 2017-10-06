@@ -3,7 +3,7 @@
 comparer
 ========
 
-[![Travis-CI Build Status](https://travis-ci.org/CollinErickson/comparer.svg?branch=master)](https://travis-ci.org/CollinErickson/comparer) <!-- [![Coverage Status](https://img.shields.io/codecov/c/github/CollinErickson/comparer/master.svg)](https://codecov.io/github/CollinErickson/comparer?branch=master) --> [![Coverage Status](https://codecov.io/gh/CollinErickson/comparer/branch/master/graph/badge.svg)](https://codecov.io/github/CollinErickson/comparer?branch=master) <!-- [![Coverage Status](https://img.shields.io/coveralls/CollinErickson/comparer.svg)](https://coveralls.io/r/CollinErickson/comparer?branch=master) --> [![Coverage Status](https://coveralls.io/repos/github/CollinErickson/comparer/badge.svg?branch=master)](https://coveralls.io/github/CollinErickson/comparer?branch=master)
+[![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/comparer)](https://cran.r-project.org/package=comparer) [![Travis-CI Build Status](https://travis-ci.org/CollinErickson/comparer.svg?branch=master)](https://travis-ci.org/CollinErickson/comparer) <!-- [![Coverage Status](https://img.shields.io/codecov/c/github/CollinErickson/comparer/master.svg)](https://codecov.io/github/CollinErickson/comparer?branch=master) --> [![Coverage Status](https://codecov.io/gh/CollinErickson/comparer/branch/master/graph/badge.svg)](https://codecov.io/github/CollinErickson/comparer?branch=master) <!-- [![Coverage Status](https://img.shields.io/coveralls/CollinErickson/comparer.svg)](https://coveralls.io/r/CollinErickson/comparer?branch=master) --> [![Coverage Status](https://coveralls.io/repos/github/CollinErickson/comparer/badge.svg?branch=master)](https://coveralls.io/github/CollinErickson/comparer?branch=master)
 
 The goal of comparer is to make it easy to compare the results of different code chunks that are trying to do the same thing. The R package `microbenchmark` is great for comparing the speed of code, but there's no way to compare their ouput to see which is more accurate.
 
@@ -32,6 +32,7 @@ mbc(mean, median, input=rexp(100))
 #>   Function Sort1 Sort2 Sort3 Sort4 Sort5 mean sd
 #> 1     mean     0     0     0     0     0    0  0
 #> 2   median     0     0     0     0     0    0  0
+#> 
 #> Output summary
 #>     Func Stat     Sort1     Sort2     Sort3     Sort4     Sort5      mean
 #> 1   mean    1 1.0321470 1.0321470 1.0321470 1.0321470 1.0321470 1.0321470
@@ -50,6 +51,7 @@ mbc(mean(x), median(x), inputi={x=rexp(100)})
 #>    Function Sort1 Sort2 Sort3 Sort4 Sort5 mean sd
 #> 1   mean(x)     0     0     0     0     0    0  0
 #> 2 median(x)     0     0     0     0     0    0  0
+#> 
 #> Output summary
 #>        Func Stat     Sort1     Sort2     Sort3     Sort4     Sort5
 #> 1   mean(x)    1 0.8813966 0.9069863 0.9513831 0.9890381 1.2063718

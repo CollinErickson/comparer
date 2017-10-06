@@ -1,0 +1,28 @@
+---
+title: "Introduction to the comparer R package"
+author: "Collin Erickson"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to the comparer R package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+When coding, especially for data science, there are multiple
+ways to solve each problem.
+When presented with two options, you want to pick the one
+that is faster and/or more accurate.
+Comparing different code chunks on the same task can be tedious.
+It often requires creating data, writing a for loop
+(or using `sapply`), then comparing.
+
+The comparer package makes this comparison quick and simple:
+
+* The same data can be given in to each model.
+
+* Various metrics can be used to judge results,
+including using the predicted errors from the code.
+
+* The results are displayed in a table that allows you
+to quickly judge the results.

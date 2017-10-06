@@ -19,6 +19,7 @@ set.seed(0)
 
 # comparer
 
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/comparer)](https://cran.r-project.org/package=comparer)
 [![Travis-CI Build Status](https://travis-ci.org/CollinErickson/comparer.svg?branch=master)](https://travis-ci.org/CollinErickson/comparer)
 <!-- [![Coverage Status](https://img.shields.io/codecov/c/github/CollinErickson/comparer/master.svg)](https://codecov.io/github/CollinErickson/comparer?branch=master) -->
 [![Coverage Status](https://codecov.io/gh/CollinErickson/comparer/branch/master/graph/badge.svg)](https://codecov.io/github/CollinErickson/comparer?branch=master)
