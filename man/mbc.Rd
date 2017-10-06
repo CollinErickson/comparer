@@ -5,7 +5,7 @@
 \title{Microbenchmark compare}
 \usage{
 mbc(..., times = 5, input, inputi, evaluator, post, target, targetin,
-  metric = "rmse", paired)
+  metric = "rmse", paired, kfold, kfoldN)
 }
 \arguments{
 \item{...}{Functions to run}
@@ -27,6 +27,12 @@ mbc(..., times = 5, input, inputi, evaluator, post, target, targetin,
 \item{metric}{c("rmse", "t", "mis90") Metric used to compare output values to target.}
 
 \item{paired}{Should the results be paired for comparison?}
+
+\item{kfold}{TRUE if k-fold CV should be run with k=`times`, or number of
+folds, which will override `times`. Use `ki` in inputi and targeti to select
+elements in the current fold.}
+
+\item{kfoldN}{Number of elements that need to be split into `kfold` folds.}
 }
 \value{
 Data frame of comparison results

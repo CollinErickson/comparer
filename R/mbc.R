@@ -10,6 +10,10 @@
 #' @param targetin Values that will be given to the result of the run to produce output.
 #' @param metric c("rmse", "t", "mis90") Metric used to compare output values to target.
 #' @param paired Should the results be paired for comparison?
+#' @param kfold TRUE if k-fold CV should be run with k=`times`, or number of
+#' folds, which will override `times`. Use `ki` in inputi and targeti to select
+#' elements in the current fold.
+#' @param kfoldN Number of elements that need to be split into `kfold` folds.
 #' @importFrom stats median predict t.test sd
 #'
 #' @return Data frame of comparison results
@@ -34,7 +38,8 @@
 #' # No input
 #' m1 <- mbc(function() {x <- runif(100);Sys.sleep(rexp(1, 30));mean(x)},
 #'   function() {x <- runif(100);Sys.sleep(rexp(1, 50));median(x)})
-mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin, metric="rmse", paired) {#browser()
+mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
+                metric="rmse", paired, kfold, kfoldN) {#browser()
   if (!missing(input) && !missing(inputi)) {
     stop("input and inputi should not both be given in")
   }
@@ -49,6 +54,20 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin, 
   # if (length(fnoname) > 0) {fnames[fnoname] <- paste0("f", fnoname)}
   if (length(fnoname) > 0) {fnames[fnoname] <- unlist(lapply(dots, function(ss) {paste0(trimws(deparse(ss)), collapse=' ')}))[fnoname]}
   if (length(fnames) == 1) {fnames <- list(fnames)}
+
+  if (!missing(kfold)) {
+    if (is.logical(kfold) && kfold==TRUE) {
+      folds <- times
+    } else if (kfold > 1) {
+      times <- folds <- kfold
+    } else {
+      stop("kfold must be TRUE or an integer")
+    }
+    if (missing(kfoldN)) {
+      stop("Must kfoldN, the number of samples")
+    }
+    ki_all <- sample(1:kfoldN)
+  }
 
   # Create objects to hold output data
   runtimes <- matrix(NA, n, times)
@@ -72,8 +91,16 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin, 
       inputi_expr <- match.call(expand.dots = FALSE)$`inputi`
       if (substr(as.character(inputi_expr[1]),1,1) == "{") {
         # browser()
+        # Create new environment to evaluate expression
         input <- new.env(parent = parent.frame())
+        # Add ki to env if using kfold
+        if (!missing(kfold)) {
+          input$ki <- ki_all[(1:kfoldN %% times) != j-1]
+        }
+        # Evaluate expression
         inputi_expr_out <- eval(inputi_expr, input)
+        # If it was single value instead of setting variable, e.g. "rnorm(10)"
+        #   instead of "x <- rnorm(10)", then store that
         if (length(ls(input)) == 0) { # Store the output in input
           input$inputi_expr_out <- inputi_expr_out
         }
@@ -189,15 +216,29 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin, 
           po <- out
         }
         if (!missing(targetin)) { # If targetin in given, use predict function
-          # if (any(exists(paste0("predict.",class(po))))) {
-            if (is.function(targetin)) {
-              targetinj <- targetin(j)
-            } else if (is.list(targetin) && !is.data.frame(targetin)) {
-              targetinj <- targetin[[j]]
-            } else {
-              targetinj <- targetin
+          # If k-fold, run it as expression with ki first
+          if (!missing(kfold)) {
+            # Create new environment to evaluate expression
+            tar_env <- new.env(parent = parent.frame())
+            # Add ki to env
+            if (!missing(kfold)) {
+              tar_env$ki <- input$ki #ki_all[(1:kfoldN %% times) == j-1]
             }
-            po <- predict(po, targetinj)
+            # Evaluate expression
+            targeti_expr <- match.call(expand.dots = FALSE)$`targetin`
+
+            # inputi_expr_out <- eval(inputi_expr, input)
+            targetin <- eval(targeti_expr, tar_env)
+          }
+          # if (any(exists(paste0("predict.",class(po))))) {
+          if (is.function(targetin)) {
+            targetinj <- targetin(j)
+          } else if (is.list(targetin) && !is.data.frame(targetin)) {
+            targetinj <- targetin[[j]]
+          } else {
+            targetinj <- targetin
+          }
+          po <- predict(po, targetinj)
           # }
         }
         # Run
@@ -206,6 +247,7 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin, 
           if ("rmse" %in% metric) {#browser()
             targetj <- if (is.function(target)) {target(j)}
                        else if (is.list(target)) {target[[j]]}
+                       else if (is.character(target) && !is.character(po) && (target%in%names(targetinj))) {targetinj[[target]]}
                        else if (is.character(target) && !is.character(po)) {input[[target]]}
                        else {target}
             po.mean <- if ("fit" %in% names(po)) po$fit else if ("mean" %in% names(po)) po$mean else {po}
