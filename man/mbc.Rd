@@ -18,7 +18,7 @@ mbc(..., times = 5, input, inputi, evaluator, post, target, targetin,
 
 \item{evaluator}{An expression that the ... expressions will be passed as "." for evaluation.}
 
-\item{post}{Function to post-process results.}
+\item{post}{Function or expression (using ".") to post-process results.}
 
 \item{target}{Values the functions are expected to (approximately) return.}
 

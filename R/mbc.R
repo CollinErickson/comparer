@@ -5,7 +5,7 @@
 #' @param input Object to be passed as input to each function
 #' @param inputi Function to be called with the replicate number then passed to each function.
 #' @param evaluator An expression that the ... expressions will be passed as "." for evaluation.
-#' @param post Function to post-process results.
+#' @param post Function or expression (using ".") to post-process results.
 #' @param target Values the functions are expected to (approximately) return.
 #' @param targetin Values that will be given to the result of the run to produce output.
 #' @param metric c("rmse", "t", "mis90") Metric used to compare output values to target.
@@ -211,7 +211,18 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
       if (!missing(post) || !missing(target)) {
         # Run post if given
         if (!missing(post)) {
-          po <- post(out)
+          # po <- post(out) # Used to require it to be function, just evaluate.
+          # Evaluate post as expression, then as function if still function.
+          post_env <- new.env(parent = parent.frame())
+          post_env$. <- out
+          if (!missing(kfold)) { # Add ki if using kfold
+            post_env$ki <- input$ki
+          }
+          post_expr <- match.call(expand.dots = FALSE)$`post`
+          po <- eval(post_expr, post_env)
+          if (is.function(po)) {
+            po <- po(out)
+          }
         } else {
           po <- out
         }
