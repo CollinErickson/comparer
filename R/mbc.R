@@ -339,6 +339,7 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
                   }
                   ttest_diffs <- t.test(diffs)
                   statname <- dimnames(postout)[[3]][istat]
+                  if (is.null(statname)) {statname <- istat}
                   comp12 <- data.frame(Func=labeli, Stat=statname, min=min(diffs), med=median(diffs), mean=mean(diffs), max=max(diffs), sd=sd(diffs), t=ttest_diffs$statistic, p=ttest_diffs$p.value)
                   # names(comp12)[3:(3+length(diffs)-1)] <- paste0("V", 1:(length(diffs)))
                   # print(comp12)
@@ -384,6 +385,7 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
                     ttest_diffs <- data.frame(statistic=NA, p.value=NA)
                   }
                   statname <- dimnames(postout)[[3]][istat]
+                  if (is.null(statname)) {statname <- istat}
                   comp12 <- data.frame(Func=labeli, Stat=statname, t(diffs), mean=mean(diffs), sd=sd(diffs), t=ttest_diffs$statistic, p=ttest_diffs$p.value)
                   names(comp12)[3:(3+length(diffs)-1)] <- paste0("V", 1:(length(diffs)))
                   # print(comp12)
@@ -411,8 +413,8 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
           out_list$Compare <- comp_df
         }
 
-      } else { # If not paired/ordered, then sort them
-        post_df_disp <- plyr::adply(postout, c(1,3), function(x) {sx <- sort(x); c(Sort=(sx), mean=mean(x), sd=sd(x))}, .id = c('Func','Stat'))
+      # } else { # If not paired/ordered, then sort them
+      #   post_df_disp <- plyr::adply(postout, c(1,3), function(x) {sx <- sort(x); c(Sort=(sx), mean=mean(x), sd=sd(x))}, .id = c('Func','Stat'))
       }
     }
     out_list$RawOutput <- outs
@@ -444,7 +446,9 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
       } else if (is.logical(postout)) {
         # post_df_disp <- plyr::adply(postout, c(1,3), table, .id = c('Func','Stat'))
         post_df_disp <- plyr::adply(postout, c(1,3), function(x) {tr <- sum(x);c('TRUE'=tr,'FALSE'=times-tr)}, .id = c('Func','Stat'))
-
+      } else if (is.character(postout)) {
+        uniques <- unique(c(postout))
+        post_df_disp <- plyr::adply(postout, c(1,3), function(x) {sapply(c("a","b"), function(ci) {sum(x==ci)})}, .id = c('Func','Stat'))
       } else {
         post_df_disp <- postout
       }
@@ -511,11 +515,11 @@ print.mbc <- function(x, ...) {#browser()
     } else {
       print(x$Output_disp)
     }
-  } else if ('Output' %in% nam) {
-    if (is.data.frame(x$Output) || is.numeric(x$Output)) { # Only print df, not list
-      cat("\nOutput \n")
-      print(x$Output)
-    }
+  # } else if ('Output' %in% nam) {
+  #   if (is.data.frame(x$Output) || is.numeric(x$Output)) { # Only print df, not list
+  #     cat("\nOutput \n")
+  #     print(x$Output)
+  #   }
   }
   if ("Compare" %in% nam) {
     cat("\nCompare\n")

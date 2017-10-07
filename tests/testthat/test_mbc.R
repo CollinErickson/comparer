@@ -49,6 +49,10 @@ test_that("mbc basic runs", {
   # Test evaluator
   expect_error(mbc(12, evaluator=function(., x) mean(.+x), input=13), NA)
   expect_error(mbc(12, evaluator=function() mean(.)), NA)
+
+  expect_error(mbc(identity, function(x) x, inputi=12, times=3, post=12), NA)
+  expect_error(mbc(mean, median, input=rnorm(100), times=7, target=0), NA)
+  expect_error(mbc(mean, median, inputi=0:10, times=7, target=0), NA)
 })
 test_that("test mbc print", {
   # Basic with compare
@@ -91,6 +95,7 @@ test_that("test mbc metrics", {
 })
 
 test_that("mbc plot", {
+  pdf(NULL) # Don't create Rplots.pdf file
   m1 <- mbc(mn={Sys.sleep(rexp(1,10));mean(x)},med= {Sys.sleep(rexp(1,20));median(x)}, inputi={x=rnorm(100)}, target=0)
   expect_error(plot(m1), NA)
 })
@@ -109,6 +114,20 @@ test_that("kfold", {
   expect_error(mbc(lm(y ~ x - 1), lm(y~x), inputi={x <- aa[ki];y <- bb[ki]}, kfold=3.3, kfoldN=10))
   expect_error(mbc(lm(y ~ x - 1), lm(y~x), inputi={x <- aa[ki];y <- bb[ki]}, kfold="5", kfoldN=10))
 
+})
+
+test_that("non numeric", {
+  # Logical
+  expect_error(mbc(TRUE, times=8), NA)
+  expect_error(mbc(x>.5, inputi=x <- runif(1)), NA)
+
+  # Character
+  expect_error(mbc("a"), NA)
+  expect_error(mbc(letters[x], inputi=x <- sample(1:2,1), times=10), NA)
+  expect_error(mbc(letters[x], letters[3-x], inputi=x <- sample(1:2,1), times=10), NA)
+
+  # List
+  expect_error(mbc(list(1,2)), NA)
 })
 
 # test_that("GauPro", {
