@@ -58,7 +58,7 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
   if (!missing(kfold)) {
     if (is.logical(kfold) && kfold==TRUE) {
       folds <- times
-    } else if (kfold > 1) {
+    } else if (kfold > 1 && (kfold==as.integer(kfold))) {
       times <- folds <- kfold
     } else {
       stop("kfold must be TRUE or an integer")
@@ -187,17 +187,19 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
         } else { # Use evaluator, dots are input to evaluator to be evaluated
           # browser()
           # This time there is no input, so create it
-          input <- new.env()
+          inputenv <- new.env()
           expr_evaluator <- match.call(expand.dots = FALSE)$`evaluator`
-          input$. <- eval(dots[[i]]) #, envir=input)
+          inputenv$. <- eval(dots[[i]]) #, envir=input)
           runtime <- system.time(
             # out <- dots[[i]](input) # Old version, required functions
-            out <- eval(expr_evaluator, envir=input)
+            out <- eval(expr_evaluator, envir=inputenv)
           )
           if (is.function(out)) {#print("Trying second time")
+            # if (is.environment(input)) {input <- as.list(input)}
             runtime <- system.time(
               # out <- out(input)
-              out <- do.call(out, input)
+              # out <- do.call(out, input)
+              out <- eval(quote(out()), inputenv)
             )
           }
         }

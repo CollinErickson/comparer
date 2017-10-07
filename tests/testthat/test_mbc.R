@@ -20,6 +20,9 @@ test_that("mbc basic runs", {
   # Give in only one name
   expect_error(m1 <- mbc(mean(x), med=median(x), inputi={x=rnorm(100)}), regexp = NA)
   expect_equal(dimnames(m1$Output)[[1]], c("mean(x)", "med"))
+  # Check single name
+  expect_error(m1 <- mbc(mean(2)), NA)
+  expect_equal(dimnames(m1$Output)[[1]], c("mean(2)"))
 
   # Give in evaluator
   expect_error(m1 <- mbc(1, 2, evaluator={.}), regexp = NA)
@@ -35,6 +38,17 @@ test_that("mbc basic runs", {
   expect_error(m1 <- mbc(mean(x), median(x), inputi={x=rnorm(100)}, times=20), regexp = NA)
   expect_error(m1 <- mbc(mean(x), median(x), inputi={x=rnorm(100)}, times=20, target=.5), regexp = NA)
   expect_error(print(m1), NA)
+
+  # Check inputi as unnamed data
+  expect_error(mbc(mean, inputi=rnorm(10)), NA)
+  # Check inputi as named single input no {}
+  expect_error(mbc(mean(x), inputi=x <- rnorm(10)), NA)
+  # Check inputi as list
+  expect_error(mbc(mean, inputi=replicate(5, list(rnorm(10)))), NA)
+
+  # Test evaluator
+  expect_error(mbc(12, evaluator=function(., x) mean(.+x), input=13), NA)
+  expect_error(mbc(12, evaluator=function() mean(.)), NA)
 })
 test_that("test mbc print", {
   # Basic with compare
@@ -88,6 +102,12 @@ test_that("kfold", {
   expect_error(mbc(lm(y ~ x - 1), lm(y~x), inputi={x <- aa[ki];y <- bb[ki]}, kfold=5))
   expect_error(mbc(lm(y ~ x - 1), lm(y~x), inputi={x <- aa[ki];y <- bb[ki]}, kfold=5, kfoldN=10), NA)
   expect_error(mbc(lm(y ~ x - 1), lm(y~x), inputi={x <- aa[ki];y <- bb[ki]}, kfold=5, kfoldN=10, targetin = {data.frame(x=aa,y=bb)[-ki,]}, target='y'), NA)
+  # expect_error(mbc(lm(y ~ x - 1), lm(y~x), inputi={x <- aa[ki];y <- bb[ki]}, kfold=5, kfoldN=10, post=predict(., data.frame(x=aa[-ki])), target=bb[-ki]), NA)
+  # Check kfold=TRUE works
+  expect_error(mbc(lm(y ~ x - 1), lm(y~x), inputi={x <- aa[ki];y <- bb[ki]}, kfold=TRUE, kfoldN=10), NA)
+  # Check error for bad kfold
+  expect_error(mbc(lm(y ~ x - 1), lm(y~x), inputi={x <- aa[ki];y <- bb[ki]}, kfold=3.3, kfoldN=10))
+  expect_error(mbc(lm(y ~ x - 1), lm(y~x), inputi={x <- aa[ki];y <- bb[ki]}, kfold="5", kfoldN=10))
 
 })
 
