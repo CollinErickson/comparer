@@ -53,6 +53,11 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
   fnoname <- which(fnames == "")
   # if (length(fnoname) > 0) {fnames[fnoname] <- paste0("f", fnoname)}
   if (length(fnoname) > 0) {fnames[fnoname] <- unlist(lapply(dots, function(ss) {paste0(trimws(deparse(ss)), collapse=' ')}))[fnoname]}
+  while(anyDuplicated(fnames)) {
+    dup <- duplicated(fnames)
+    itemp <- which(dup)[1]
+    fnames[itemp] <- paste0(fnames[itemp], itemp)
+  }
   if (length(fnames) == 1) {fnames <- list(fnames)}
 
   if (!missing(kfold)) {

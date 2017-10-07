@@ -53,6 +53,11 @@ test_that("mbc basic runs", {
   expect_error(mbc(identity, function(x) x, inputi=12, times=3, post=12), NA)
   expect_error(mbc(mean, median, input=rnorm(100), times=7, target=0), NA)
   expect_error(mbc(mean, median, inputi=0:10, times=7, target=0), NA)
+
+  # Test duplicate names
+  expect_error(mbc(mean,mean,input=rnorm(3), times=2), NA)
+  expect_error(mbc(mean,mean,mean,input=rnorm(3), times=2), NA)
+  expect_error(mbc(m=mean,m=mean, m2=mean,input=rnorm(3), times=2), NA)
 })
 test_that("test mbc print", {
   # Basic with compare
