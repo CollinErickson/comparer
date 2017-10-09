@@ -67,9 +67,12 @@ test_that("test mbc print", {
 
 test_that("test mbc metrics", {
 
-  m1 <- mbc(mean, median, inputi=function(i)rnorm(10))
+  expect_error(m1 <- mbc(mean, median, inputi=function(i)rnorm(10)), NA)
 
-  m1 <- mbc(mean, median, inputi=function(i)rnorm(10), target=10)
+  expect_error(m1 <- mbc(mean, median, inputi=function(i)rnorm(10), target=10), NA)
+  # Give function for target
+  expect_error(m1 <- mbc(mean, median, inputi=function(i)rnorm(10), target=function(i){i}), NA)
+  expect_error(m1 <- mbc(mean, median, inputi=function(i)rnorm(10), target=list(1,2,3,4,5)), NA)
 
   # Test t and mis90 using lm
   x1 <- runif(10)
