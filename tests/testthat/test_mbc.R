@@ -41,6 +41,7 @@ test_that("mbc basic runs", {
 
   # Check inputi as unnamed data
   expect_error(mbc(mean, inputi=rnorm(10)), NA)
+  expect_error(mbc(mean, inputi={rexp(10)}), NA)
   # Check inputi as named single input no {}
   expect_error(mbc(mean(x), inputi=x <- rnorm(10)), NA)
   # Check inputi as list
