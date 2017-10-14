@@ -88,11 +88,18 @@ test_that("test mbc metrics", {
   expect_error(mbc(lm(y1 ~ x1), lm(y1 ~ x1 + x2), targetin = xdf, target=ydf), NA)
   # mbc(lm(y1 ~ x1), lm(y1 ~ x1 + x2), targetin = cbind(xdf, ydf), target="ydf")
 
+  # Test t
   m1 <- mbc(lm(y1 ~ x1), lm(y1 ~ x1 + x2), target=ydf, metric="t", post=function(mod){predict(mod, xdf,se=T)})
   expect_true("Mean t" %in% m1$Output_disp$Stat)
   expect_error(print(m1), NA)
+
+  # Test mis90
   m1 <- mbc(lm(y1 ~ x1), lm(y1 ~ x1 + x2), target=ydf, metric="mis90", post=function(mod){predict(mod, xdf,se=T)})
   expect_true("mis90" %in% m1$Output_disp$Stat)
+  # Test giving in as function, list, and character as name from input
+  expect_error(mbc(lm(y1 ~ x1), lm(y1 ~ x1 + x2), target=function(i) {ydf}, metric="mis90", post=function(mod){predict(mod, xdf,se=T)}), NA)
+  expect_error(mbc(lm(y1 ~ x1), lm(y1 ~ x1 + x2), target=lapply(1:5, function(i)ydf), metric="mis90", post=function(mod){predict(mod, xdf,se=T)}), NA)
+  expect_error(mbc(lm(y1 ~ x1), lm(y1 ~ x1 + x2), target=ydf, metric="mis90", input=list(ydf=ydf),post=function(mod){predict(mod, xdf,se=T)}), NA)
 
   # t and mis90
   m1 <- mbc(lm(y1 ~ x1), lm(y1 ~ x1 + x2), target=ydf, metric=c("t","mis90"), post=function(mod){predict(mod, xdf,se=T)})
