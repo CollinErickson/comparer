@@ -41,7 +41,7 @@ test_that("mbc basic runs", {
 
   # Check inputi as unnamed data
   expect_error(mbc(mean, inputi=rnorm(10)), NA)
-  expect_error(mbc(mean, inputi={rexp(10)}), NA)
+  expect_error(mbc(mean, median, inputi={rexp(10)}), NA)
   # Check inputi as named single input no {}
   expect_error(mbc(mean(x), inputi=x <- rnorm(10)), NA)
   # Check inputi as list
@@ -122,6 +122,8 @@ test_that("kfold", {
   # Check error for bad kfold
   expect_error(mbc(lm(y ~ x - 1), lm(y~x), inputi={x <- aa[ki];y <- bb[ki]}, kfold=3.3, kfoldN=10))
   expect_error(mbc(lm(y ~ x - 1), lm(y~x), inputi={x <- aa[ki];y <- bb[ki]}, kfold="5", kfoldN=10))
+  # Test post with expression
+  expect_error(mbc(mean(x), inputi={x <- rnorm(100)[ki]}, kfold=5, kfoldN = 100, post=.+max(ki)), NA)
 
 })
 
