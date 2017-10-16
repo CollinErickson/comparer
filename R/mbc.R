@@ -9,12 +9,14 @@
 #' @param target Values the functions are expected to (approximately) return.
 #' @param targetin Values that will be given to the result of the run to produce output.
 #' @param metric c("rmse", "t", "mis90") Metric used to compare output values to target.
+#' mis90 is the mean interval score for 90\% confidence, see Gneiting and Raftery (2007).
 #' @param paired Should the results be paired for comparison?
 #' @param kfold TRUE if k-fold CV should be run with k=`times`, or number of
 #' folds, which will override `times`. Use `ki` in inputi and targeti to select
 #' elements in the current fold.
 #' @param kfoldN Number of elements that need to be split into `kfold` folds.
 #' @importFrom stats median predict t.test sd
+#' @references Gneiting, T., & Raftery, A. E. (2007). Strictly proper scoring rules, prediction, and estimation. Journal of the American Statistical Association, 102(477), 359-378.
 #'
 #' @return Data frame of comparison results
 #' @export

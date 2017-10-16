@@ -24,7 +24,8 @@ mbc(..., times = 5, input, inputi, evaluator, post, target, targetin,
 
 \item{targetin}{Values that will be given to the result of the run to produce output.}
 
-\item{metric}{c("rmse", "t", "mis90") Metric used to compare output values to target.}
+\item{metric}{c("rmse", "t", "mis90") Metric used to compare output values to target.
+mis90 is the mean interval score for 90\% confidence, see Gneiting and Raftery (2007).}
 
 \item{paired}{Should the results be paired for comparison?}
 
@@ -59,4 +60,7 @@ mbc(function(x) {mean(x)+runif(1)},  a1=function(x) {median(x)+runif(1)},
 # No input
 m1 <- mbc(function() {x <- runif(100);Sys.sleep(rexp(1, 30));mean(x)},
   function() {x <- runif(100);Sys.sleep(rexp(1, 50));median(x)})
+}
+\references{
+Gneiting, T., & Raftery, A. E. (2007). Strictly proper scoring rules, prediction, and estimation. Journal of the American Statistical Association, 102(477), 359-378.
 }
