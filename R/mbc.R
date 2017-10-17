@@ -8,8 +8,9 @@
 #' @param post Function or expression (using ".") to post-process results.
 #' @param target Values the functions are expected to (approximately) return.
 #' @param targetin Values that will be given to the result of the run to produce output.
-#' @param metric c("rmse", "t", "mis90") Metric used to compare output values to target.
+#' @param metric c("rmse", "t", "mis90", "sr27") Metric used to compare output values to target.
 #' mis90 is the mean interval score for 90\% confidence, see Gneiting and Raftery (2007).
+#' sr27 is the scoring rule given in Equation 27 of Gneiting and Raftery (2007).
 #' @param paired Should the results be paired for comparison?
 #' @param kfold TRUE if k-fold CV should be run with k=`times`, or number of
 #' folds, which will override `times`. Use `ki` in inputi and targeti to select
@@ -297,6 +298,17 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
             po.mismean <- c(mis90=mean(po.mis)) # summary(po.t) #c(mean=mean(po.t)) # rmse=sqrt(mean((po - targetj)^2)))
             # names(po) <- paste0("", names(po), " mis90")
             po.metric <- c(po.metric, po.mismean)
+          }
+          if ("sr27" %in% metric) {
+            targetj <- if (is.function(target)) {target(j)}
+            else if (is.list(target)) {target[[j]]}
+            else if (is.character(target) && !is.character(po)) {input[[target]]}
+            else {target}
+            po.mean <- if ("fit" %in% names(po)) po$fit else if ("mean" %in% names(po)) po$mean else {stop("Can't get fit/mean from post/out")}
+            po.se <- po$se
+            po.sr <- -((po.mean-targetj)/po.se)^2 - 2 * log(po.se)
+            po.srmean <- c(sr27=mean(po.sr))
+            po.metric <- c(po.metric, po.srmean)
           }
           #else {stop("Only metric recognized are rmse and t and mis90")}
           po <- po.metric
