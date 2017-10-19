@@ -42,10 +42,10 @@ mbc(mean, median, input=rexp(100))
 #> 2  0
 ```
 
-To get the data to be generated for each trial, use the `inputi` argument to set a variable that the functions call. The arguments `mean(x)` and `median(x)` are captured as expressions, as is `{x=rexp(100)}` for `inputi`. Note that you must put brackets around the value of `inputi` if it is an expression or it will give an error. You can see that the values are now different for each trial.
+To get the data to be generated for each trial, use the `inputi` argument to set a variable that the functions call. The arguments `mean(x)` and `median(x)` are captured as expressions, as is `{x=rexp(100)}` for `inputi`. Note that `x` is stored in that code chunk, and the functions both call `x` in the evaluation. You can see that the values are now different for each trial.
 
 ``` r
-## Regenerate the data each time.
+## Regenerate the data each time
 mbc(mean(x), median(x), inputi={x=rexp(100)})
 #> Run times (sec)
 #>    Function Sort1 Sort2 Sort3 Sort4 Sort5 mean sd
@@ -59,4 +59,23 @@ mbc(mean(x), median(x), inputi={x=rexp(100)})
 #>        mean         sd
 #> 1 0.9870352 0.12937442
 #> 2 0.7038964 0.06642411
+```
+
+If the code chunks to compare are all simple functions that take a single input, then the value in `inputi` does not need to be saved as any variable, and the code chunks can just be the functions. For example, the previous code can be simplified as below.
+
+``` r
+## Simplify the call when the input is single object
+mbc(mean, median, inputi=rexp(100))
+#> Run times (sec)
+#>   Function Sort1 Sort2 Sort3 Sort4 Sort5 mean sd
+#> 1     mean     0     0     0     0     0    0  0
+#> 2   median     0     0     0     0     0    0  0
+#> 
+#> Output summary
+#>     Func Stat     Sort1     Sort2     Sort3     Sort4     Sort5      mean
+#> 1   mean    1 0.8781278 1.0184794 1.1029084 1.1511791 1.1535740 1.0608537
+#> 2 median    1 0.6119180 0.6358414 0.7141539 0.7832192 0.9887379 0.7467741
+#>          sd
+#> 1 0.1158757
+#> 2 0.1511878
 ```
