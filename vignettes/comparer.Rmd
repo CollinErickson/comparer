@@ -9,6 +9,11 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r setup, echo=FALSE}
+set.seed(0)
+```
+
+
 When coding, especially for data science, there are multiple
 ways to solve each problem.
 When presented with two options, you want to pick the one
@@ -26,3 +31,71 @@ including using the predicted errors from the code.
 
 * The results are displayed in a table that allows you
 to quickly judge the results.
+
+This document introduces the main function of the `comparer` package, `mbc`.
+
+
+## Motivation from `microbenchmark`
+
+The R package `microbenchmark` provides the fantastic eponymous function.
+It makes it simple to run different segments of code and see which is faster.
+Borrowing an example from http://adv-r.had.co.nz/Performance.html,
+the following shows how it gives a summary of how fast each ran.
+
+```{r}
+library(microbenchmark)
+x <- runif(100)
+microbenchmark(sqrt(x), x ^ .5)
+```
+
+However it gives no summary of the output.
+For this example it is fine since the output is deterministic,
+but when working with randomness or model predictions we want
+to have some sort of summary or evaluation metric to see which
+has better accuracy, or to just see how the outputs differ.
+
+
+## `mbc` to the rescue
+
+The function `mbc` in the `comparer` package was created to solve this
+problem, where a comparison of the output is desired in addition to
+the run time.
+
+For example, we may wish to see how the sample size affects
+an estimate of the mean of a random sample.
+The following shows the results of finding the mean of 10 and 100
+samples from a normal distribution.
+
+```{r}
+library(comparer)
+mbc(mean(rnorm(10)), mean(rnorm(100)))
+```
+
+By default it only runs 5 trials, but this can be changed with the
+`times` parameter.
+The first part of the output gives the run times.
+For 5 or fewer, it shows all the values in sorted order,
+for more than 5 it shows summary statistics.
+Unfortunately, the timing is only accurate up to 0.01 seconds,
+so these all show as 0.
+
+The second section of the output gives the summary of the output.
+This also will show summary stats for more than 5 trials,
+but for this small sample size it shows all the values in sorted order
+with the mean and standard deviation given.
+The first column shows the name of each,
+and the second column shows which output statistic is given.
+Since there is only one output for this code it is called "1".
+
+Setting `times` changes the number of trials run.
+Below the same example as above is run but for 100 trials.
+
+```{r}
+mbc(mean(rnorm(10)), mean(rnorm(100)), times=100)
+```
+
+We see that the mean of both is around zero,
+but that the larger sample size (`mean(rnorm(100))`) has a tighter
+distribution and a standard deviation a third as large as the other,
+which is about what we expect for a sample that is 10 times larger
+(it should be $\sqrt{10} \approx 3.16$ times smaller on average).
