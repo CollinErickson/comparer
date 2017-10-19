@@ -444,7 +444,7 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
     #  in case single return value already is post
     lengths <- sapply(outs, function(listi) {sapply(listi, length)})
     len <- lengths[[1]]
-    if (all(lengths == len) && any(class(outs[[1]][[1]]) %in% c("numeric", "character", "logical"))) { # Try to auto-post-process
+    if (all(lengths == len) && any(class(outs[[1]][[1]]) %in% c("numeric", "character", "logical", "integer"))) { # Try to auto-post-process
       # Convert data to array
       postout <- array(data = NA, dim = c(n, times, len))
       dimnames(postout)[[1]] <- fnames
@@ -460,7 +460,11 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
         if (times > 5) {
           post_df_disp <- plyr::adply(postout, c(1,3), function(x) data.frame(min=min(x), med=median(x), mean=mean(x), max=max(x), sd=sd(x)), .id = c('Func','Stat'))
         } else {
-          post_df_disp <- plyr::adply(postout, c(1,3), function(x) {sx <- sort(x); c(Sort=(sx), mean=mean(x), sd=sd(x))}, .id = c('Func','Stat'))
+          if (paired) {
+            post_df_disp <- plyr::adply(postout, c(1,3), function(x) {c(V=x, mean=mean(x), sd=sd(x))}, .id = c('Func','Stat'))
+          } else {
+            post_df_disp <- plyr::adply(postout, c(1,3), function(x) {sx <- sort(x); c(Sort=(sx), mean=mean(x), sd=sd(x))}, .id = c('Func','Stat'))
+          }
         }
       } else if (is.logical(postout)) {
         # post_df_disp <- plyr::adply(postout, c(1,3), table, .id = c('Func','Stat'))
