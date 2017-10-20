@@ -50,6 +50,7 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
   # dots <- list(...)
   dots <- as.list(match.call(expand.dots = FALSE)$`...`)
   n <- length(dots)
+  gcFirst <- FALSE # arg passed to system.time, slows down by .07 sec per evaluation
 
   fnames <- names(dots)
   if (is.null(fnames)) {fnames <- rep("", n)}
@@ -141,7 +142,8 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
         if (missing(evaluator)) { # Run as normal if no evaluator given
           runtime <- system.time(
             # out <- dots[[i]](input) # Old version, required functions
-            out <- eval(dots[[i]], envir=input)
+            out <- eval(dots[[i]], envir=input),
+            gcFirst = gcFirst
           )
           if (is.function(out)) {#print("Trying second time")
             if (is.environment(input)) { # Try to run as function
@@ -149,12 +151,14 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
             }
             if ("inputi_expr_out" %in% names(input) && length(list) == 1) {
               runtime <- system.time(
-                out <- out(input$inputi_expr_out)
+                out <- out(input$inputi_expr_out),
+                gcFirst = gcFirst
               )
             } else {
               runtime <- system.time(
                 # out <- out(input)
-                out <- do.call(out, input)
+                out <- do.call(out, input),
+                gcFirst = gcFirst
               )
             }
           }
@@ -164,32 +168,38 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
           input$. <- eval(dots[[i]], envir=input)
           runtime <- system.time(
             # out <- dots[[i]](input) # Old version, required functions
-            out <- eval(expr_evaluator, envir=input)
+            out <- eval(expr_evaluator, envir=input),
+            gcFirst = gcFirst
           )
           if (is.function(out)) {#print("Trying second time")
             runtime <- system.time(
               # out <- out(input)
-              out <- do.call(out, input)
+              out <- do.call(out, input),
+              gcFirst = gcFirst
             )
           }
         }
       # } else if (!missing(inputi)) { # Different input for each rep
       #   runtime <- system.time(
-      #     out <- dots[[i]](inputi(j))
+      #     out <- dots[[i]](inputi(j)),
+      #     gcFirst = gcFirst
       #   )
       } else { # No input at all
         # runtime <- system.time(
-        #   out <- dots[[i]]()
+        #   out <- dots[[i]](),
+        #   gcFirst = gcFirst
         # )
         if (missing(evaluator)) {
           runtime <- system.time(
             # out <- dots[[i]](input) # Old version, required functions
-            out <- eval(dots[[i]], envir=parent.frame())
+            out <- eval(dots[[i]], envir=parent.frame()),
+            gcFirst = gcFirst
           )
           if (is.function(out)) {#print("Trying second time 2")
             runtime <- system.time(
               # out <- out(input)
-              out <- out() #do.call(out, input)
+              out <- out(), #do.call(out, input)
+              gcFirst = gcFirst
             )
           }
         } else { # Use evaluator, dots are input to evaluator to be evaluated
@@ -200,14 +210,16 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
           inputenv$. <- eval(dots[[i]]) #, envir=input)
           runtime <- system.time(
             # out <- dots[[i]](input) # Old version, required functions
-            out <- eval(expr_evaluator, envir=inputenv)
+            out <- eval(expr_evaluator, envir=inputenv),
+            gcFirst = gcFirst
           )
           if (is.function(out)) {#print("Trying second time")
             # if (is.environment(input)) {input <- as.list(input)}
             runtime <- system.time(
               # out <- out(input)
               # out <- do.call(out, input)
-              out <- eval(quote(out()), inputenv)
+              out <- eval(quote(out()), inputenv),
+              gcFirst = gcFirst
             )
           }
         }
