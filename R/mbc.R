@@ -346,9 +346,9 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
   out_list$Run_times <-
     if (times > 5) {
       # plyr::adply(runtimes, 1, function(x) data.frame(min=min(x), med=median(x), mean=mean(x), max=max(x)), .id = 'Function')
-      plyr::adply(runtimes, 1, function(x) {c(summary(x), sd=sd(x))}, .id = 'Function')
+      plyr::adply(runtimes, 1, function(x) {c(summary(x), sd=sd(x), neval=times)}, .id = 'Function')
     } else {
-      plyr::adply(runtimes, 1, function(x) {sx <- unname(sort(x)); c(Sort=(sx), mean=mean(x), sd=sd(x))}, .id = 'Function')
+      plyr::adply(runtimes, 1, function(x) {sx <- unname(sort(x)); c(Sort=(sx), mean=mean(x), sd=sd(x), neval=times)}, .id = 'Function')
     }
 
   # Run post to post process
