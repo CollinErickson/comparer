@@ -346,7 +346,7 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
   out_list$Run_times <-
     if (times > 5) {
       # plyr::adply(runtimes, 1, function(x) data.frame(min=min(x), med=median(x), mean=mean(x), max=max(x)), .id = 'Function')
-      plyr::adply(runtimes, 1, summary, .id = 'Function')
+      plyr::adply(runtimes, 1, function(x) {c(summary(x), sd=sd(x))}, .id = 'Function')
     } else {
       plyr::adply(runtimes, 1, function(x) {sx <- unname(sort(x)); c(Sort=(sx), mean=mean(x), sd=sd(x))}, .id = 'Function')
     }
@@ -354,7 +354,7 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
   # Run post to post process
   if (!missing(post) || !missing(target)) {
     if (times > 5) {
-      post_df_disp <- plyr::adply(postout, c(1,3), function(x) data.frame(min=min(x), med=median(x), mean=mean(x), max=max(x), sd=sd(x)), .id = c('Func','Stat'))
+      post_df_disp <- plyr::adply(postout, c(1,3), function(x) {as.data.frame(t(c(summary(x), sd=sd(x))))}, .id = c('Func','Stat'))
       if (paired || !paired) { # Used to only compared, now do both, there's an if(paired) below
         if (n > 1) {
           for (i1 in 1:(n-1)) {
@@ -371,7 +371,10 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
                   ttest_diffs <- t.test(diffs)
                   statname <- dimnames(postout)[[3]][istat]
                   if (is.null(statname)) {statname <- istat}
-                  comp12 <- data.frame(Func=labeli, Stat=statname, min=min(diffs), med=median(diffs), mean=mean(diffs), max=max(diffs), sd=sd(diffs), t=ttest_diffs$statistic, p=ttest_diffs$p.value)
+                  # comp12 <- data.frame(Func=labeli, Stat=statname, min=min(diffs), med=median(diffs), mean=mean(diffs), max=max(diffs), sd=sd(diffs), t=ttest_diffs$statistic, p=ttest_diffs$p.value)
+                  comp12 <- cbind(data.frame(Func=labeli, Stat=statname),
+                                  as.data.frame(t(c(summary(diffs), sd=sd(diffs), t=ttest_diffs$statistic, p=ttest_diffs$p.value)))
+                  )
                   # names(comp12)[3:(3+length(diffs)-1)] <- paste0("V", 1:(length(diffs)))
                   # print(comp12)
                   # post_df_disp <- rbind(post_df_disp, comp12)
@@ -470,7 +473,7 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
       # Post-process
       if (is.numeric(postout)) {
         if (times > 5) {
-          post_df_disp <- plyr::adply(postout, c(1,3), function(x) data.frame(min=min(x), med=median(x), mean=mean(x), max=max(x), sd=sd(x)), .id = c('Func','Stat'))
+          post_df_disp <- plyr::adply(postout, c(1,3), function(x) {as.data.frame(t(c(summary(x), sd=sd(x))))}, .id = c('Func','Stat'))
         } else {
           if (paired) {
             post_df_disp <- plyr::adply(postout, c(1,3), function(x) {c(V=x, mean=mean(x), sd=sd(x))}, .id = c('Func','Stat'))
