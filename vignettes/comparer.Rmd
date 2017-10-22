@@ -99,3 +99,80 @@ but that the larger sample size (`mean(rnorm(100))`) has a tighter
 distribution and a standard deviation a third as large as the other,
 which is about what we expect for a sample that is 10 times larger
 (it should be $\sqrt{10} \approx 3.16$ times smaller on average).
+
+In this example each function had its own input,
+but many times we want to compare the functions
+on the same input for better comparison.
+
+
+## Shared input
+
+Input can be passed in to the `input` argument as a list,
+and then the code will be evaluated in an environment with that data.
+In this example we compare the functions `mean` and `median` on random
+data from an exponential distribution.
+The mean should be about 1, while the median should be about
+$\ln(2)=0.693$.
+
+```{r}
+mbc(mean(x), median(x), input=list(x=rexp(30)))
+```
+
+In this case each evaluation is identical since the input is not random.
+The data passed to `input` is kept as is, so there is no randomness
+from the data.
+If we want randomness in the data, we can use `inputi`,
+which evaluates its argument as an expression,
+meaning that each time it will be different.
+
+Below is the same code as above except `inputi` is used with
+`x` set in brackets instead of a list.
+We see there is randomness and we can get an idea of the distribution
+of the median and mean.
+
+```{r}
+mbc(mean(x), median(x), inputi={x=rexp(30)})
+```
+
+When the code chunks to evaluate are simple functions of a single variable,
+this can be simplified.
+Look how simple it is to run a test on these!
+
+```{r}
+mbc(mean, median, inputi=rexp(30))
+```
+
+## Comparing to expected values
+
+The previous comparisons showed a summary of the outputs,
+but many times we want to compare output values to true values,
+then calculate a summary statistic, such as an average error.
+The argument `target` specifies the values the code chunks should
+give, then summary statistics can be calculated by specifying `metrics`,
+which defaults to calculating the rmse.
+
+For example, suppose we have data from a linear function,
+and want to see how accurate the model is when the output
+values are corrupted with noise.
+Below we compare two linear models: the first with an intercept term,
+and the second without.
+The model with the intercept term should be much better
+since the data has an intercept of $-0.6$.
+We see that the output is different in a few ways now.
+The `Stat`
+
+```{r}
+n <- 20
+x <- seq(0, 1, length.out = n)
+y <- 1.8 * x - .6
+ynoise <- y + rnorm(n, 0, .2)
+```
+
+```{r}
+mbc(predict(lm(ynoise ~ x), data.frame(x)),
+    predict(lm(ynoise ~ x - 1), data.frame(x)),
+    target = y)
+```
+
+
+
