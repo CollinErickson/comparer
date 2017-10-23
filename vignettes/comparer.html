@@ -12,7 +12,7 @@
 
 <meta name="author" content="Collin Erickson" />
 
-<meta name="date" content="2017-10-22" />
+<meta name="date" content="2017-10-23" />
 
 <title>Introduction to the comparer R package</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Introduction to the comparer R package</h1>
 <h4 class="author"><em>Collin Erickson</em></h4>
-<h4 class="date"><em>2017-10-22</em></h4>
+<h4 class="date"><em>2017-10-23</em></h4>
 
 
 
@@ -89,9 +89,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 x &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dv">100</span>)
 <span class="kw">microbenchmark</span>(<span class="kw">sqrt</span>(x), x <span class="op">^</span><span class="st"> </span>.<span class="dv">5</span>)</code></pre></div>
 <pre><code>## Unit: nanoseconds
-##     expr  min   lq   mean median   uq   max neval
-##  sqrt(x)  380  760 1125.3    761 1141 18626   100
-##    x^0.5 4181 4562 5747.5   4941 6082 41053   100</code></pre>
+##     expr  min   lq    mean median   uq   max neval
+##  sqrt(x)  380  380  847.82    760  761 19386   100
+##    x^0.5 4181 4561 5017.67   4562 4942  8363   100</code></pre>
 <p>However it gives no summary of the output. For this example it is fine since the output is deterministic, but when working with randomness or model predictions we want to have some sort of summary or evaluation metric to see which has better accuracy, or to just see how the outputs differ.</p>
 </div>
 <div id="mbc-to-the-rescue" class="section level2">
@@ -118,8 +118,8 @@ x &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dv">1
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mbc</span>(<span class="kw">mean</span>(<span class="kw">rnorm</span>(<span class="dv">10</span>)), <span class="kw">mean</span>(<span class="kw">rnorm</span>(<span class="dv">100</span>)), <span class="dt">times=</span><span class="dv">100</span>)</code></pre></div>
 <pre><code>## Run times (sec)
 ##           Function Min. 1st Qu. Median  Mean 3rd Qu. Max.    sd neval
-## 1  mean(rnorm(10))    0       0      0 2e-04       0 0.02 0.002   100
-## 2 mean(rnorm(100))    0       0      0 0e+00       0 0.00 0.000   100
+## 1  mean(rnorm(10))    0       0      0 0e+00       0 0.00 0.000   100
+## 2 mean(rnorm(100))    0       0      0 2e-04       0 0.02 0.002   100
 ## 
 ## Output summary
 ##               Func Stat       Min.     1st Qu.      Median        Mean
@@ -191,10 +191,10 @@ ynoise &lt;-<span class="st"> </span>y <span class="op">+</span><span class="st"
     <span class="dt">target =</span> y)</code></pre></div>
 <pre><code>## Run times (sec)
 ##                                     Function Sort1 Sort2 Sort3 Sort4 Sort5
-## 1     predict(lm(ynoise ~ x), data.frame(x))     0     0     0     0  0.00
+## 1     predict(lm(ynoise ~ x), data.frame(x))     0     0     0     0  0.02
 ## 2 predict(lm(ynoise ~ x - 1), data.frame(x))     0     0     0     0  0.01
 ##    mean          sd neval
-## 1 0.000 0.000000000     5
+## 1 0.004 0.008944272     5
 ## 2 0.002 0.004472136     5
 ## 
 ## Output summary
@@ -217,11 +217,11 @@ ynoise &lt;-<span class="st"> </span>y <span class="op">+</span><span class="st"
     <span class="dt">target =</span> y)</code></pre></div>
 <pre><code>## Run times (sec)
 ##                                     Function Sort1 Sort2 Sort3 Sort4 Sort5
-## 1     predict(lm(ynoise ~ x), data.frame(x))     0     0     0     0  0.00
-## 2 predict(lm(ynoise ~ x - 1), data.frame(x))     0     0     0     0  0.01
+## 1     predict(lm(ynoise ~ x), data.frame(x))     0     0     0     0  0.01
+## 2 predict(lm(ynoise ~ x - 1), data.frame(x))     0     0     0     0  0.02
 ##    mean          sd neval
-## 1 0.000 0.000000000     5
-## 2 0.002 0.004472136     5
+## 1 0.002 0.004472136     5
+## 2 0.004 0.008944272     5
 ## 
 ## Output summary
 ##                                         Func Stat        V1         V2
@@ -238,6 +238,36 @@ ynoise &lt;-<span class="st"> </span>y <span class="op">+</span><span class="st"
 ## t rmse -0.2048625 -0.2984309 -0.3021308 -0.3000427 -0.2652116 -0.2741357
 ##           sd         t            p
 ## t 0.04160401 -14.73382 0.0001235005</code></pre>
+</div>
+<div id="simplifying-with-evaluator" class="section level2">
+<h2>Simplifying with <code>evaluator</code></h2>
+<p>Many times the code chunks we want to compare only differ by a small amount, such as asingle argument. In the example above, the only difference is the formula in the <code>lm</code> command. With <code>mbc</code>, the <code>evaluator</code> can be set to make these cases easier. The argument for <code>evaluator</code> should be an expression including <code>.</code>, which will be replaced with the code chunks provided. The example below rewrites the above comparison using <code>evaluator</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mbc</span>(ynoise <span class="op">~</span><span class="st"> </span>x,
+    ynoise <span class="op">~</span><span class="st"> </span>x <span class="op">-</span><span class="st"> </span><span class="dv">1</span>,
+    <span class="dt">evaluator=</span><span class="kw">predict</span>(<span class="kw">lm</span>(.), <span class="kw">data.frame</span>(x)),
+    <span class="dt">inputi=</span>{ynoise &lt;-<span class="st"> </span>y <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(n, <span class="dv">0</span>, .<span class="dv">2</span>)},
+    <span class="dt">target =</span> y)</code></pre></div>
+<pre><code>## Run times (sec)
+##         Function Sort1 Sort2 Sort3 Sort4 Sort5  mean          sd neval
+## 1     ynoise ~ x     0     0     0     0  0.02 0.004 0.008944272     5
+## 2 ynoise ~ x - 1     0     0     0     0  0.00 0.000 0.000000000     5
+## 
+## Output summary
+##             Func Stat         V1         V2        V3         V4
+## 1     ynoise ~ x rmse 0.05038184 0.02971854 0.1055691 0.06501551
+## 2 ynoise ~ x - 1 rmse 0.31377557 0.31206988 0.3214883 0.31179433
+##           V5       mean          sd
+## 1 0.04056214 0.05824943 0.029468982
+## 2 0.31132893 0.31409141 0.004236993
+## 
+## Compare
+##                        Func Stat         V1         V2         V3
+## t ynoise ~ x-ynoise ~ x - 1 rmse -0.2633937 -0.2823513 -0.2159192
+##           V4         V5      mean        sd         t            p
+## t -0.2467788 -0.2707668 -0.255842 0.0257803 -22.19059 2.441287e-05</code></pre>
+</div>
+<div id="k-fold-cross-validation" class="section level1">
+<h1>K-Fold Cross Validation</h1>
 </div>
 
 

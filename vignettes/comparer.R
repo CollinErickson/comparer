@@ -39,3 +39,10 @@ mbc(predict(lm(ynoise ~ x), data.frame(x)),
     inputi={ynoise <- y + rnorm(n, 0, .2)},
     target = y)
 
+## ------------------------------------------------------------------------
+mbc(ynoise ~ x,
+    ynoise ~ x - 1,
+    evaluator=predict(lm(.), data.frame(x)),
+    inputi={ynoise <- y + rnorm(n, 0, .2)},
+    target = y)
+

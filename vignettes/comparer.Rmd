@@ -195,3 +195,25 @@ mbc(predict(lm(ynoise ~ x), data.frame(x)),
     target = y)
 ```
 
+## Simplifying with `evaluator`
+
+Many times the code chunks we want to compare only differ by a small amount,
+such as asingle argument.
+In the example above, the only difference is the formula in the `lm` command.
+With `mbc`, the `evaluator` can be set to make these cases easier.
+The argument for `evaluator` should be an expression including `.`,
+which will be replaced with the code chunks provided.
+The example below rewrites the above comparison using `evaluator`.
+
+```{r}
+mbc(ynoise ~ x,
+    ynoise ~ x - 1,
+    evaluator=predict(lm(.), data.frame(x)),
+    inputi={ynoise <- y + rnorm(n, 0, .2)},
+    target = y)
+```
+
+
+# K-Fold Cross Validation
+
+
