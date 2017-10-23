@@ -12,12 +12,50 @@
 
 <meta name="author" content="Collin Erickson" />
 
-<meta name="date" content="2017-10-06" />
+<meta name="date" content="2017-10-22" />
 
 <title>Introduction to the comparer R package</title>
 
 
 
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
 
 
 
@@ -32,7 +70,7 @@
 
 <h1 class="title toc-ignore">Introduction to the comparer R package</h1>
 <h4 class="author"><em>Collin Erickson</em></h4>
-<h4 class="date"><em>2017-10-06</em></h4>
+<h4 class="date"><em>2017-10-22</em></h4>
 
 
 
@@ -43,6 +81,164 @@
 <li><p>Various metrics can be used to judge results, including using the predicted errors from the code.</p></li>
 <li><p>The results are displayed in a table that allows you to quickly judge the results.</p></li>
 </ul>
+<p>This document introduces the main function of the <code>comparer</code> package, <code>mbc</code>.</p>
+<div id="motivation-from-microbenchmark" class="section level2">
+<h2>Motivation from <code>microbenchmark</code></h2>
+<p>The R package <code>microbenchmark</code> provides the fantastic eponymous function. It makes it simple to run different segments of code and see which is faster. Borrowing an example from <a href="http://adv-r.had.co.nz/Performance.html" class="uri">http://adv-r.had.co.nz/Performance.html</a>, the following shows how it gives a summary of how fast each ran.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(microbenchmark)
+x &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dv">100</span>)
+<span class="kw">microbenchmark</span>(<span class="kw">sqrt</span>(x), x <span class="op">^</span><span class="st"> </span>.<span class="dv">5</span>)</code></pre></div>
+<pre><code>## Unit: nanoseconds
+##     expr  min   lq   mean median   uq   max neval
+##  sqrt(x)  380  760 1125.3    761 1141 18626   100
+##    x^0.5 4181 4562 5747.5   4941 6082 41053   100</code></pre>
+<p>However it gives no summary of the output. For this example it is fine since the output is deterministic, but when working with randomness or model predictions we want to have some sort of summary or evaluation metric to see which has better accuracy, or to just see how the outputs differ.</p>
+</div>
+<div id="mbc-to-the-rescue" class="section level2">
+<h2><code>mbc</code> to the rescue</h2>
+<p>The function <code>mbc</code> in the <code>comparer</code> package was created to solve this problem, where a comparison of the output is desired in addition to the run time.</p>
+<p>For example, we may wish to see how the sample size affects an estimate of the mean of a random sample. The following shows the results of finding the mean of 10 and 100 samples from a normal distribution.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(comparer)
+<span class="kw">mbc</span>(<span class="kw">mean</span>(<span class="kw">rnorm</span>(<span class="dv">10</span>)), <span class="kw">mean</span>(<span class="kw">rnorm</span>(<span class="dv">100</span>)))</code></pre></div>
+<pre><code>## Run times (sec)
+##           Function Sort1 Sort2 Sort3 Sort4 Sort5 mean sd neval
+## 1  mean(rnorm(10))     0     0     0     0     0    0  0     5
+## 2 mean(rnorm(100))     0     0     0     0     0    0  0     5
+## 
+## Output summary
+##               Func Stat       Sort1       Sort2       Sort3       Sort4
+## 1  mean(rnorm(10))    1 -0.25552091 -0.03541135 -0.03160087 -0.01748239
+## 2 mean(rnorm(100))    1 -0.09895678 -0.01811174 -0.01659186  0.04176382
+##        Sort5         mean       sd
+## 1 0.23999128 -0.020004846 0.175673
+## 2 0.07945149 -0.002489014 0.067863</code></pre>
+<p>By default it only runs 5 trials, but this can be changed with the <code>times</code> parameter. The first part of the output gives the run times. For 5 or fewer, it shows all the values in sorted order, for more than 5 it shows summary statistics. Unfortunately, the timing is only accurate up to 0.01 seconds, so these all show as 0.</p>
+<p>The second section of the output gives the summary of the output. This also will show summary stats for more than 5 trials, but for this small sample size it shows all the values in sorted order with the mean and standard deviation given. The first column shows the name of each, and the second column shows which output statistic is given. Since there is only one output for this code it is called “1”.</p>
+<p>Setting <code>times</code> changes the number of trials run. Below the same example as above is run but for 100 trials.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mbc</span>(<span class="kw">mean</span>(<span class="kw">rnorm</span>(<span class="dv">10</span>)), <span class="kw">mean</span>(<span class="kw">rnorm</span>(<span class="dv">100</span>)), <span class="dt">times=</span><span class="dv">100</span>)</code></pre></div>
+<pre><code>## Run times (sec)
+##           Function Min. 1st Qu. Median  Mean 3rd Qu. Max.    sd neval
+## 1  mean(rnorm(10))    0       0      0 2e-04       0 0.02 0.002   100
+## 2 mean(rnorm(100))    0       0      0 0e+00       0 0.00 0.000   100
+## 
+## Output summary
+##               Func Stat       Min.     1st Qu.      Median        Mean
+## 1  mean(rnorm(10))    1 -0.8175108 -0.15620118 -0.02166650 0.001056646
+## 2 mean(rnorm(100))    1 -0.2170817 -0.06626509 -0.00111176 0.005715118
+##      3rd Qu.      Max.        sd
+## 1 0.19105787 0.6266277 0.2954722
+## 2 0.06441406 0.2827851 0.1021612</code></pre>
+<p>We see that the mean of both is around zero, but that the larger sample size (<code>mean(rnorm(100))</code>) has a tighter distribution and a standard deviation a third as large as the other, which is about what we expect for a sample that is 10 times larger (it should be <span class="math inline">\(\sqrt{10} \approx 3.16\)</span> times smaller on average).</p>
+<p>In this example each function had its own input, but many times we want to compare the functions on the same input for better comparison.</p>
+</div>
+<div id="shared-input" class="section level2">
+<h2>Shared input</h2>
+<p>Input can be passed in to the <code>input</code> argument as a list, and then the code will be evaluated in an environment with that data. In this example we compare the functions <code>mean</code> and <code>median</code> on random data from an exponential distribution. The mean should be about 1, while the median should be about <span class="math inline">\(\ln(2)=0.693\)</span>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mbc</span>(<span class="kw">mean</span>(x), <span class="kw">median</span>(x), <span class="dt">input=</span><span class="kw">list</span>(<span class="dt">x=</span><span class="kw">rexp</span>(<span class="dv">30</span>)))</code></pre></div>
+<pre><code>## Run times (sec)
+##    Function Sort1 Sort2 Sort3 Sort4 Sort5 mean sd neval
+## 1   mean(x)     0     0     0     0     0    0  0     5
+## 2 median(x)     0     0     0     0     0    0  0     5
+## 
+## Output summary
+##        Func Stat     Sort1     Sort2     Sort3     Sort4     Sort5
+## 1   mean(x)    1 0.7360094 0.7360094 0.7360094 0.7360094 0.7360094
+## 2 median(x)    1 0.5679456 0.5679456 0.5679456 0.5679456 0.5679456
+##        mean sd
+## 1 0.7360094  0
+## 2 0.5679456  0</code></pre>
+<p>In this case each evaluation is identical since the input is not random. The data passed to <code>input</code> is kept as is, so there is no randomness from the data. If we want randomness in the data, we can use <code>inputi</code>, which evaluates its argument as an expression, meaning that each time it will be different.</p>
+<p>Below is the same code as above except <code>inputi</code> is used with <code>x</code> set in brackets instead of a list. We see there is randomness and we can get an idea of the distribution of the median and mean.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mbc</span>(<span class="kw">mean</span>(x), <span class="kw">median</span>(x), <span class="dt">inputi=</span>{x=<span class="kw">rexp</span>(<span class="dv">30</span>)})</code></pre></div>
+<pre><code>## Run times (sec)
+##    Function Sort1 Sort2 Sort3 Sort4 Sort5 mean sd neval
+## 1   mean(x)     0     0     0     0     0    0  0     5
+## 2 median(x)     0     0     0     0     0    0  0     5
+## 
+## Output summary
+##        Func Stat        V1        V2        V3       V4        V5
+## 1   mean(x)    1 0.9041031 1.1820833 0.9131991 1.483039 0.9399961
+## 2 median(x)    1 0.7290917 0.8445266 0.5957285 1.163204 0.6192530
+##        mean        sd
+## 1 1.0844841 0.2505615
+## 2 0.7903606 0.2306833</code></pre>
+<p>When the code chunks to evaluate are simple functions of a single variable, this can be simplified. Look how simple it is to run a test on these!</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mbc</span>(mean, median, <span class="dt">inputi=</span><span class="kw">rexp</span>(<span class="dv">30</span>))</code></pre></div>
+<pre><code>## Run times (sec)
+##   Function Sort1 Sort2 Sort3 Sort4 Sort5 mean sd neval
+## 1     mean     0     0     0     0     0    0  0     5
+## 2   median     0     0     0     0     0    0  0     5
+## 
+## Output summary
+##     Func Stat        V1        V2        V3        V4        V5      mean
+## 1   mean    1 0.8241886 0.8783592 0.7454609 0.8459507 1.1176282 0.8823175
+## 2 median    1 0.6591866 0.4701343 0.5269150 0.4204864 0.7466348 0.5646714
+##          sd
+## 1 0.1403727
+## 2 0.1352737</code></pre>
+</div>
+<div id="comparing-to-expected-values" class="section level2">
+<h2>Comparing to expected values</h2>
+<p>The previous comparisons showed a summary of the outputs, but many times we want to compare output values to true values, then calculate a summary statistic, such as an average error. The argument <code>target</code> specifies the values the code chunks should give, then summary statistics can be calculated by specifying <code>metrics</code>, which defaults to calculating the rmse.</p>
+<p>For example, suppose we have data from a linear function, and want to see how accurate the model is when the output values are corrupted with noise. Below we compare two linear models: the first with an intercept term, and the second without. The model with the intercept term should be much better since the data has an intercept of <span class="math inline">\(-0.6\)</span>.</p>
+<p>We see that the output is different in a few ways now. The <code>Stat</code> column tells what the row is showing. These all say <code>rmse</code>, meaning they are giving the root mean squared error of the predicted values compared to the true <code>y</code>. There’s also a new section at the bottom title <code>Compare</code>. This compares the <code>rmse</code> values from the two methods, and does a t-test to see if the difference is significant. However, since there is no randomness, it fails to perform the t-test.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">n &lt;-<span class="st"> </span><span class="dv">20</span>
+x &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dt">length.out =</span> n)
+y &lt;-<span class="st"> </span><span class="fl">1.8</span> <span class="op">*</span><span class="st"> </span>x <span class="op">-</span><span class="st"> </span>.<span class="dv">6</span>
+ynoise &lt;-<span class="st"> </span>y <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(n, <span class="dv">0</span>, .<span class="dv">2</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mbc</span>(<span class="kw">predict</span>(<span class="kw">lm</span>(ynoise <span class="op">~</span><span class="st"> </span>x), <span class="kw">data.frame</span>(x)),
+    <span class="kw">predict</span>(<span class="kw">lm</span>(ynoise <span class="op">~</span><span class="st"> </span>x <span class="op">-</span><span class="st"> </span><span class="dv">1</span>), <span class="kw">data.frame</span>(x)),
+    <span class="dt">target =</span> y)</code></pre></div>
+<pre><code>## Run times (sec)
+##                                     Function Sort1 Sort2 Sort3 Sort4 Sort5
+## 1     predict(lm(ynoise ~ x), data.frame(x))     0     0     0     0  0.00
+## 2 predict(lm(ynoise ~ x - 1), data.frame(x))     0     0     0     0  0.01
+##    mean          sd neval
+## 1 0.000 0.000000000     5
+## 2 0.002 0.004472136     5
+## 
+## Output summary
+##                                         Func Stat         V1         V2
+## 1     predict(lm(ynoise ~ x), data.frame(x)) rmse 0.03031246 0.03031246
+## 2 predict(lm(ynoise ~ x - 1), data.frame(x)) rmse 0.31245490 0.31245490
+##           V3         V4         V5       mean sd
+## 1 0.03031246 0.03031246 0.03031246 0.03031246  0
+## 2 0.31245490 0.31245490 0.31245490 0.31245490  0
+## 
+## Compare
+##                                                                                   Func
+## 1 predict(lm(ynoise ~ x), data.frame(x)) vs predict(lm(ynoise ~ x - 1), data.frame(x))
+##   Stat conf.low conf.up  t  p
+## 1 rmse       NA      NA NA NA</code></pre>
+<p>To add randomness we can simply define <code>ynoise</code> in the <code>inputi</code> argument, as shown below. Now there is randomness in the data, so a paired t-test can be computed. It is paired since the same <code>ynoise</code> is given to each model. We see that even with only a sample size of 5, the p-value is highly significant.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mbc</span>(<span class="kw">predict</span>(<span class="kw">lm</span>(ynoise <span class="op">~</span><span class="st"> </span>x), <span class="kw">data.frame</span>(x)),
+    <span class="kw">predict</span>(<span class="kw">lm</span>(ynoise <span class="op">~</span><span class="st"> </span>x <span class="op">-</span><span class="st"> </span><span class="dv">1</span>), <span class="kw">data.frame</span>(x)),
+    <span class="dt">inputi=</span>{ynoise &lt;-<span class="st"> </span>y <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(n, <span class="dv">0</span>, .<span class="dv">2</span>)},
+    <span class="dt">target =</span> y)</code></pre></div>
+<pre><code>## Run times (sec)
+##                                     Function Sort1 Sort2 Sort3 Sort4 Sort5
+## 1     predict(lm(ynoise ~ x), data.frame(x))     0     0     0     0  0.00
+## 2 predict(lm(ynoise ~ x - 1), data.frame(x))     0     0     0     0  0.01
+##    mean          sd neval
+## 1 0.000 0.000000000     5
+## 2 0.002 0.004472136     5
+## 
+## Output summary
+##                                         Func Stat        V1         V2
+## 1     predict(lm(ynoise ~ x), data.frame(x)) rmse 0.1209678 0.01310184
+## 2 predict(lm(ynoise ~ x - 1), data.frame(x)) rmse 0.3258303 0.31153273
+##            V3         V4         V5       mean          sd
+## 1 0.009311599 0.01142981 0.04681271 0.04032476 0.047652966
+## 2 0.311442443 0.31147247 0.31202430 0.31446045 0.006360358
+## 
+## Compare
+##                                                                                Func
+## t predict(lm(ynoise ~ x), data.frame(x))-predict(lm(ynoise ~ x - 1), data.frame(x))
+##   Stat         V1         V2         V3         V4         V5       mean
+## t rmse -0.2048625 -0.2984309 -0.3021308 -0.3000427 -0.2652116 -0.2741357
+##           sd         t            p
+## t 0.04160401 -14.73382 0.0001235005</code></pre>
+</div>
 
 
 

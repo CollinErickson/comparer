@@ -158,8 +158,15 @@ Below we compare two linear models: the first with an intercept term,
 and the second without.
 The model with the intercept term should be much better
 since the data has an intercept of $-0.6$.
+
 We see that the output is different in a few ways now.
-The `Stat`
+The `Stat` column tells what the row is showing.
+These all say `rmse`, meaning they are giving the root mean squared error
+of the predicted values compared to the true `y`.
+There's also a new section at the bottom title `Compare`.
+This compares the `rmse` values from the two methods,
+and does a t-test to see if the difference is significant.
+However, since there is no randomness, it fails to perform the t-test.
 
 ```{r}
 n <- 20
@@ -174,5 +181,17 @@ mbc(predict(lm(ynoise ~ x), data.frame(x)),
     target = y)
 ```
 
+To add randomness we can simply define `ynoise` in the `inputi` argument,
+as shown below.
+Now there is randomness in the data, so a paired t-test can be computed.
+It is paired since the same `ynoise` is given to each model.
+We see that even with only a sample size of 5,
+the p-value is highly significant.
 
+```{r}
+mbc(predict(lm(ynoise ~ x), data.frame(x)),
+    predict(lm(ynoise ~ x - 1), data.frame(x)),
+    inputi={ynoise <- y + rnorm(n, 0, .2)},
+    target = y)
+```
 
