@@ -120,17 +120,17 @@ test_that("kfold", {
   aa <- 1:10
   bb <- aa*1.8 + 10
   # Need to give in kfoldN
-  expect_error(mbc(lm(y ~ x - 1), lm(y~x), inputi={x <- aa[ki];y <- bb[ki]}, kfold=5))
-  expect_error(mbc(lm(y ~ x - 1), lm(y~x), inputi={x <- aa[ki];y <- bb[ki]}, kfold=5, kfoldN=10), NA)
-  expect_error(mbc(lm(y ~ x - 1), lm(y~x), inputi={x <- aa[ki];y <- bb[ki]}, kfold=5, kfoldN=10, targetin = {data.frame(x=aa,y=bb)[-ki,]}, target='y'), NA)
+  expect_error(mbc(lm(y ~ x - 1), lm(y~x), inputi={x <- aa[ki];y <- bb[ki]}, kfold=TRUE))
+  expect_error(mbc(lm(y ~ x - 1), lm(y~x), inputi={x <- aa[ki];y <- bb[ki]}, kfold=c(10,5)), NA)
+  expect_error(mbc(lm(y ~ x - 1), lm(y~x), inputi={x <- aa[ki];y <- bb[ki]}, kfold=c(10,5), times=15, targetin = {data.frame(x=aa,y=bb)[-ki,]}, target='y'), NA)
   # expect_error(mbc(lm(y ~ x - 1), lm(y~x), inputi={x <- aa[ki];y <- bb[ki]}, kfold=5, kfoldN=10, post=predict(., data.frame(x=aa[-ki])), target=bb[-ki]), NA)
   # Check kfold=TRUE works
-  expect_error(mbc(lm(y ~ x - 1), lm(y~x), inputi={x <- aa[ki];y <- bb[ki]}, kfold=TRUE, kfoldN=10), NA)
+  expect_error(mbc(lm(y ~ x - 1), lm(y~x), inputi={x <- aa[ki];y <- bb[ki]}, kfold=c(10)), NA)
   # Check error for bad kfold
-  expect_error(mbc(lm(y ~ x - 1), lm(y~x), inputi={x <- aa[ki];y <- bb[ki]}, kfold=3.3, kfoldN=10))
-  expect_error(mbc(lm(y ~ x - 1), lm(y~x), inputi={x <- aa[ki];y <- bb[ki]}, kfold="5", kfoldN=10))
+  expect_error(mbc(lm(y ~ x - 1), lm(y~x), inputi={x <- aa[ki];y <- bb[ki]}, kfold=c(10,3.3)))
+  expect_error(mbc(lm(y ~ x - 1), lm(y~x), inputi={x <- aa[ki];y <- bb[ki]}, kfold=c(10,"5")))
   # Test post with expression
-  expect_error(mbc(mean(x), inputi={x <- rnorm(100)[ki]}, kfold=5, kfoldN = 100, post=.+max(ki)), NA)
+  expect_error(mbc(mean(x), inputi={x <- rnorm(100)[ki]}, kfold=c(100,5), post=.+max(ki)), NA)
 
 })
 

@@ -1,4 +1,6 @@
-#' Microbenchmark compare
+#' Model benchmark compare
+#'
+#' Compare the run time and output of various code chunks
 #'
 #' @param ... Functions to run
 #' @param times Number of times to run
@@ -12,10 +14,10 @@
 #' mis90 is the mean interval score for 90\% confidence, see Gneiting and Raftery (2007).
 #' sr27 is the scoring rule given in Equation 27 of Gneiting and Raftery (2007).
 #' @param paired Should the results be paired for comparison?
-#' @param kfold TRUE if k-fold CV should be run with k=`times`, or number of
-#' folds, which will override `times`. Use `ki` in inputi and targeti to select
-#' elements in the current fold.
-#' @param kfoldN Number of elements that need to be split into `kfold` folds.
+#' @param kfold First element should be the number of elements that are being
+#' split into groups. If the number of folds is different from `times`, then
+#' the second argument is the number of folds.
+#' Use `ki` in `inputi` and `targeti` to select elements in the current fold.
 #' @importFrom stats median predict t.test sd
 #' @references Gneiting, T., & Raftery, A. E. (2007). Strictly proper scoring rules, prediction, and estimation. Journal of the American Statistical Association, 102(477), 359-378.
 #'
@@ -42,7 +44,7 @@
 #' m1 <- mbc(function() {x <- runif(100);Sys.sleep(rexp(1, 30));mean(x)},
 #'   function() {x <- runif(100);Sys.sleep(rexp(1, 50));median(x)})
 mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
-                metric="rmse", paired, kfold, kfoldN) {#browser()
+                metric="rmse", paired, kfold) {#browser()
   if (!missing(input) && !missing(inputi)) {
     stop("input and inputi should not both be given in")
   }
@@ -65,17 +67,17 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
   if (length(fnames) == 1) {fnames <- list(fnames)}
 
   if (!missing(kfold)) {
-    if (is.logical(kfold) && kfold==TRUE) {
+    if (length(kfold) == 1) {
       folds <- times
-    } else if (kfold > 1 && (kfold==as.integer(kfold))) {
-      times <- folds <- kfold
+      kfoldN <- kfold
+    } else if (length(kfold) == 2) {
+      kfoldN <- kfold[1]
+      folds <- kfold[2]
     } else {
-      stop("kfold must be TRUE or an integer")
+      stop("kfold must be # of indices and use times for # of folds or c(# of indices, # of folds #923052")
     }
-    if (missing(kfoldN)) {
-      stop("Must kfoldN, the number of samples")
-    }
-    ki_all <- sample(1:kfoldN)
+    if (!is.numeric(folds) || (folds != as.integer(folds))) {stop("kfold must be integers #52027")}
+    if (!is.numeric(kfoldN) || (kfoldN != as.integer(kfoldN))) {stop("kfold must be integers #52028")}
   }
 
   # Create objects to hold output data
@@ -91,6 +93,11 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
   # Loop over each replicate
   for (j in 1:times) {
 
+    # Update kfold if finished set
+    if (!missing(kfold) && (((j-1) %% folds) == 0)) {
+      ki_all <- sample(1:kfoldN)
+    }
+
     # Get input for replicate if inputi given
     if (!missing(inputi)) {
       if (missing(paired)) {paired <- TRUE} # Same inputs so pair them
@@ -104,7 +111,7 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
         input <- new.env(parent = parent.frame())
         # Add ki to env if using kfold
         if (!missing(kfold)) {
-          input$ki <- ki_all[(1:kfoldN %% times) != j-1]
+          input$ki <- ki_all[(1:kfoldN %% folds) != (j-1)%%folds]
         }
         # Evaluate expression
         inputi_expr_out <- eval(inputi_expr, input)

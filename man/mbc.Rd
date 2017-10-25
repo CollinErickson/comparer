@@ -2,10 +2,10 @@
 % Please edit documentation in R/mbc.R
 \name{mbc}
 \alias{mbc}
-\title{Microbenchmark compare}
+\title{Model benchmark compare}
 \usage{
 mbc(..., times = 5, input, inputi, evaluator, post, target, targetin,
-  metric = "rmse", paired, kfold, kfoldN)
+  metric = "rmse", paired, kfold)
 }
 \arguments{
 \item{...}{Functions to run}
@@ -30,17 +30,16 @@ sr27 is the scoring rule given in Equation 27 of Gneiting and Raftery (2007).}
 
 \item{paired}{Should the results be paired for comparison?}
 
-\item{kfold}{TRUE if k-fold CV should be run with k=`times`, or number of
-folds, which will override `times`. Use `ki` in inputi and targeti to select
-elements in the current fold.}
-
-\item{kfoldN}{Number of elements that need to be split into `kfold` folds.}
+\item{kfold}{First element should be the number of elements that are being
+split into groups. If the number of folds is different from `times`, then
+the second argument is the number of folds.
+Use `ki` in `inputi` and `targeti` to select elements in the current fold.}
 }
 \value{
 Data frame of comparison results
 }
 \description{
-Microbenchmark compare
+Compare the run time and output of various code chunks
 }
 \examples{
 # input given, no post
