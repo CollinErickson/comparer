@@ -216,4 +216,57 @@ mbc(ynoise ~ x,
 
 # K-Fold Cross Validation
 
+K-fold cross validation can also be done using `mbc` 
+using the `kfold` parameter.
+K-fold cross validation involves splitting $N$ data points into
+$k$ groups.
+`kfold` should specify what this $N$ is, since it depends on the data.
+By default it will set the number of folds, $k$, to be `times`.
+Then each replicate will be evaluating a single fold.
+Note that this will not do $k$ folds $times$ times.
+
+To make $k$ different from $times$, pass in $kfold$ as a vector
+whose second element in the number of folds.
+For example, suppose you have 100 data points,
+want to do 5 folds,
+and repeat this process twice (i.e. evaluate 10 folds).
+Then you should pass in $kfold=c(100,5)$ and $times=10$.
+The first five trials would then the the five separate folds.
+The sixth through tenth trials would be a new partition of
+the data into five folds.
+
+Then to use this folds you must use `ki`
+as part of an expression in the code chunk or `inputi`.
+The following shows how to use k-fold cross validation
+fitting a linear model to the `cars` dataset.
+Setting `kfold=c(nrow(cars), 5)` tells it that you want to use
+5 folds on the `cars` data set. It has 50 rows, so in each trial
+`ki` is a subset of `1:50` of 40 elements.
+Setting `times=30` means that we are repeating the five folds
+six times.
+The code chunk fits the model, makes predictions on the hold-out data,
+and calculates the RMSE.
+
+```{r kfold_cars_ex}
+mbc({mod <- lm(dist ~ speed, data=cars[ki,])
+     p <- predict(mod,cars[-ki,])
+     sqrt(mean((p - cars$dist[-ki])^2))
+     },
+    kfold=c(nrow(cars), 5),
+    times=30)
+```
+
+The following example simplifies this a little.
+Setting `targetin` tells it what the input to `predict` should be
+and setting `target="dist"` tells it that the target is the
+`dist` element from `targetin`.
+You cannot set `target=cars$dit[-ki]` since `target`
+cannot be evaluated as an expression.
+
+```{r kfold_cars_ex2}
+mbc(lm(dist ~ speed, data=cars[ki,]),
+    targetin=cars[-ki,], target="dist",
+    kfold=c(nrow(cars), 5),
+    times=30)
+```
 
