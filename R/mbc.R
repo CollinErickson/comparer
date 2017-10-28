@@ -92,10 +92,12 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
 
   # Loop over each replicate
   for (j in 1:times) {
-
     # Update kfold if finished set
     if (!missing(kfold) && (((j-1) %% folds) == 0)) {
       ki_all <- sample(1:kfoldN)
+    }
+    if (!missing(kfold)) {
+      ki <- ki_all[(1:kfoldN %% folds) != (j-1)%%folds]
     }
 
     # Get input for replicate if inputi given
@@ -111,7 +113,8 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
         input <- new.env(parent = parent.frame())
         # Add ki to env if using kfold
         if (!missing(kfold)) {
-          input$ki <- ki_all[(1:kfoldN %% folds) != (j-1)%%folds]
+          # input$ki <- ki_all[(1:kfoldN %% folds) != (j-1)%%folds]
+          input$ki <- ki
         }
         # Evaluate expression
         inputi_expr_out <- eval(inputi_expr, input)
@@ -197,9 +200,14 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
         #   gcFirst = gcFirst
         # )
         if (missing(evaluator)) {
+          inputenv <- new.env(parent = parent.frame()) # Only ki and parent.frame
+          if (!missing(kfold)) { # If kfold, set ki
+            # inputenv$ki <- ki_all[(1:kfoldN %% folds) != (j-1)%%folds]
+            inputenv$ki <- ki
+          }
           runtime <- system.time(
             # out <- dots[[i]](input) # Old version, required functions
-            out <- eval(dots[[i]], envir=parent.frame()),
+            out <- eval(dots[[i]], envir=inputenv),
             gcFirst = gcFirst
           )
           if (is.function(out)) {#print("Trying second time 2")
@@ -213,6 +221,10 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
           # browser()
           # This time there is no input, so create it
           inputenv <- new.env()
+          if (!missing(kfold)) { # If kfold, set ki
+            # inputenv$ki <- ki_all[(1:kfoldN %% folds) != (j-1)%%folds]
+            inputenv$ki <- ki
+          }
           expr_evaluator <- match.call(expand.dots = FALSE)$`evaluator`
           inputenv$. <- eval(dots[[i]]) #, envir=input)
           runtime <- system.time(
@@ -262,7 +274,8 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
             tar_env <- new.env(parent = parent.frame())
             # Add ki to env
             if (!missing(kfold)) {
-              tar_env$ki <- input$ki #ki_all[(1:kfoldN %% times) == j-1]
+              # tar_env$ki <- input$ki #ki_all[(1:kfoldN %% times) == j-1]
+              tar_env$ki <- ki
             }
             # Evaluate expression
             targeti_expr <- match.call(expand.dots = FALSE)$`targetin`
