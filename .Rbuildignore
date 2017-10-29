@@ -5,3 +5,4 @@ scratch
 ^README\.Rmd$
 ^README-.*\.png$
 ^codecov\.yml$
+^cran-comments\.md$
