@@ -1,11 +1,13 @@
 Package: comparer
 Type: Package
-Title: Compare R functions
+Title: Compare the output and run time of R code
 Version: 0.1.0
-Author: Collin Erickson
-Maintainer: Collin Erickson <collinberickson@gmail.com>
-Description: Makes comparisons quickly for different functions performing
-    the same task. Can be used to compare model fits to the same data or
+Authors@R: c(
+  person("Collin", "Erickson", , "collinberickson@gmail.com", c("aut", "cre"))
+  )
+Description: Makes comparisons quickly for different functions or code
+    blocks performing the same task with the function 'mbc'. 
+    Can be used to compare model fits to the same data or
     see which function runs faster.
 License: GPL-3
 Encoding: UTF-8
