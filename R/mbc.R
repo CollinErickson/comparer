@@ -25,26 +25,44 @@
 #' @export
 #'
 #' @examples
+#' # Compare distribution of mean for different sample sizes
+#' mbc(mean(rnorm(1e2)),
+#'     mean(rnorm(1e4)),
+#'     times=20)
+#'
+#' # Compare mean and median on same data
+#' mbc(mean(x),
+#'     median(x),
+#'     inputi={x=rexp(1e2)})
+#'
 #' # input given, no post
-#' m1 <- mbc(function(x) {Sys.sleep(rexp(1, 30));mean(x)},
-#'   function(x) {Sys.sleep(rexp(1, 5));median(x)}, input=runif(100))
-#' m1
+#' mbc(function(x) {Sys.sleep(rexp(1, 30));mean(x)},
+#'     function(x) {Sys.sleep(rexp(1, 5));median(x)},
+#'     inputi={x=runif(100)})
+#'
 #' # input given with post
 #' mbc(function(x) {Sys.sleep(rexp(1, 30));mean(x)},
-#'   function(x) {Sys.sleep(rexp(1, 5));median(x)}, input=runif(100),
-#'   post=function(x){c(x+1, 12)})
+#'     function(x) {Sys.sleep(rexp(1, 5));median(x)},
+#'     inputi={x=runif(100)},
+#'     post=function(x){c(x+1, 12)})
+#'
 #' # input given with post, 30 times
 #' mbc(function(x) {Sys.sleep(rexp(1, 30));mean(x)+runif(1)},
-#'   function(x) {Sys.sleep(rexp(1, 50));median(x)+runif(1)}, input=runif(100),
-#'   post=function(x){c(x+1, 12)}, times=10)
+#'     function(x) {Sys.sleep(rexp(1, 50));median(x)+runif(1)},
+#'     inputi={runif(100)},
+#'     post=function(x){c(x+1, 12)}, times=10)
+#'
 #' # Name one function and post
-#' mbc(function(x) {mean(x)+runif(1)},  a1=function(x) {median(x)+runif(1)},
-#'   input=runif(100),  post=function(x){c(rr=x+1, gg=12)}, times=10)
+#' mbc(function(x) {mean(x)+runif(1)},
+#'     a1=function(x) {median(x)+runif(1)},
+#'     inputi={x=runif(100)},
+#'     post=function(x){c(rr=x+1, gg=12)}, times=10)
+#'
 #' # No input
 #' m1 <- mbc(function() {x <- runif(100);Sys.sleep(rexp(1, 30));mean(x)},
-#'   function() {x <- runif(100);Sys.sleep(rexp(1, 50));median(x)})
+#'           function() {x <- runif(100);Sys.sleep(rexp(1, 50));median(x)})
 mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
-                metric="rmse", paired, kfold) {#browser()
+                metric="rmse", paired, kfold) {
   if (!missing(input) && !missing(inputi)) {
     stop("input and inputi should not both be given in")
   }
@@ -108,7 +126,6 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
       # If first char is "{", then it is
       inputi_expr <- match.call(expand.dots = FALSE)$`inputi`
       if (substr(as.character(inputi_expr[1]),1,1) == "{") {
-        # browser()
         # Create new environment to evaluate expression
         input <- new.env(parent = parent.frame())
         # Add ki to env if using kfold
@@ -145,7 +162,7 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
     }
 
     # Loop over each function
-    for (i in 1:n) { # browser()
+    for (i in 1:n) {
 
       # See if there is input to each
       if (!missing(input)) { # Single input for all
@@ -172,8 +189,7 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
               )
             }
           }
-        } else { # evaluator is given, call it on each dots as argument .
-          # browser()
+        } else { # evaluator is given, call it on each dots as argument
           expr_evaluator <- match.call(expand.dots = FALSE)$`evaluator`
           input$. <- eval(dots[[i]], envir=input)
           runtime <- system.time(
@@ -218,7 +234,6 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
             )
           }
         } else { # Use evaluator, dots are input to evaluator to be evaluated
-          # browser()
           # This time there is no input, so create it
           inputenv <- new.env()
           if (!missing(kfold)) { # If kfold, set ki
@@ -297,7 +312,7 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
         # Run
         if (!missing(target)) {
           po.metric <- c()
-          if ("rmse" %in% metric) {#browser()
+          if ("rmse" %in% metric) {
             targetj <- if (is.function(target)) {target(j)}
                        else if (is.list(target)) {target[[j]]}
                        else if (is.character(target) && !is.character(po) && (target%in%names(targetinj))) {targetinj[[target]]}
@@ -306,7 +321,7 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
             po.mean <- if ("fit" %in% names(po)) po$fit else if ("mean" %in% names(po)) po$mean else {po}
             po.metric <- c(po.metric, rmse=sqrt(mean((po.mean - targetj)^2)))
           }
-          if ("t" %in% metric) {#browser()
+          if ("t" %in% metric) {
               targetj <- if (is.function(target)) {target(j)}
               else if (is.list(target)) {target[[j]]}
               else if (is.character(target) && !is.character(po)) {input[[target]]}
@@ -318,7 +333,7 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
               names(po.tsum) <- paste0("", names(po.tsum), " t")
               po.metric <- c(po.metric, po.tsum)
           }
-          if ("mis90" %in% metric) {#browser()
+          if ("mis90" %in% metric) {
             targetj <- if (is.function(target)) {target(j)}
             else if (is.list(target)) {target[[j]]}
             else if (is.character(target) && !is.character(po)) {input[[target]]}
@@ -355,7 +370,6 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
       pb$tick() # tick progress bar
     } # end for i in 1:n
   }
-  # browser()
 
   # Create list to return, set to class mbc so S3 methods can be used
   out_list <- list()
@@ -379,7 +393,7 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
         if (n > 1) {
           for (i1 in 1:(n-1)) {
             for (i2 in (i1+1):n) {
-              for (istat in 1:(dim(postout)[3])) { #browser()
+              for (istat in 1:(dim(postout)[3])) {
                 if (paired) {
                   labeli <- paste0(dimnames(postout)[[1]][i1],'-',dimnames(postout)[[1]][i2])
                   diffs <- postout[i1,,istat] - postout[i2,,istat]
@@ -518,7 +532,6 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
       out_list$Output <- outs
     }
   }
-  # browser()
   if (is.array(out_list$Output)) {
     dimnames(out_list$Output)[[1]] <- fnames
   }
@@ -559,7 +572,7 @@ plot.mbc <- function(x, ...) {
 #' m1 <- mbc(function(x) {Sys.sleep(rexp(1, 30));mean(x)},
 #'   function(x) {Sys.sleep(rexp(1, 5));median(x)}, input=runif(100))
 #' print(m1)
-print.mbc <- function(x, ...) {#browser()
+print.mbc <- function(x, ...) {
   nam <- names(x)
   if ('Run_times' %in% nam) {
     cat("Run times (sec)\n")
