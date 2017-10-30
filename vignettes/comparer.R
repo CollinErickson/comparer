@@ -60,3 +60,10 @@ mbc(lm(dist ~ speed, data=cars[ki,]),
     kfold=c(nrow(cars), 5),
     times=30)
 
+## ----kfold_cars_metric_t-------------------------------------------------
+mbc(lm(dist ~ speed, data=cars[ki,]),
+    targetin=cars[-ki,], target="dist",
+    kfold=c(nrow(cars), 5),
+    times=30,
+    metric='t')
+
