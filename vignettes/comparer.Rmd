@@ -7,6 +7,21 @@ vignette: >
   %\VignetteIndexEntry{Introduction to the comparer R package}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  
+references:
+- id: gneiting
+  title: Strictly proper scoring rules, prediction, and estimation
+  author:
+  - family: Gneiting
+    given: Tilmann
+  - family: Raftery
+    given: Adrian E.
+  container-title: Journal of the American Statistical Association
+  publisher: Taylor \& Francis
+  page: 359-378
+  type: article-journal
+  issued:
+    year: 2007
 ---
 
 ```{r setup, echo=FALSE}
@@ -214,7 +229,7 @@ mbc(ynoise ~ x,
 ```
 
 
-# K-Fold Cross Validation
+## K-Fold Cross Validation
 
 K-fold cross validation can also be done using `mbc` 
 using the `kfold` parameter.
@@ -270,3 +285,69 @@ mbc(lm(dist ~ speed, data=cars[ki,]),
     times=30)
 ```
 
+
+
+## Metrics
+
+In the previous example, the output shows that the "Stat" is "rmse",
+meaning that it calculated the root-mean-square error from the.
+predictions and target values.
+The metric, or statistic, calculated can be changed using
+the `metric` argument, which defaults to `rmse`.
+Three of the other options for `metric` are `t`, `mis90`, and `sr27`.
+These three all compare target values ($y$) to 
+predicted values ($\hat{y}$) and
+predicted errors ($s$).
+These only work for models that give predicted errors,
+such as Gaussian process models.
+
+
+
+### `metric=t`
+
+Using these the target value, predicted value, and predicted error,
+we can calculate a t-score.
+
+$$ t = \frac{\hat{y} - y}{s} $$
+
+The output then shows the distribution of these t-scores
+by showing the six number summary.
+
+```{r kfold_cars_metric_t}
+mbc(lm(dist ~ speed, data=cars[ki,]),
+    targetin=cars[-ki,], target="dist",
+    kfold=c(nrow(cars), 5),
+    times=30,
+    metric='t')
+```
+
+### `metric=mis90`
+
+The t-score metric is not very informative because you can get the
+same t-scores by having a large error and large predicted error
+as having a small error and small predicted error.
+`mis90` is the mean interval score for 90\% coverage intervals
+as described by @gneiting [Equation 43].
+
+$$ 3.28s + 20 \left( \hat{y} - y - 1.64s \right)^+ + 20 \left( y - \hat{y} - 1.64s \right)^+  $$
+where $()+$ denotes the positive part of what is in the parantheses.
+Smaller values are better.
+This metric penalizes having large predicted errors and having
+actual errors different from the predicted errors,
+so it is very good for judging the accuracy of a prediction interval.
+
+
+### `metric=sr27`
+
+The scoring rule in Equation 27 @gneiting is another proper scoring rule.
+
+$$  -\left( \frac{\hat{y} - y}{s} \right)^2 - \log s^2 $$
+For this metric, larger values are better.
+A problem with this metric is that if $s=0$, which can happen from
+numerical issues, then it will go to infinity,
+which does not happen with the mean interval score.
+
+
+
+
+## References

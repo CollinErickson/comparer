@@ -47,10 +47,16 @@ mbc(ynoise ~ x,
     target = y)
 
 ## ----kfold_cars_ex-------------------------------------------------------
-mbc({mod <- lm(dist ~ speed, data=cars[ki,]);
+mbc({mod <- lm(dist ~ speed, data=cars[ki,])
      p <- predict(mod,cars[-ki,])
      sqrt(mean((p - cars$dist[-ki])^2))
      },
+    kfold=c(nrow(cars), 5),
+    times=30)
+
+## ----kfold_cars_ex2------------------------------------------------------
+mbc(lm(dist ~ speed, data=cars[ki,]),
+    targetin=cars[-ki,], target="dist",
     kfold=c(nrow(cars), 5),
     times=30)
 
