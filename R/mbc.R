@@ -306,8 +306,10 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
           } else {
             targetinj <- targetin
           }
-          po <- predict(po, targetinj)
+          po <- predict(po, targetinj, se.fit=any(c("t","mis90","sr27") %in% metric))
           # }
+        } else {
+          targetinj <- NULL
         }
         # Run
         if (!missing(target)) {
@@ -324,6 +326,7 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
           if ("t" %in% metric) {
               targetj <- if (is.function(target)) {target(j)}
               else if (is.list(target)) {target[[j]]}
+              else if (is.character(target) && !is.character(po) && (target%in%names(targetinj))) {targetinj[[target]]}
               else if (is.character(target) && !is.character(po)) {input[[target]]}
               else {target}
               po.mean <- if ("fit" %in% names(po)) po$fit else if ("mean" %in% names(po)) po$mean else {stop("Can't get fit/mean from post/out")}
@@ -336,6 +339,7 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
           if ("mis90" %in% metric) {
             targetj <- if (is.function(target)) {target(j)}
             else if (is.list(target)) {target[[j]]}
+            else if (is.character(target) && !is.character(po) && (target%in%names(targetinj))) {targetinj[[target]]}
             else if (is.character(target) && !is.character(po)) {input[[target]]}
             else {target}
             po.mean <- if ("fit" %in% names(po)) po$fit else if ("mean" %in% names(po)) po$mean else {stop("Can't get fit/mean from post/out")}
@@ -349,6 +353,7 @@ mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
           if ("sr27" %in% metric) {
             targetj <- if (is.function(target)) {target(j)}
             else if (is.list(target)) {target[[j]]}
+            else if (is.character(target) && !is.character(po) && (target%in%names(targetinj))) {targetinj[[target]]}
             else if (is.character(target) && !is.character(po)) {input[[target]]}
             else {target}
             po.mean <- if ("fit" %in% names(po)) po$fit else if ("mean" %in% names(po)) po$mean else {stop("Can't get fit/mean from post/out")}

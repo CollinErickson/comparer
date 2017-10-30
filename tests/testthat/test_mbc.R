@@ -100,6 +100,7 @@ test_that("test mbc metrics", {
   expect_error(mbc(lm(y1 ~ x1), lm(y1 ~ x1 + x2), target=function(i) {ydf}, metric="mis90", post=function(mod){predict(mod, xdf,se=T)}), NA)
   expect_error(mbc(lm(y1 ~ x1), lm(y1 ~ x1 + x2), target=lapply(1:5, function(i)ydf), metric="mis90", post=function(mod){predict(mod, xdf,se=T)}), NA)
   expect_error(mbc(lm(y1 ~ x1), lm(y1 ~ x1 + x2), target="ydf", metric="mis90", input=list(ydf=ydf, x1=xdf$x1, x2=xdf$x2, y1=y1),post=function(mod){predict(mod, xdf,se=T)}), NA)
+  expect_error(mbc(lm(y1 ~ x1), lm(y1 ~ x1 + x2), targetin=data.frame(ydf=ydf, x1=xdf$x1, x2=xdf$x2, y1=y1), target="ydf", metric="mis90", input=list(ydf=ydf, x1=xdf$x1, x2=xdf$x2, y1=y1)), NA)
 
   # t and mis90
   m1 <- mbc(lm(y1 ~ x1), lm(y1 ~ x1 + x2), target=ydf, metric=c("t","mis90"), post=function(mod){predict(mod, xdf,se=T)})
