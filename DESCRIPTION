@@ -1,6 +1,6 @@
 Package: comparer
 Type: Package
-Title: Compare the output and run time of R code
+Title: Compare Output and Run Time
 Version: 0.1.0
 Authors@R: c(
   person("Collin", "Erickson", , "collinberickson@gmail.com", c("aut", "cre"))
