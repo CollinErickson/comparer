@@ -1,7 +1,7 @@
 comparer <- R6::R6Class(
   classname = "comparer",
   public = list(
-    outrawdf = NULL,
+    outrawdf = data.frame(),
     outdf = NULL,
     enddf = NULL,
     rungrid = NULL,
@@ -11,8 +11,11 @@ comparer <- R6::R6Class(
     number_runs = NULL,
     completed_runs = NULL,
     eval_func = NULL,
-    initialize = function(..., eval_func) {#browser()
+    outlist = NULL,
+    save_output = NULL,
+    initialize = function(..., eval_func, save_output=FALSE) {#browser()
       self$eval_func <- eval_func
+      self$save_output <- save_output
       self$arglist <- list(...)
       self$nvars <- sapply(self$arglist,
                       function(i) {
@@ -39,10 +42,10 @@ comparer <- R6::R6Class(
         to_run <- 1:self$number_runs
       }
       sapply(to_run,function(ii){self$run_one(ii, noplot=noplot)})
-      self$postprocess_outdf()
+      # self$postprocess_outdf()
       invisible(self)
     },
-    run_one = function(irow=NULL, save_output=self$save_output, noplot=FALSE) {browser()
+    run_one = function(irow=NULL, save_output=self$save_output, noplot=FALSE) {#browser()
       if (is.null(irow)) { # If irow not given, set to next not run
         if (any(self$completed_runs == FALSE)) {
           irow <- which(self$completed_runs == 0)[1]
@@ -55,12 +58,12 @@ comparer <- R6::R6Class(
       } else if (self$completed_runs[irow] == TRUE) {
         warning("irow already run, will run again anyways")
       }
-      browser()
+      # browser()
       cat("Running ", irow, ", completed ", sum(self$completed_runs),"/",length(self$completed_runs), " ", format(Sys.time(), "%a %b %d %X %Y"), "\n", sep="")
       row_grid <- self$rungrid[irow, ] #rungrid row for current run
       # if (!is.na(row_grid$seed)) {set.seed(row_grid$seed)}
       row_list <- lapply(1:ncol(self$nvars),
-                         function(i) {browser()
+                         function(i) {#browser()
                            ar <- self$arglist[[i]]
                            if (is.data.frame(ar)) {
                              tr <- as.list(ar[row_grid[1,i],])
@@ -93,14 +96,21 @@ comparer <- R6::R6Class(
       #                      row.names=NULL,
       #                      stringsAsFactors = FALSE
       # )
+      self$outlist[[irow]] <- output
+      if (is.data.frame(output)) {
+        newdf0 <- output
+      } else {
+        newdf0 <- data.frame(runtime=systime[1])
+      }
       newdf1 <- cbind(row_grid, newdf0, row.names=NULL)
+      nr <- nrow(newdf1)
       #if (browsernow) {browser()}
       #self$outdf <- rbind(self$outdf, newdf1)
       if (nrow(self$outrawdf) == 0) { # If outrawdf not yet created, created blank df with correct names and size
-        self$outrawdf <- as.data.frame(matrix(data=NA, nrow=nrow(self$rungrid) * self$batches, ncol=ncol(newdf1)))
+        self$outrawdf <- as.data.frame(matrix(data=NA, nrow=nrow(self$rungrid) * nrow(newdf1), ncol=ncol(newdf1)))
         colnames(self$outrawdf) <- colnames(newdf1)
       }
-      self$outrawdf[((irow-1)*self$batches+1):(irow*self$batches), ] <- newdf1
+      self$outrawdf[((irow-1)*nr+1):(irow*nr), ] <- newdf1
       #stop("Here it is adding some columns wrong, force2 should be 0_0 and I think it is as newdf0, but it shows up as 1 in final df")
       if (save_output) {
         if (file.exists(paste0(self$folder_path,"/data_cat.csv"))) { # append new row
@@ -109,7 +119,6 @@ comparer <- R6::R6Class(
           write.table(x=newdf1, file=paste0(self$folder_path,"/data_cat.csv"),append=F, sep=",", col.names=T)
         }
       }
-      u$delete()
       self$completed_runs[irow] <- TRUE
       invisible(self)
     }
@@ -119,6 +128,7 @@ comparer <- R6::R6Class(
   )
 )
 cc <- comparer$new(a=1:3,b=2, cd=data.frame(c=3:4,d=5:6), eval_func=function(...) {list(...)})
+cc <- comparer$new(a=1:3,b=2, cd=data.frame(c=3:4,d=5:6), eval_func=function(...,a,b) {data.frame(apb=a+b)})
 cc$arglist
 cc$run_one()
-
+cc$run_all()
