@@ -1,4 +1,4 @@
-I submitted yesterday and was told to make the Title title-case. I changed it from 'Compare the output and run time of R code' to 'Compare Output and Run Time'.
+I submitted a couple days ago and was told I had to edit the description. I made the required change.
 
 ## Test environments
 * local Window 7 install, R 3.4.2
