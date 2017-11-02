@@ -6,7 +6,7 @@ Authors@R: c(
   person("Collin", "Erickson", , "collinberickson@gmail.com", c("aut", "cre"))
   )
 Description: Makes comparisons quickly for different functions or code
-    blocks performing the same task with the function 'mbc'. 
+    blocks performing the same task with the function mbc(). 
     Can be used to compare model fits to the same data or
     see which function runs faster.
 License: GPL-3
