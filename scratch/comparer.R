@@ -13,7 +13,10 @@ comparer <- R6::R6Class(
     eval_func = NULL,
     outlist = NULL,
     save_output = NULL,
-    initialize = function(..., eval_func, save_output=FALSE) {#browser()
+    parallel = NULL,
+    parallel_cores = NULL,
+    parallel_cluster = NULL,
+    initialize = function(..., eval_func, save_output=FALSE, parallel=FALSE, parallel_cores="detect") {#browser()
       self$eval_func <- eval_func
       self$save_output <- save_output
       self$arglist <- list(...)
@@ -32,8 +35,17 @@ comparer <- R6::R6Class(
 
       self$number_runs <- nrow(self$rungrid)
       self$completed_runs <- rep(FALSE, self$number_runs)
-      13
-      14
+      self$parallel <- parallel
+      self$parallel_cores <- parallel_cores
+      if (self$parallel) {
+        # For now assume using parallel package
+        if (parallel_cores == "detect") {
+          self$parallel_cores <- parallel::detectCores()
+        } else {
+          self$parallel_cores <- parallel_cores
+        }
+        self$parallel_cluster <- parallel::makeCluster(spec = self$parallel_cores, type = "SOCK")
+      }
     },
     run_all = function(redo = FALSE, noplot=FALSE) {
       if (!redo) { # Only run ones that haven't been run yet
@@ -41,7 +53,13 @@ comparer <- R6::R6Class(
       } else {
         to_run <- 1:self$number_runs
       }
-      sapply(to_run,function(ii){self$run_one(ii, noplot=noplot)})
+      if (self$parallel) {#browser()
+        pc <- parallel::detectCores()
+        cl1 <- parallel::makeCluster(spec=pc, type="SOCK")
+        parallel::parSapply(cl=cl1, to_run,function(ii){self$run_one(ii, noplot=noplot)})
+      } else {
+        sapply(to_run,function(ii){self$run_one(ii, noplot=noplot)})
+      }
       # self$postprocess_outdf()
       invisible(self)
     },
@@ -60,7 +78,7 @@ comparer <- R6::R6Class(
       }
       # browser()
       cat("Running ", irow, ", completed ", sum(self$completed_runs),"/",length(self$completed_runs), " ", format(Sys.time(), "%a %b %d %X %Y"), "\n", sep="")
-      row_grid <- self$rungrid[irow, ] #rungrid row for current run
+      row_grid <- self$rungrid[irow, , drop=FALSE] #rungrid row for current run
       # if (!is.na(row_grid$seed)) {set.seed(row_grid$seed)}
       row_list <- lapply(1:ncol(self$nvars),
                          function(i) {#browser()
@@ -121,14 +139,20 @@ comparer <- R6::R6Class(
       }
       self$completed_runs[irow] <- TRUE
       invisible(self)
+    },
+    delete = function() {
+      cat("Deleting...\n")
+      if (!is.null(self$parallel_cluster)) {parallel::stopCluster(self$parallel_cluster)}
     }
   ),
   private = list(
 
   )
 )
-cc <- comparer$new(a=1:3,b=2, cd=data.frame(c=3:4,d=5:6), eval_func=function(...) {list(...)})
-cc <- comparer$new(a=1:3,b=2, cd=data.frame(c=3:4,d=5:6), eval_func=function(...,a,b) {data.frame(apb=a+b)})
-cc$arglist
-cc$run_one()
-cc$run_all()
+if (F) {
+  cc <- comparer$new(a=1:3,b=2, cd=data.frame(c=3:4,d=5:6), eval_func=function(...) {list(...)})
+  cc <- comparer$new(a=1:3,b=2, cd=data.frame(c=3:4,d=5:6), eval_func=function(...,a,b) {data.frame(apb=a+b)})
+  cc$arglist
+  cc$run_one()
+  cc$run_all()
+}
