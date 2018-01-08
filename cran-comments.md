@@ -13,8 +13,8 @@ if (requireNamespace("microbenchmark", quietly = TRUE)) {
 This should correct the problem.
 
 ## Test environments
-* local Window 7 install, R 3.4.2
-* ubuntu 12.04 (on travis-ci), R 3.4.2
+* local Window 7 install, R 3.4.3
+* ubuntu 14.04.5 (on travis-ci), R 3.4.2
 * win-builder (devel and release)
 
 ## R CMD check results
