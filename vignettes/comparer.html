@@ -12,7 +12,7 @@
 
 <meta name="author" content="Collin Erickson" />
 
-<meta name="date" content="2017-10-30" />
+<meta name="date" content="2018-01-08" />
 
 <title>Introduction to the comparer R package</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Introduction to the comparer R package</h1>
 <h4 class="author"><em>Collin Erickson</em></h4>
-<h4 class="date"><em>2017-10-30</em></h4>
+<h4 class="date"><em>2018-01-08</em></h4>
 
 
 
@@ -85,13 +85,16 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="motivation-from-microbenchmark" class="section level2">
 <h2>Motivation from <code>microbenchmark</code></h2>
 <p>The R package <code>microbenchmark</code> provides the fantastic eponymous function. It makes it simple to run different segments of code and see which is faster. Borrowing an example from <a href="http://adv-r.had.co.nz/Performance.html" class="uri">http://adv-r.had.co.nz/Performance.html</a>, the following shows how it gives a summary of how fast each ran.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(microbenchmark)
-x &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dv">100</span>)
-<span class="kw">microbenchmark</span>(<span class="kw">sqrt</span>(x), x <span class="op">^</span><span class="st"> </span>.<span class="dv">5</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="cf">if</span> (<span class="kw">requireNamespace</span>(<span class="st">&quot;microbenchmark&quot;</span>, <span class="dt">quietly =</span> <span class="ot">TRUE</span>)) {
+  x &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dv">100</span>)
+  microbenchmark<span class="op">::</span><span class="kw">microbenchmark</span>(<span class="kw">sqrt</span>(x), x <span class="op">^</span><span class="st"> </span>.<span class="dv">5</span>)
+} <span class="cf">else</span> {
+  <span class="st">&quot;microbenchmark not available on your computer&quot;</span>
+}</code></pre></div>
 <pre><code>## Unit: nanoseconds
-##     expr  min   lq    mean median   uq   max neval
-##  sqrt(x)  380 1140 1418.03 1141.0 1521 18246   100
-##    x^0.5 4181 6272 6880.24 7222.5 7603  9123   100</code></pre>
+##     expr  min   lq    mean median   uq   max neval cld
+##  sqrt(x)  380  760  996.04    760  761 18246   100  a 
+##    x^0.5 4181 4182 4873.17   4561 4562 15585   100   b</code></pre>
 <p>However it gives no summary of the output. For this example it is fine since the output is deterministic, but when working with randomness or model predictions we want to have some sort of summary or evaluation metric to see which has better accuracy, or to just see how the outputs differ.</p>
 </div>
 <div id="mbc-to-the-rescue" class="section level2">
@@ -101,9 +104,9 @@ x &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dv">1
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(comparer)
 <span class="kw">mbc</span>(<span class="kw">mean</span>(<span class="kw">rnorm</span>(<span class="dv">10</span>)), <span class="kw">mean</span>(<span class="kw">rnorm</span>(<span class="dv">100</span>)))</code></pre></div>
 <pre><code>## Run times (sec)
-##           Function Sort1 Sort2 Sort3 Sort4 Sort5 mean sd neval
-## 1  mean(rnorm(10))     0     0     0     0     0    0  0     5
-## 2 mean(rnorm(100))     0     0     0     0     0    0  0     5
+##           Function Sort1 Sort2 Sort3 Sort4 Sort5  mean          sd neval
+## 1  mean(rnorm(10))     0     0     0     0  0.00 0.000 0.000000000     5
+## 2 mean(rnorm(100))     0     0     0     0  0.01 0.002 0.004472136     5
 ## 
 ## Output summary
 ##               Func Stat       Sort1       Sort2       Sort3       Sort4
@@ -191,11 +194,11 @@ ynoise &lt;-<span class="st"> </span>y <span class="op">+</span><span class="st"
     <span class="dt">target =</span> y)</code></pre></div>
 <pre><code>## Run times (sec)
 ##                                     Function Sort1 Sort2 Sort3 Sort4 Sort5
-## 1     predict(lm(ynoise ~ x), data.frame(x))     0     0     0  0.01  0.02
-## 2 predict(lm(ynoise ~ x - 1), data.frame(x))     0     0     0  0.00  0.00
+## 1     predict(lm(ynoise ~ x), data.frame(x))     0     0     0     0  0.02
+## 2 predict(lm(ynoise ~ x - 1), data.frame(x))     0     0     0     0  0.02
 ##    mean          sd neval
-## 1 0.006 0.008944272     5
-## 2 0.000 0.000000000     5
+## 1 0.004 0.008944272     5
+## 2 0.004 0.008944272     5
 ## 
 ## Output summary
 ##                                         Func Stat         V1         V2
@@ -217,11 +220,11 @@ ynoise &lt;-<span class="st"> </span>y <span class="op">+</span><span class="st"
     <span class="dt">target =</span> y)</code></pre></div>
 <pre><code>## Run times (sec)
 ##                                     Function Sort1 Sort2 Sort3 Sort4 Sort5
-## 1     predict(lm(ynoise ~ x), data.frame(x))     0     0     0  0.00  0.00
-## 2 predict(lm(ynoise ~ x - 1), data.frame(x))     0     0     0  0.01  0.02
-##    mean          sd neval
-## 1 0.000 0.000000000     5
-## 2 0.006 0.008944272     5
+## 1     predict(lm(ynoise ~ x), data.frame(x))     0     0     0     0     0
+## 2 predict(lm(ynoise ~ x - 1), data.frame(x))     0     0     0     0     0
+##   mean sd neval
+## 1    0  0     5
+## 2    0  0     5
 ## 
 ## Output summary
 ##                                         Func Stat        V1         V2
@@ -250,7 +253,7 @@ ynoise &lt;-<span class="st"> </span>y <span class="op">+</span><span class="st"
 <pre><code>## Run times (sec)
 ##         Function Sort1 Sort2 Sort3 Sort4 Sort5  mean          sd neval
 ## 1     ynoise ~ x     0     0     0     0  0.01 0.002 0.004472136     5
-## 2 ynoise ~ x - 1     0     0     0     0  0.02 0.004 0.008944272     5
+## 2 ynoise ~ x - 1     0     0     0     0  0.00 0.000 0.000000000     5
 ## 
 ## Output summary
 ##             Func Stat         V1         V2        V3         V4
@@ -281,7 +284,7 @@ ynoise &lt;-<span class="st"> </span>y <span class="op">+</span><span class="st"
 ##                                                                                                           Function
 ## 1 { mod &lt;- lm(dist ~ speed, data = cars[ki, ]) p &lt;- predict(mod, cars[-ki, ]) sqrt(mean((p - cars$dist[-ki])^2)) }
 ##   Min. 1st Qu. Median        Mean 3rd Qu. Max.          sd neval
-## 1    0       0      0 0.003666667       0 0.02 0.007183954    30
+## 1    0       0      0 0.001333333       0 0.02 0.005074163    30
 ## 
 ## Output summary
 ##                                                                                                               Func
@@ -294,10 +297,10 @@ ynoise &lt;-<span class="st"> </span>y <span class="op">+</span><span class="st"
     <span class="dt">kfold=</span><span class="kw">c</span>(<span class="kw">nrow</span>(cars), <span class="dv">5</span>),
     <span class="dt">times=</span><span class="dv">30</span>)</code></pre></div>
 <pre><code>## Run times (sec)
-##                              Function Min. 1st Qu. Median        Mean
-## 1 lm(dist ~ speed, data = cars[ki, ])    0       0      0 0.002666667
-##   3rd Qu. Max.          sd neval
-## 1       0 0.02 0.006914918    30
+##                              Function Min. 1st Qu. Median  Mean 3rd Qu.
+## 1 lm(dist ~ speed, data = cars[ki, ])    0       0      0 0.001       0
+##   Max.          sd neval
+## 1 0.02 0.004025779    30
 ## 
 ## Output summary
 ##                                  Func Stat     Min.  1st Qu.   Median
@@ -319,10 +322,10 @@ ynoise &lt;-<span class="st"> </span>y <span class="op">+</span><span class="st"
     <span class="dt">times=</span><span class="dv">30</span>,
     <span class="dt">metric=</span><span class="st">'t'</span>)</code></pre></div>
 <pre><code>## Run times (sec)
-##                              Function Min. 1st Qu. Median        Mean
-## 1 lm(dist ~ speed, data = cars[ki, ])    0       0      0 0.001666667
-##   3rd Qu. Max.          sd neval
-## 1       0 0.02 0.005306686    30
+##                              Function Min. 1st Qu. Median  Mean 3rd Qu.
+## 1 lm(dist ~ speed, data = cars[ki, ])    0       0      0 0.002       0
+##   Max.          sd neval
+## 1 0.02 0.005508614    30
 ## 
 ## Output summary
 ##                                  Func      Stat       Min.     1st Qu.

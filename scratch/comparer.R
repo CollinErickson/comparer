@@ -44,7 +44,7 @@ comparer <- R6::R6Class(
         } else {
           self$parallel_cores <- parallel_cores
         }
-        self$parallel_cluster <- parallel::makeCluster(spec = self$parallel_cores, type = "SOCK")
+        # self$parallel_cluster <- parallel::makeCluster(spec = self$parallel_cores, type = "SOCK")
       }
     },
     run_all = function(redo = FALSE, noplot=FALSE) {
@@ -54,9 +54,15 @@ comparer <- R6::R6Class(
         to_run <- 1:self$number_runs
       }
       if (self$parallel) {#browser()
-        pc <- parallel::detectCores()
-        cl1 <- parallel::makeCluster(spec=pc, type="SOCK")
-        parallel::parSapply(cl=cl1, to_run,function(ii){self$run_one(ii, noplot=noplot)})
+        # pc <- parallel::detectCores()
+        # cl1 <- parallel::makeCluster(spec=pc, type="SOCK")
+        # parallel::parSapply(cl=cl1, to_run,function(ii){self$run_one(ii, noplot=noplot)})
+        if (is.null(self$parallel_cluster)) {
+          self$parallel_cluster <- parallel::makeCluster(spec = self$parallel_cores, type = "SOCK")
+        }
+        parallel::parSapply(cl=self$parallel_cluster, to_run,function(ii){self$run_one(ii, noplot=noplot)})
+        parallel::stopCluster(self$parallel_cluster)
+        self$parallel_cluster <- NULL
       } else {
         sapply(to_run,function(ii){self$run_one(ii, noplot=noplot)})
       }

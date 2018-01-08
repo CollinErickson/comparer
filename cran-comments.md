@@ -1,4 +1,16 @@
-I submitted a couple days ago and was told I had to edit the description. I made the required change.
+I got an email from Brian Ripley saying that I had to fix my usage of microbenchmark. It is in suggests but not used conditionally. I only had it once in my vignette, I changed it to be
+
+```
+
+if (requireNamespace("microbenchmark", quietly = TRUE)) {
+  x <- runif(100)
+  microbenchmark::microbenchmark(sqrt(x), x ^ .5)
+} else {
+  "microbenchmark not available on your computer"
+}
+```
+
+This should correct the problem.
 
 ## Test environments
 * local Window 7 install, R 3.4.2
@@ -7,10 +19,10 @@ I submitted a couple days ago and was told I had to edit the description. I made
 
 ## R CMD check results
 
-0 errors | 0 warnings | 1 note
+0 errors | 0 warnings | 0 note
 
-* This is a new release.
+
 
 ## Reverse dependencies
 
-This is a new release, so there are no reverse dependencies.
+None.

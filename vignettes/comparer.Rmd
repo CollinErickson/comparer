@@ -58,9 +58,12 @@ Borrowing an example from http://adv-r.had.co.nz/Performance.html,
 the following shows how it gives a summary of how fast each ran.
 
 ```{r}
-library(microbenchmark)
-x <- runif(100)
-microbenchmark(sqrt(x), x ^ .5)
+if (requireNamespace("microbenchmark", quietly = TRUE)) {
+  x <- runif(100)
+  microbenchmark::microbenchmark(sqrt(x), x ^ .5)
+} else {
+  "microbenchmark not available on your computer"
+}
 ```
 
 However it gives no summary of the output.

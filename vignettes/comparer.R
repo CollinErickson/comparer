@@ -2,9 +2,12 @@
 set.seed(0)
 
 ## ------------------------------------------------------------------------
-library(microbenchmark)
-x <- runif(100)
-microbenchmark(sqrt(x), x ^ .5)
+if (requireNamespace("microbenchmark", quietly = TRUE)) {
+  x <- runif(100)
+  microbenchmark::microbenchmark(sqrt(x), x ^ .5)
+} else {
+  "microbenchmark not available on your computer"
+}
 
 ## ------------------------------------------------------------------------
 library(comparer)
