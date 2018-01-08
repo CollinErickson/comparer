@@ -12,7 +12,7 @@ Description: Makes comparisons quickly for different functions or code
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-Imports: R6, progress
+Imports: progress
 Suggests: plyr,
     testthat,
     covr,
