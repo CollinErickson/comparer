@@ -1,3 +1,5 @@
+# comparer 0.1.1.9000
+
 # comparer 0.1.1
 
 * Fixing so `microbenchmark` is only used conditionally as requested by CRAN, only occurs once in vignette.
