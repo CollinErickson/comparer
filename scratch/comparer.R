@@ -31,7 +31,16 @@ comparer <- R6::R6Class(
                         }
                       }
                       )
-      self$rungrid <- do.call(reshape::expand.grid.df, lapply(1:ncol(self$nvars), function(i){x <- self$nvars[2,i];td <- data.frame(tt=1:x);names(td) <- names(x);td}))
+      self$rungrid <- do.call(reshape::expand.grid.df,
+                              lapply(1:ncol(self$nvars),
+                                     function(i){
+                                       x <- self$nvars[2,i]
+                                       td <- data.frame(tt=1:x)
+                                       names(td) <- names(x)
+                                       td
+                                     }
+                              )
+                      )
 
       self$number_runs <- nrow(self$rungrid)
       self$completed_runs <- rep(FALSE, self$number_runs)
@@ -60,7 +69,8 @@ comparer <- R6::R6Class(
         if (is.null(self$parallel_cluster)) {
           self$parallel_cluster <- parallel::makeCluster(spec = self$parallel_cores, type = "SOCK")
         }
-        parallel::parSapply(cl=self$parallel_cluster, to_run,function(ii){self$run_one(ii, noplot=noplot)})
+        parout <- parallel::parLapplyLB(cl=self$parallel_cluster, to_run,function(ii){self$run_one(ii, noplot=noplot, is_parallel=TRUE)})
+        lapply(parout, function(oneout) {do.call(self$add_result_of_one, oneout)})
         parallel::stopCluster(self$parallel_cluster)
         self$parallel_cluster <- NULL
       } else {
@@ -69,7 +79,7 @@ comparer <- R6::R6Class(
       # self$postprocess_outdf()
       invisible(self)
     },
-    run_one = function(irow=NULL, save_output=self$save_output, noplot=FALSE) {#browser()
+    run_one = function(irow=NULL, save_output=self$save_output, noplot=FALSE, is_parallel=FALSE) {#browser()
       if (is.null(irow)) { # If irow not given, set to next not run
         if (any(self$completed_runs == FALSE)) {
           irow <- which(self$completed_runs == 0)[1]
@@ -83,7 +93,9 @@ comparer <- R6::R6Class(
         warning("irow already run, will run again anyways")
       }
       # browser()
-      cat("Running ", irow, ", completed ", sum(self$completed_runs),"/",length(self$completed_runs), " ", format(Sys.time(), "%a %b %d %X %Y"), "\n", sep="")
+      cat("Running ", irow, ", completed ", sum(self$completed_runs),"/",
+          length(self$completed_runs), " ",
+          format(Sys.time(), "%a %b %d %X %Y"), "\n", sep="")
       row_grid <- self$rungrid[irow, , drop=FALSE] #rungrid row for current run
       # if (!is.na(row_grid$seed)) {set.seed(row_grid$seed)}
       row_list <- lapply(1:ncol(self$nvars),
@@ -104,7 +116,21 @@ comparer <- R6::R6Class(
       row_list <- as.list(unlist(row_list, recursive = FALSE)) # Need to get list of lists out into single list
       print(row_list)
       # return()
+
+      # Run and time it
       systime <- system.time(output <- do.call(self$eval_func, row_list))
+
+      # If parallel need to return everything to be added to original object
+      if (is_parallel) {
+        return(list(output=output, systime=systime, irow=irow, row_grid=row_grid, save_output=save_output))
+      }
+      # If not parallel
+      # Add results using function
+      self$add_result_of_one(output=output, systime=systime, irow=irow, row_grid=row_grid, save_output=save_output)
+      # Return invisible self
+      invisible(self)
+    },
+    add_result_of_one = function(output, systime, irow, row_grid, save_output) {
       # systime <- system.time(u$run(row_grid$batches,noplot=noplot))
       #browser()
       # newdf0 <- data.frame(batch=u$stats$iteration, mse=u$stats$mse,
@@ -122,9 +148,10 @@ comparer <- R6::R6Class(
       # )
       self$outlist[[irow]] <- output
       if (is.data.frame(output)) {
+        output$runtime <- systime[3]
         newdf0 <- output
       } else {
-        newdf0 <- data.frame(runtime=systime[1])
+        newdf0 <- data.frame(runtime=systime[3])
       }
       newdf1 <- cbind(row_grid, newdf0, row.names=NULL)
       nr <- nrow(newdf1)
@@ -144,7 +171,6 @@ comparer <- R6::R6Class(
         }
       }
       self$completed_runs[irow] <- TRUE
-      invisible(self)
     },
     delete = function() {
       cat("Deleting...\n")
@@ -161,4 +187,9 @@ if (F) {
   cc$arglist
   cc$run_one()
   cc$run_all()
+  # Try parallel
+  cc <- comparer$new(a=1:3,b=2, cd=data.frame(c=3:4,d=5:6), eval_func=function(...,a,b) {Sys.sleep(rexp(1, 10));data.frame(apb=a+b)}, parallel=T)
+  cc <- comparer$new(a=1:10, eval_func=function(...,a) {Sys.sleep(rexp(1, 5));data.frame(apb=a^2)}, parallel=T)
+  system.time(cc$run_all())
+  cc$outrawdf
 }
