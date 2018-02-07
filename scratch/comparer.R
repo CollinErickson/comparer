@@ -2,6 +2,7 @@ comparer <- R6::R6Class(
   classname = "comparer",
   public = list(
     outrawdf = data.frame(),
+    outcleandf = data.frame(),
     outdf = NULL,
     enddf = NULL,
     rungrid = NULL,
@@ -128,24 +129,49 @@ comparer <- R6::R6Class(
                            row_list <<- c(row_list, tr)
                            # tr
                          })
-      row_list <- as.list(unlist(row_list, recursive = FALSE)) # Need to get list of lists out into single list
+      # row_list <- as.list(unlist(row_list, recursive = FALSE)) # Need to get list of lists out into single list
       print(row_list)
       # return()
+
+      # Get df for output row, must be number of string, no functions
+      row_df <- lapply(1:ncol(self$nvars),
+                                function(i) {
+                                  ar <- self$arglist[[i]]
+                                  if (is.data.frame(ar)) {
+                                    tr <- as.list(ar[row_grid[1,i],])
+                                  } else if (is.list(ar)) {
+                                    tr <- ar[[row_grid[1,i]]]
+                                  } else if (is.function(ar)) {
+                                    tr <- ar # If single value is a function
+                                  } else {
+                                    tr <- ar[row_grid[1,i]]
+                                  }
+                                  # Can't use functions
+                                  #  and deparse(quote(tr)) gives "tr"
+                                  if (is.function(tr)) {
+                                    tr <- row_grid[1,i]
+                                  }
+                                  if (is.null(names(tr))) {
+                                    names(tr) <- names(self$arglist)[i]
+                                  }
+                                  tr
+                                })
+      row_df <- as.list(unlist(row_df, recursive = FALSE)) # Need to get list of lists out into single list
 
       # Run and time it
       systime <- system.time(output <- do.call(self$eval_func, row_list))
 
       # If parallel need to return everything to be added to original object
       if (is_parallel) {
-        return(list(output=output, systime=systime, irow=irow, row_grid=row_grid, save_output=save_output))
+        return(list(output=output, systime=systime, irow=irow, row_grid=row_grid, row_df=row_df, save_output=save_output))
       }
       # If not parallel
       # Add results using function
-      self$add_result_of_one(output=output, systime=systime, irow=irow, row_grid=row_grid, save_output=save_output)
+      self$add_result_of_one(output=output, systime=systime, irow=irow, row_grid=row_grid, row_df=row_df, save_output=save_output)
       # Return invisible self
       invisible(self)
     },
-    add_result_of_one = function(output, systime, irow, row_grid, save_output) {
+    add_result_of_one = function(output, systime, irow, row_grid, row_df, save_output) {
       # systime <- system.time(u$run(row_grid$batches,noplot=noplot))
       #browser()
       # newdf0 <- data.frame(batch=u$stats$iteration, mse=u$stats$mse,
@@ -168,16 +194,24 @@ comparer <- R6::R6Class(
       } else {
         newdf0 <- data.frame(runtime=systime[3])
       }
+
+      # Add to outrawdf
       newdf1 <- cbind(row_grid, newdf0, row.names=NULL)
+      newdf_clean <- cbind(row_df, newdf0, row.names=NULL, stringsAsFactors=FALSE)
       nr <- nrow(newdf1)
-      #if (browsernow) {browser()}
-      #self$outdf <- rbind(self$outdf, newdf1)
       if (nrow(self$outrawdf) == 0) { # If outrawdf not yet created, created blank df with correct names and size
         self$outrawdf <- as.data.frame(matrix(data=NA, nrow=nrow(self$rungrid) * nrow(newdf1), ncol=ncol(newdf1)))
         colnames(self$outrawdf) <- colnames(newdf1)
+        # Create outcleandf too
+        self$outcleandf <- as.data.frame(matrix(data=NA, nrow=nrow(self$rungrid) * nrow(newdf_clean), ncol=ncol(newdf_clean)))
+        colnames(self$outcleandf) <- colnames(newdf_clean)
+        # browser()
+        for (i in 1:ncol(self$outcleandf)) {class(self$outcleandf[,i]) <- class(newdf_clean[1,i])}
       }
       self$outrawdf[((irow-1)*nr+1):(irow*nr), ] <- newdf1
-      #stop("Here it is adding some columns wrong, force2 should be 0_0 and I think it is as newdf0, but it shows up as 1 in final df")
+      self$outcleandf[((irow-1)*nr+1):(irow*nr), ] <- newdf_clean
+
+
       if (save_output) {
         if (file.exists(paste0(self$folder_path,"/data_cat.csv"))) { # append new row
           write.table(x=newdf1, file=paste0(self$folder_path,"/data_cat.csv"),append=T, sep=",", col.names=F)
@@ -207,4 +241,7 @@ if (F) {
   cc <- comparer$new(a=1:10, b=list(sin), eval_func=function(...,a) {Sys.sleep(rexp(1, 5));data.frame(apb=a^2)}, parallel=F)
   system.time(cc$run_all())
   cc$outrawdf
+  cd <- comparer$new(a=5:2, bc=data.frame(b=LETTERS[14:17], c=6:9, stringsAsFactors=F), eval_func=function(a,b,c){data.frame(ac=a+c)}); cd$run_all()
+  cd <- comparer$new(a=5:2, bc=data.frame(b=LETTERS[14:17], c=6:9, stringsAsFactors=F), d=cos, eval_func=function(a,b,c,...){data.frame(ac=a+c)}); cd$run_all()
+  cd <- comparer$new(a=5:2, bc=data.frame(b=LETTERS[14:17], c=6:9, stringsAsFactors=F), g='a', eval_func=function(a,b,c,...){data.frame(ac=a)}); cd$run_all(); cd$outcleandf
 }
