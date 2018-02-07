@@ -98,20 +98,35 @@ comparer <- R6::R6Class(
           format(Sys.time(), "%a %b %d %X %Y"), "\n", sep="")
       row_grid <- self$rungrid[irow, , drop=FALSE] #rungrid row for current run
       # if (!is.na(row_grid$seed)) {set.seed(row_grid$seed)}
-      row_list <- lapply(1:ncol(self$nvars),
-                         function(i) {#browser()
+      # Can't just set row_list <- lapply since a function can't be named
+      #  so to get names there we need to handle functions separately.
+      row_list <- list();lapply(1:ncol(self$nvars),
+                         function(i) {
                            ar <- self$arglist[[i]]
                            if (is.data.frame(ar)) {
                              tr <- as.list(ar[row_grid[1,i],])
                            } else if (is.list(ar)) {
                              tr <- ar[[row_grid[1,i]]]
+                           } else if (is.function(ar)) {
+                             tr <- ar # If single value is a function
                            } else {
                              tr <- ar[row_grid[1,i]]
                            }
                            if (is.null(names(tr))) {
-                             names(tr) <- names(self$arglist)[i]
+                             if (is.function(tr)) {
+                               # can't set names of function
+                               # tr <- c(names(self$arglist)[i]=tr)
+                               # row_list[names(self$arglist)[i]] <- tr
+                               # row_list <- c(row_list, names(self$arglist)[i]=tr)
+                               row_list <<- c(row_list, tmpnameforfunc=tr)
+                               names(row_list)[names(row_list)=="tmpnameforfunc"] <<- names(self$arglist)[i]
+                               return()
+                             } else {
+                               names(tr) <- names(self$arglist)[i]
+                             }
                            }
-                           tr
+                           row_list <<- c(row_list, tr)
+                           # tr
                          })
       row_list <- as.list(unlist(row_list, recursive = FALSE)) # Need to get list of lists out into single list
       print(row_list)
@@ -189,7 +204,7 @@ if (F) {
   cc$run_all()
   # Try parallel
   cc <- comparer$new(a=1:3,b=2, cd=data.frame(c=3:4,d=5:6), eval_func=function(...,a,b) {Sys.sleep(rexp(1, 10));data.frame(apb=a+b)}, parallel=T)
-  cc <- comparer$new(a=1:10, eval_func=function(...,a) {Sys.sleep(rexp(1, 5));data.frame(apb=a^2)}, parallel=T)
+  cc <- comparer$new(a=1:10, b=list(sin), eval_func=function(...,a) {Sys.sleep(rexp(1, 5));data.frame(apb=a^2)}, parallel=F)
   system.time(cc$run_all())
   cc$outrawdf
 }
