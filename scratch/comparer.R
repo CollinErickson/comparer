@@ -70,7 +70,7 @@ comparer <- R6::R6Class(
         if (is.null(self$parallel_cluster)) {
           self$parallel_cluster <- parallel::makeCluster(spec = self$parallel_cores, type = "SOCK")
         }
-        parout <- parallel::parLapplyLB(cl=self$parallel_cluster, to_run,function(ii){self$run_one(ii, noplot=noplot, is_parallel=TRUE)})
+        parout <- parallel::clusterApplyLB(cl=self$parallel_cluster, to_run,function(ii){self$run_one(ii, noplot=noplot, is_parallel=TRUE)})
         lapply(parout, function(oneout) {do.call(self$add_result_of_one, oneout)})
         parallel::stopCluster(self$parallel_cluster)
         self$parallel_cluster <- NULL
@@ -159,21 +159,23 @@ comparer <- R6::R6Class(
       row_df <- as.list(unlist(row_df, recursive = FALSE)) # Need to get list of lists out into single list
 
       # Run and time it
+      start_time <- Sys.time()
       systime <- system.time(output <- do.call(self$eval_func, row_list))
+      end_time <- Sys.time()
 
       # If parallel need to return everything to be added to original object
       if (is_parallel) {
-        return(list(output=output, systime=systime, irow=irow, row_grid=row_grid, row_df=row_df, save_output=save_output))
+        return(list(output=output, systime=systime, irow=irow, row_grid=row_grid, row_df=row_df, start_time=start_time, end_time=end_time, save_output=save_output))
       }
       # If not parallel
       # Add results using function
-      self$add_result_of_one(output=output, systime=systime, irow=irow, row_grid=row_grid, row_df=row_df, save_output=save_output)
+      self$add_result_of_one(output=output, systime=systime, irow=irow, row_grid=row_grid, row_df=row_df, start_time=start_time, end_time=end_time, save_output=save_output)
       # Return invisible self
       invisible(self)
     },
-    add_result_of_one = function(output, systime, irow, row_grid, row_df, save_output) {
+    add_result_of_one = function(output, systime, irow, row_grid, row_df, start_time, end_time, save_output) {
       # systime <- system.time(u$run(row_grid$batches,noplot=noplot))
-      #browser()
+      # browser()
       # newdf0 <- data.frame(batch=u$stats$iteration, mse=u$stats$mse,
       #                      pvar=u$stats$pvar, pamv=u$stats$pamv,
       #                      pred_intwerror=u$stats$intwerror,
@@ -191,9 +193,18 @@ comparer <- R6::R6Class(
       if (is.data.frame(output)) {
         output$runtime <- systime[3]
         newdf0 <- output
+        # newdf0$start_time <- start_time
+        # newdf0$end_time <- end_time
       } else {
         newdf0 <- data.frame(runtime=systime[3])
+        # newdf0 <- data.frame()
+        # newdf0$start_time <- start_time
+        # newdf0$end_time <- end_time
       }
+      # newdf0$runtime <- systime[3]
+      newdf0$start_time <- start_time
+      newdf0$end_time <- end_time
+      newdf0$run_number <- irow
 
       # Add to outrawdf
       newdf1 <- cbind(row_grid, newdf0, row.names=NULL)
