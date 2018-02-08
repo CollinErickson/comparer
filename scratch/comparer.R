@@ -57,12 +57,21 @@ comparer <- R6::R6Class(
         # self$parallel_cluster <- parallel::makeCluster(spec = self$parallel_cores, type = "SOCK")
       }
     },
-    run_all = function(redo = FALSE, noplot=FALSE) {
+    run_all = function(redo = FALSE, noplot=FALSE, run_order) {
+      if (missing(run_order)) { # random for parallel for load balancing
+        if (self$parallel) {run_order <- "random"}
+        else {run_order <- "inorder"}
+      }
       if (!redo) { # Only run ones that haven't been run yet
         to_run <- which(self$completed_runs == FALSE)
       } else {
         to_run <- 1:self$number_runs
       }
+      if (run_order == "inorder") {} # Leave it in order
+      else if (run_order == "reverse") {to_run <- rev(to_run)}
+      else if (run_order == "random") {to_run <- sample(to_run)}
+      else {stop("run_order not recognized #567128")}
+
       if (self$parallel) {#browser()
         # pc <- parallel::detectCores()
         # cl1 <- parallel::makeCluster(spec=pc, type="SOCK")
