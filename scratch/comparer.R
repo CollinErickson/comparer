@@ -241,6 +241,14 @@ comparer <- R6::R6Class(
       }
       self$completed_runs[irow] <- TRUE
     },
+    plot_run_times = function() {
+      ggplot2::ggplot(self$outcleandf) +
+        ggplot2::geom_segment(
+          ggplot2::aes(x=start_time, xend=end_time,
+                       y=run_number, yend=run_number)) +
+        ggplot2::xlab("Start and end time") +
+        ggplot2::ylab("Run number")
+    },
     delete = function() {
       cat("Deleting...\n")
       if (!is.null(self$parallel_cluster)) {parallel::stopCluster(self$parallel_cluster)}
