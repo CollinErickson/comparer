@@ -59,7 +59,7 @@ comparer <- R6::R6Class(
         # self$parallel_cluster <- parallel::makeCluster(spec = self$parallel_cores, type = "SOCK")
       }
     },
-    run_all = function(redo = FALSE, noplot=FALSE, run_order) {
+    run_all = function(redo = FALSE, noplot=FALSE, run_order, parallel_temp_save=FALSE) {
       if (missing(run_order)) { # random for parallel for load balancing
         if (self$parallel) {run_order <- "random"}
         else {run_order <- "inorder"}
@@ -81,10 +81,27 @@ comparer <- R6::R6Class(
         if (is.null(self$parallel_cluster)) {
           self$parallel_cluster <- parallel::makeCluster(spec = self$parallel_cores, type = "SOCK")
         }
-        parout <- parallel::clusterApplyLB(cl=self$parallel_cluster, to_run,function(ii){self$run_one(ii, noplot=noplot, is_parallel=TRUE)})
+        if (parallel_temp_save) {self$create_save_folder_if_nonexistant()}
+        parout <- parallel::clusterApplyLB(
+          cl=self$parallel_cluster,
+          to_run,
+          function(ii){
+            tout <- self$run_one(ii, noplot=noplot, is_parallel=TRUE)
+            if (parallel_temp_save) {
+              saveRDS(object=tout, file=paste0(self$folder_path,"/parallel_temp_output_",ii,".rds"))
+            }
+            tout
+          })
         lapply(parout, function(oneout) {do.call(self$add_result_of_one, oneout)})
         parallel::stopCluster(self$parallel_cluster)
         self$parallel_cluster <- NULL
+        if (parallel_temp_save) {
+          sapply(to_run,
+                 function(ii) {
+                   unlink(paste0(self$folder_path,"/parallel_temp_output_",ii,".rds"))
+                 })
+          self$delete_save_folder_if_empty()
+        }
       } else {
         sapply(to_run,function(ii){self$run_one(ii, noplot=noplot)})
       }
@@ -254,13 +271,35 @@ comparer <- R6::R6Class(
     save_self = function() {
       file_path <- paste0(self$folder_path,"/object.rds")
       cat("Saving to ", file_path, "\n")
-      self$create_save_folder()
+      self$create_save_folder_if_nonexistant()
       saveRDS(object = self, file = file_path)
     },
-    create_save_folder = function() {
+    create_save_folder_if_nonexistant = function() {
       if (!dir.exists(self$folder_path)) {
         dir.create(self$folder_path)
       }
+    },
+    delete_save_folder_if_empty = function() {
+      if (length(list.files(path=cc$folder_path, all.files = TRUE, no.. = TRUE)) == 0) {
+        unlink(cc$folder_path, recursive = TRUE)
+      } else {
+        stop("Folder is not empty")
+      }
+    },
+    recover_parallel_temp_save = function() {
+      # Read in and save
+      for (ii in 1:nrow(self$rungrid)) {
+        # Check for file
+        file_ii <- paste0(self$folder_path,"/parallel_temp_output_",ii,".rds")
+        if (file.exists(file_ii)) {
+          # Read in
+          oneout <- readRDS(file=file_ii)
+          do.call(self$add_result_of_one, oneout)
+          # Delete it
+          unlink(file_ii)
+        }
+      }
+      self$delete_save_folder_if_empty()
     },
     delete = function() {
       cat("Deleting...\n")
