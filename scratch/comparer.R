@@ -17,9 +17,11 @@ comparer <- R6::R6Class(
     parallel = NULL,
     parallel_cores = NULL,
     parallel_cluster = NULL,
-    initialize = function(..., eval_func, save_output=FALSE, parallel=FALSE, parallel_cores="detect") {#browser()
+    folder_path = NULL,
+    initialize = function(..., eval_func, save_output=FALSE, parallel=FALSE, parallel_cores="detect", folder_path) {#browser()
       self$eval_func <- eval_func
       self$save_output <- save_output
+      self$folder_path <- if (missing(folder_path)) {paste0(getwd(),"/comparerobj_",gsub(" ","_",gsub(":","-",Sys.time())))} else {folder_path}
       self$arglist <- list(...)
       self$nvars <- sapply(self$arglist,
                       function(i) {
@@ -248,6 +250,17 @@ comparer <- R6::R6Class(
                        y=run_number, yend=run_number)) +
         ggplot2::xlab("Start and end time") +
         ggplot2::ylab("Run number")
+    },
+    save_self = function() {
+      file_path <- paste0(self$folder_path,"/object.rds")
+      cat("Saving to ", file_path, "\n")
+      self$create_save_folder()
+      saveRDS(object = self, file = file_path)
+    },
+    create_save_folder = function() {
+      if (!dir.exists(self$folder_path)) {
+        dir.create(self$folder_path)
+      }
     },
     delete = function() {
       cat("Deleting...\n")
