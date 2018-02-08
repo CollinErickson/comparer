@@ -280,8 +280,8 @@ comparer <- R6::R6Class(
       }
     },
     delete_save_folder_if_empty = function() {
-      if (length(list.files(path=cc$folder_path, all.files = TRUE, no.. = TRUE)) == 0) {
-        unlink(cc$folder_path, recursive = TRUE)
+      if (length(list.files(path=self$folder_path, all.files = TRUE, no.. = TRUE)) == 0) {
+        unlink(self$folder_path, recursive = TRUE)
       } else {
         stop("Folder is not empty")
       }
