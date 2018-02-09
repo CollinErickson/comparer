@@ -56,10 +56,9 @@ comparer <- R6::R6Class(
         } else {
           self$parallel_cores <- parallel_cores
         }
-        # self$parallel_cluster <- parallel::makeCluster(spec = self$parallel_cores, type = "SOCK")
       }
     },
-    run_all = function(redo = FALSE, noplot=FALSE, run_order, parallel_temp_save=FALSE) {
+    run_all = function(redo = FALSE, run_order, parallel_temp_save=FALSE) {
       if (missing(run_order)) { # random for parallel for load balancing
         if (self$parallel) {run_order <- "random"}
         else {run_order <- "inorder"}
@@ -77,16 +76,16 @@ comparer <- R6::R6Class(
       if (self$parallel) {#browser()
         # pc <- parallel::detectCores()
         # cl1 <- parallel::makeCluster(spec=pc, type="SOCK")
-        # parallel::parSapply(cl=cl1, to_run,function(ii){self$run_one(ii, noplot=noplot)})
+        # parallel::parSapply(cl=cl1, to_run,function(ii){self$run_one(ii)})
         if (is.null(self$parallel_cluster)) {
           self$parallel_cluster <- parallel::makeCluster(spec = self$parallel_cores, type = "SOCK")
         }
-        if (parallel_temp_save) {self$create_save_folder_if_nonexistant()}
+        if (parallel_temp_save) {self$create_save_folder_if_nonexistent()}
         parout <- parallel::clusterApplyLB(
           cl=self$parallel_cluster,
           to_run,
           function(ii){
-            tout <- self$run_one(ii, noplot=noplot, is_parallel=TRUE)
+            tout <- self$run_one(ii, is_parallel=TRUE)
             if (parallel_temp_save) {
               saveRDS(object=tout, file=paste0(self$folder_path,"/parallel_temp_output_",ii,".rds"))
             }
@@ -103,12 +102,12 @@ comparer <- R6::R6Class(
           self$delete_save_folder_if_empty()
         }
       } else {
-        sapply(to_run,function(ii){self$run_one(ii, noplot=noplot)})
+        sapply(to_run,function(ii){self$run_one(ii)})
       }
       # self$postprocess_outdf()
       invisible(self)
     },
-    run_one = function(irow=NULL, save_output=self$save_output, noplot=FALSE, is_parallel=FALSE) {#browser()
+    run_one = function(irow=NULL, save_output=self$save_output, is_parallel=FALSE) {#browser()
       if (is.null(irow)) { # If irow not given, set to next not run
         if (any(self$completed_runs == FALSE)) {
           irow <- which(self$completed_runs == 0)[1]
@@ -202,21 +201,6 @@ comparer <- R6::R6Class(
       invisible(self)
     },
     add_result_of_one = function(output, systime, irow, row_grid, row_df, start_time, end_time, save_output) {
-      # systime <- system.time(u$run(row_grid$batches,noplot=noplot))
-      # browser()
-      # newdf0 <- data.frame(batch=u$stats$iteration, mse=u$stats$mse,
-      #                      pvar=u$stats$pvar, pamv=u$stats$pamv,
-      #                      pred_intwerror=u$stats$intwerror,
-      #                      actual_intwerror=u$stats$actual_intwerror,
-      #                      #obj=row_grid$obj,
-      #                      num=paste0(row_grid$obj,row_grid$repl),
-      #                      time = systime[3], #repl=row_grid$repl,
-      #                      #force_old=row_grid$force_old, force_pvar=row_grid$force_pvar,
-      #                      force2=paste0(row_grid$force_old, '_', row_grid$force_pvar),
-      #
-      #                      row.names=NULL,
-      #                      stringsAsFactors = FALSE
-      # )
       self$outlist[[irow]] <- output
       if (is.data.frame(output)) {
         output$runtime <- systime[3]
@@ -241,6 +225,7 @@ comparer <- R6::R6Class(
       if (nrow(self$outrawdf) == 0) { # If outrawdf not yet created, created blank df with correct names and size
         self$outrawdf <- as.data.frame(matrix(data=NA, nrow=nrow(self$rungrid) * nrow(newdf1), ncol=ncol(newdf1)))
         colnames(self$outrawdf) <- colnames(newdf1)
+        for (i in 1:ncol(self$outrawdf)) {class(self$outrawdf[,i]) <- class(newdf1[1,i])}
         # Create outcleandf too
         self$outcleandf <- as.data.frame(matrix(data=NA, nrow=nrow(self$rungrid) * nrow(newdf_clean), ncol=ncol(newdf_clean)))
         colnames(self$outcleandf) <- colnames(newdf_clean)
@@ -267,17 +252,20 @@ comparer <- R6::R6Class(
                        y=run_number, yend=run_number)) +
         ggplot2::xlab("Start and end time") +
         ggplot2::ylab("Run number")
+      invisible(self)
     },
     save_self = function() {
       file_path <- paste0(self$folder_path,"/object.rds")
       cat("Saving to ", file_path, "\n")
-      self$create_save_folder_if_nonexistant()
+      self$create_save_folder_if_nonexistent()
       saveRDS(object = self, file = file_path)
+      invisible(self)
     },
-    create_save_folder_if_nonexistant = function() {
+    create_save_folder_if_nonexistent = function() {
       if (!dir.exists(self$folder_path)) {
         dir.create(self$folder_path)
       }
+      invisible(self)
     },
     delete_save_folder_if_empty = function() {
       if (length(list.files(path=self$folder_path, all.files = TRUE, no.. = TRUE)) == 0) {
@@ -285,6 +273,7 @@ comparer <- R6::R6Class(
       } else {
         stop("Folder is not empty")
       }
+      invisible(self)
     },
     recover_parallel_temp_save = function() {
       # Read in and save
@@ -324,4 +313,6 @@ if (F) {
   cd <- comparer$new(a=5:2, bc=data.frame(b=LETTERS[14:17], c=6:9, stringsAsFactors=F), eval_func=function(a,b,c){data.frame(ac=a+c)}); cd$run_all()
   cd <- comparer$new(a=5:2, bc=data.frame(b=LETTERS[14:17], c=6:9, stringsAsFactors=F), d=cos, eval_func=function(a,b,c,...){data.frame(ac=a+c)}); cd$run_all()
   cd <- comparer$new(a=5:2, bc=data.frame(b=LETTERS[14:17], c=6:9, stringsAsFactors=F), g='a', eval_func=function(a,b,c,...){data.frame(ac=a)}); cd$run_all(); cd$outcleandf
+  # Calculate parallel efficiency
+  with(data = cc$outcleandf, sum(runtime) / as.numeric(max(end_time) - min(start_time)), units="secs")
 }
