@@ -53,6 +53,11 @@ comparer <- R6::R6Class(
         # For now assume using parallel package
         if (parallel_cores == "detect") {
           self$parallel_cores <- parallel::detectCores()
+        } else if (parallel_cores == "detect-1") {
+          self$parallel_cores <- parallel::detectCores() - 1
+          if (self$parallel_cores == 0) {
+            "Only 1 core detected, can't do 'detect-1'"
+          }
         } else {
           self$parallel_cores <- parallel_cores
         }
@@ -315,4 +320,6 @@ if (F) {
   cd <- comparer$new(a=5:2, bc=data.frame(b=LETTERS[14:17], c=6:9, stringsAsFactors=F), g='a', eval_func=function(a,b,c,...){data.frame(ac=a)}); cd$run_all(); cd$outcleandf
   # Calculate parallel efficiency
   with(data = cc$outcleandf, sum(runtime) / as.numeric(max(end_time) - min(start_time)), units="secs")
+  # parallel 'detect-1'
+  system.time(comparer$new(a=1:4, eval_func=function(a){Sys.sleep(1)}, parallel = T, parallel_cores = 'detect-1')$run_all())
 }
