@@ -18,10 +18,14 @@ comparer <- R6::R6Class(
     parallel_cores = NULL,
     parallel_cluster = NULL,
     folder_path = NULL,
-    initialize = function(..., eval_func, save_output=FALSE, parallel=FALSE, parallel_cores="detect", folder_path) {#browser()
+    initialize = function(..., eval_func, save_output=FALSE, parallel=FALSE,
+                          parallel_cores="detect", folder_path) {
       self$eval_func <- eval_func
       self$save_output <- save_output
-      self$folder_path <- if (missing(folder_path)) {paste0(getwd(),"/comparerobj_",gsub(" ","_",gsub(":","-",Sys.time())))} else {folder_path}
+      self$folder_path <- if (missing(folder_path)) {
+        paste0(getwd(),
+               "/comparerobj_",gsub(" ","_",gsub(":","-",Sys.time())))}
+        else {folder_path}
       self$arglist <- list(...)
       self$nvars <- sapply(self$arglist,
                       function(i) {
@@ -83,7 +87,8 @@ comparer <- R6::R6Class(
         # cl1 <- parallel::makeCluster(spec=pc, type="SOCK")
         # parallel::parSapply(cl=cl1, to_run,function(ii){self$run_one(ii)})
         if (is.null(self$parallel_cluster)) {
-          self$parallel_cluster <- parallel::makeCluster(spec = self$parallel_cores, type = "SOCK")
+          self$parallel_cluster <- parallel::makeCluster(
+            spec=self$parallel_cores, type = "SOCK")
         }
         if (parallel_temp_save) {self$create_save_folder_if_nonexistent()}
         parout <- parallel::clusterApplyLB(
@@ -92,17 +97,22 @@ comparer <- R6::R6Class(
           function(ii){
             tout <- self$run_one(ii, is_parallel=TRUE)
             if (parallel_temp_save) {
-              saveRDS(object=tout, file=paste0(self$folder_path,"/parallel_temp_output_",ii,".rds"))
+              saveRDS(object=tout,
+                      file=paste0(self$folder_path,
+                                  "/parallel_temp_output_",ii,".rds"))
             }
             tout
           })
-        lapply(parout, function(oneout) {do.call(self$add_result_of_one, oneout)})
+        lapply(parout,
+               function(oneout) {do.call(self$add_result_of_one, oneout)})
         parallel::stopCluster(self$parallel_cluster)
         self$parallel_cluster <- NULL
         if (parallel_temp_save) {
           sapply(to_run,
                  function(ii) {
-                   unlink(paste0(self$folder_path,"/parallel_temp_output_",ii,".rds"))
+                   unlink(
+                     paste0(self$folder_path,
+                            "/parallel_temp_output_",ii,".rds"))
                  })
           self$delete_save_folder_if_empty()
         }
@@ -112,7 +122,8 @@ comparer <- R6::R6Class(
       # self$postprocess_outdf()
       invisible(self)
     },
-    run_one = function(irow=NULL, save_output=self$save_output, is_parallel=FALSE) {#browser()
+    run_one = function(irow=NULL, save_output=self$save_output,
+                       is_parallel=FALSE) {#browser()
       if (is.null(irow)) { # If irow not given, set to next not run
         if (any(self$completed_runs == FALSE)) {
           irow <- which(self$completed_runs == 0)[1]
@@ -120,7 +131,8 @@ comparer <- R6::R6Class(
           stop("irow not given and all runs completed")
         }
       } else if (length(irow) > 1) { # If more than one, run each separately
-        sapply(irow, function(ii){self$run_one(irow=ii, save_output=save_output)})
+        sapply(irow,
+               function(ii){self$run_one(irow=ii, save_output=save_output)})
         return(invisible(self))
       } else if (self$completed_runs[irow] == TRUE) {
         warning("irow already run, will run again anyways")
@@ -150,9 +162,12 @@ comparer <- R6::R6Class(
                                # can't set names of function
                                # tr <- c(names(self$arglist)[i]=tr)
                                # row_list[names(self$arglist)[i]] <- tr
-                               # row_list <- c(row_list, names(self$arglist)[i]=tr)
+                               # row_list <- c(row_list,
+                               #               names(self$arglist)[i]=tr)
                                row_list <<- c(row_list, tmpnameforfunc=tr)
-                               names(row_list)[names(row_list)=="tmpnameforfunc"] <<- names(self$arglist)[i]
+                               names(row_list)[
+                                 names(row_list)=="tmpnameforfunc"] <<-
+                                 names(self$arglist)[i]
                                return()
                              } else {
                                names(tr) <- names(self$arglist)[i]
@@ -161,7 +176,8 @@ comparer <- R6::R6Class(
                            row_list <<- c(row_list, tr)
                            # tr
                          })
-      # row_list <- as.list(unlist(row_list, recursive = FALSE)) # Need to get list of lists out into single list
+      # Need to get list of lists out into single list
+      # row_list <- as.list(unlist(row_list, recursive = FALSE))
       print(row_list)
       # return()
 
@@ -188,7 +204,8 @@ comparer <- R6::R6Class(
                                   }
                                   tr
                                 })
-      row_df <- as.list(unlist(row_df, recursive = FALSE)) # Need to get list of lists out into single list
+      # Need to get list of lists out into single list
+      row_df <- as.list(unlist(row_df, recursive = FALSE))
 
       # Run and time it
       start_time <- Sys.time()
@@ -197,15 +214,22 @@ comparer <- R6::R6Class(
 
       # If parallel need to return everything to be added to original object
       if (is_parallel) {
-        return(list(output=output, systime=systime, irow=irow, row_grid=row_grid, row_df=row_df, start_time=start_time, end_time=end_time, save_output=save_output))
+        return(list(output=output, systime=systime, irow=irow,
+                    row_grid=row_grid, row_df=row_df,
+                    start_time=start_time, end_time=end_time,
+                    save_output=save_output))
       }
       # If not parallel
       # Add results using function
-      self$add_result_of_one(output=output, systime=systime, irow=irow, row_grid=row_grid, row_df=row_df, start_time=start_time, end_time=end_time, save_output=save_output)
+      self$add_result_of_one(output=output, systime=systime, irow=irow,
+                             row_grid=row_grid, row_df=row_df,
+                             start_time=start_time, end_time=end_time,
+                             save_output=save_output)
       # Return invisible self
       invisible(self)
     },
-    add_result_of_one = function(output, systime, irow, row_grid, row_df, start_time, end_time, save_output) {
+    add_result_of_one = function(output, systime, irow, row_grid, row_df,
+                                 start_time, end_time, save_output) {
       self$outlist[[irow]] <- output
       if (is.data.frame(output)) {
         output$runtime <- systime[3]
@@ -225,12 +249,20 @@ comparer <- R6::R6Class(
 
       # Add to outrawdf
       newdf1 <- cbind(row_grid, newdf0, row.names=NULL)
-      newdf_clean <- cbind(row_df, newdf0, row.names=NULL, stringsAsFactors=FALSE)
+      newdf_clean <- cbind(row_df, newdf0, row.names=NULL,
+                           stringsAsFactors=FALSE)
       nr <- nrow(newdf1)
-      if (nrow(self$outrawdf) == 0) { # If outrawdf not yet created, created blank df with correct names and size
-        self$outrawdf <- as.data.frame(matrix(data=NA, nrow=nrow(self$rungrid) * nrow(newdf1), ncol=ncol(newdf1)))
+      if (nrow(self$outrawdf) == 0) {
+        # If outrawdf not yet created, created blank df with correct names
+        #   and size
+        self$outrawdf <- as.data.frame(
+          matrix(data=NA,
+                 nrow=nrow(self$rungrid) * nrow(newdf1),
+                 ncol=ncol(newdf1)))
         colnames(self$outrawdf) <- colnames(newdf1)
-        for (i in 1:ncol(self$outrawdf)) {class(self$outrawdf[,i]) <- class(newdf1[1,i])}
+        for (i in 1:ncol(self$outrawdf)) {
+          class(self$outrawdf[,i]) <- class(newdf1[1,i])
+        }
         # Create outcleandf too
         self$outcleandf <- as.data.frame(matrix(data=NA, nrow=nrow(self$rungrid) * nrow(newdf_clean), ncol=ncol(newdf_clean)))
         colnames(self$outcleandf) <- colnames(newdf_clean)
