@@ -264,20 +264,29 @@ comparer <- R6::R6Class(
           class(self$outrawdf[,i]) <- class(newdf1[1,i])
         }
         # Create outcleandf too
-        self$outcleandf <- as.data.frame(matrix(data=NA, nrow=nrow(self$rungrid) * nrow(newdf_clean), ncol=ncol(newdf_clean)))
+        self$outcleandf <- as.data.frame(
+          matrix(data=NA, nrow=nrow(self$rungrid) * nrow(newdf_clean),
+                 ncol=ncol(newdf_clean)))
         colnames(self$outcleandf) <- colnames(newdf_clean)
         # browser()
-        for (i in 1:ncol(self$outcleandf)) {class(self$outcleandf[,i]) <- class(newdf_clean[1,i])}
+        for (i in 1:ncol(self$outcleandf)) {
+          class(self$outcleandf[,i]) <- class(newdf_clean[1,i])
+        }
       }
       self$outrawdf[((irow-1)*nr+1):(irow*nr), ] <- newdf1
       self$outcleandf[((irow-1)*nr+1):(irow*nr), ] <- newdf_clean
 
 
       if (save_output) {
-        if (file.exists(paste0(self$folder_path,"/data_cat.csv"))) { # append new row
-          write.table(x=newdf1, file=paste0(self$folder_path,"/data_cat.csv"),append=T, sep=",", col.names=F)
+        if (file.exists(paste0(self$folder_path,"/data_cat.csv"))) {
+          # append new row
+          write.table(x=newdf1,
+                      file=paste0(self$folder_path,"/data_cat.csv"),
+                      append=T, sep=",", col.names=F)
         } else { #create file
-          write.table(x=newdf1, file=paste0(self$folder_path,"/data_cat.csv"),append=F, sep=",", col.names=T)
+          write.table(x=newdf1,
+                      file=paste0(self$folder_path,"/data_cat.csv"),
+                      append=F, sep=",", col.names=T)
         }
       }
       self$completed_runs[irow] <- TRUE
@@ -305,7 +314,8 @@ comparer <- R6::R6Class(
       invisible(self)
     },
     delete_save_folder_if_empty = function() {
-      if (length(list.files(path=self$folder_path, all.files = TRUE, no.. = TRUE)) == 0) {
+      if (length(list.files(path=self$folder_path,
+                            all.files = TRUE, no.. = TRUE)) == 0) {
         unlink(self$folder_path, recursive = TRUE)
       } else {
         stop("Folder is not empty")
@@ -329,7 +339,9 @@ comparer <- R6::R6Class(
     },
     delete = function() {
       cat("Deleting...\n")
-      if (!is.null(self$parallel_cluster)) {parallel::stopCluster(self$parallel_cluster)}
+      if (!is.null(self$parallel_cluster)) {
+        parallel::stopCluster(self$parallel_cluster)
+      }
     }
   ),
   private = list(
@@ -337,21 +349,44 @@ comparer <- R6::R6Class(
   )
 )
 if (F) {
-  cc <- comparer$new(a=1:3,b=2, cd=data.frame(c=3:4,d=5:6), eval_func=function(...) {list(...)})
-  cc <- comparer$new(a=1:3,b=2, cd=data.frame(c=3:4,d=5:6), eval_func=function(...,a,b) {data.frame(apb=a+b)})
+  cc <- comparer$new(a=1:3,b=2, cd=data.frame(c=3:4,d=5:6),
+                     eval_func=function(...) {list(...)})
+  cc <- comparer$new(a=1:3,b=2, cd=data.frame(c=3:4,d=5:6),
+                     eval_func=function(...,a,b) {data.frame(apb=a+b)})
   cc$arglist
   cc$run_one()
   cc$run_all()
   # Try parallel
-  cc <- comparer$new(a=1:3,b=2, cd=data.frame(c=3:4,d=5:6), eval_func=function(...,a,b) {Sys.sleep(rexp(1, 10));data.frame(apb=a+b)}, parallel=T)
-  cc <- comparer$new(a=1:10, b=list(sin), eval_func=function(...,a) {Sys.sleep(rexp(1, 5));data.frame(apb=a^2)}, parallel=F)
+  cc <- comparer$new(a=1:3,b=2, cd=data.frame(c=3:4,d=5:6),
+                     eval_func=function(...,a,b) {
+                       Sys.sleep(rexp(1, 10));data.frame(apb=a+b)},
+                     parallel=T)
+  cc <- comparer$new(a=1:10, b=list(sin),
+                     eval_func=function(...,a) {
+                       Sys.sleep(rexp(1, 5));data.frame(apb=a^2)}, parallel=F)
   system.time(cc$run_all())
   cc$outrawdf
-  cd <- comparer$new(a=5:2, bc=data.frame(b=LETTERS[14:17], c=6:9, stringsAsFactors=F), eval_func=function(a,b,c){data.frame(ac=a+c)}); cd$run_all()
-  cd <- comparer$new(a=5:2, bc=data.frame(b=LETTERS[14:17], c=6:9, stringsAsFactors=F), d=cos, eval_func=function(a,b,c,...){data.frame(ac=a+c)}); cd$run_all()
-  cd <- comparer$new(a=5:2, bc=data.frame(b=LETTERS[14:17], c=6:9, stringsAsFactors=F), g='a', eval_func=function(a,b,c,...){data.frame(ac=a)}); cd$run_all(); cd$outcleandf
+  cd <- comparer$new(a=5:2,
+                     bc=data.frame(b=LETTERS[14:17], c=6:9,
+                                   stringsAsFactors=F),
+                     eval_func=function(a,b,c){data.frame(ac=a+c)}
+                     ); cd$run_all()
+  cd <- comparer$new(a=5:2,
+                     bc=data.frame(b=LETTERS[14:17], c=6:9,
+                                   stringsAsFactors=F), d=cos,
+                     eval_func=function(a,b,c,...){data.frame(ac=a+c)}
+                     ); cd$run_all()
+  cd <- comparer$new(a=5:2,
+                     bc=data.frame(b=LETTERS[14:17], c=6:9,
+                                   stringsAsFactors=F), g='a',
+                     eval_func=function(a,b,c,...){data.frame(ac=a)}
+                     ); cd$run_all(); cd$outcleandf
   # Calculate parallel efficiency
-  with(data = cc$outcleandf, sum(runtime) / as.numeric(max(end_time) - min(start_time)), units="secs")
+  with(data = cc$outcleandf,
+       sum(runtime) / as.numeric(max(end_time) - min(start_time)),
+       units="secs")
   # parallel 'detect-1'
-  system.time(comparer$new(a=1:4, eval_func=function(a){Sys.sleep(1)}, parallel = T, parallel_cores = 'detect-1')$run_all())
+  system.time(comparer$new(a=1:4, eval_func=function(a){Sys.sleep(1)},
+                           parallel = T,
+                           parallel_cores = 'detect-1')$run_all())
 }
