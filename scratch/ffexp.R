@@ -1,5 +1,5 @@
-comparer <- R6::R6Class(
-  classname = "comparer",
+ffexp <- R6::R6Class(
+  classname = "ffexp",
   public = list(
     outrawdf = data.frame(),
     outcleandf = data.frame(),
@@ -24,7 +24,7 @@ comparer <- R6::R6Class(
       self$save_output <- save_output
       self$folder_path <- if (missing(folder_path)) {
         paste0(getwd(),
-               "/comparerobj_",gsub(" ","_",gsub(":","-",Sys.time())))}
+               "/ffexpobj_",gsub(" ","_",gsub(":","-",Sys.time())))}
         else {folder_path}
       self$arglist <- list(...)
       self$nvars <- sapply(self$arglist,
@@ -349,34 +349,34 @@ comparer <- R6::R6Class(
   )
 )
 if (F) {
-  cc <- comparer$new(a=1:3,b=2, cd=data.frame(c=3:4,d=5:6),
+  cc <- ffexp$new(a=1:3,b=2, cd=data.frame(c=3:4,d=5:6),
                      eval_func=function(...) {list(...)})
-  cc <- comparer$new(a=1:3,b=2, cd=data.frame(c=3:4,d=5:6),
+  cc <- ffexp$new(a=1:3,b=2, cd=data.frame(c=3:4,d=5:6),
                      eval_func=function(...,a,b) {data.frame(apb=a+b)})
   cc$arglist
   cc$run_one()
   cc$run_all()
   # Try parallel
-  cc <- comparer$new(a=1:3,b=2, cd=data.frame(c=3:4,d=5:6),
+  cc <- ffexp$new(a=1:3,b=2, cd=data.frame(c=3:4,d=5:6),
                      eval_func=function(...,a,b) {
                        Sys.sleep(rexp(1, 10));data.frame(apb=a+b)},
                      parallel=T)
-  cc <- comparer$new(a=1:10, b=list(sin),
+  cc <- ffexp$new(a=1:10, b=list(sin),
                      eval_func=function(...,a) {
                        Sys.sleep(rexp(1, 5));data.frame(apb=a^2)}, parallel=F)
   system.time(cc$run_all())
   cc$outrawdf
-  cd <- comparer$new(a=5:2,
+  cd <- ffexp$new(a=5:2,
                      bc=data.frame(b=LETTERS[14:17], c=6:9,
                                    stringsAsFactors=F),
                      eval_func=function(a,b,c){data.frame(ac=a+c)}
                      ); cd$run_all()
-  cd <- comparer$new(a=5:2,
+  cd <- ffexp$new(a=5:2,
                      bc=data.frame(b=LETTERS[14:17], c=6:9,
                                    stringsAsFactors=F), d=cos,
                      eval_func=function(a,b,c,...){data.frame(ac=a+c)}
                      ); cd$run_all()
-  cd <- comparer$new(a=5:2,
+  cd <- ffexp$new(a=5:2,
                      bc=data.frame(b=LETTERS[14:17], c=6:9,
                                    stringsAsFactors=F), g='a',
                      eval_func=function(a,b,c,...){data.frame(ac=a)}
@@ -386,7 +386,7 @@ if (F) {
        sum(runtime) / as.numeric(max(end_time) - min(start_time)),
        units="secs")
   # parallel 'detect-1'
-  system.time(comparer$new(a=1:4, eval_func=function(a){Sys.sleep(1)},
+  system.time(ffexp$new(a=1:4, eval_func=function(a){Sys.sleep(1)},
                            parallel = T,
                            parallel_cores = 'detect-1')$run_all())
 }
