@@ -2,6 +2,7 @@
 
 S3method(plot,mbc)
 S3method(print,mbc)
+export(ffexp)
 export(mbc)
 importFrom(graphics,stripchart)
 importFrom(stats,median)
