@@ -10,4 +10,5 @@ tf <- function(...) {
   f2 <- function(i) {mb1[[i]] <<- microbenchmark::microbenchmark(o1[[i]] <<- eval(dots[[1]]))}
   print(o1)
 }
+a <- 12
 tf(2*a)
