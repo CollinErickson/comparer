@@ -93,19 +93,19 @@ ffexp <- R6::R6Class(
       self$folder_path <- if (missing(folder_path)) {
         paste0(getwd(),
                "/ffexpobj_",gsub(" ","_",gsub(":","-",Sys.time())))}
-        else {folder_path}
+      else {folder_path}
       self$arglist <- list(...)
       self$nvars <- sapply(self$arglist,
-                      function(i) {
-                        if (is.data.frame(i)) {
-                        rev(dim(i))
-                        } else if (is.list(i)) {
-                          c(length(i), length(i[[1]]))
-                        } else {
-                          c(1, length(i))
-                        }
-                      }
-                      )
+                           function(i) {
+                             if (is.data.frame(i)) {
+                               rev(dim(i))
+                             } else if (is.list(i)) {
+                               c(length(i), length(i[[1]]))
+                             } else {
+                               c(1, length(i))
+                             }
+                           }
+      )
       self$rungrid <- do.call(reshape::expand.grid.df,
                               lapply(1:ncol(self$nvars),
                                      function(i){
@@ -115,7 +115,7 @@ ffexp <- R6::R6Class(
                                        td
                                      }
                               )
-                      )
+      )
 
       self$number_runs <- nrow(self$rungrid)
       self$completed_runs <- rep(FALSE, self$number_runs)
@@ -213,37 +213,38 @@ ffexp <- R6::R6Class(
       # if (!is.na(row_grid$seed)) {set.seed(row_grid$seed)}
       # Can't just set row_list <- lapply since a function can't be named
       #  so to get names there we need to handle functions separately.
-      row_list <- list();lapply(1:ncol(self$nvars),
-                         function(i) {
-                           ar <- self$arglist[[i]]
-                           if (is.data.frame(ar)) {
-                             tr <- as.list(ar[row_grid[1,i],])
-                           } else if (is.list(ar)) {
-                             tr <- ar[[row_grid[1,i]]]
-                           } else if (is.function(ar)) {
-                             tr <- ar # If single value is a function
-                           } else {
-                             tr <- ar[row_grid[1,i]]
-                           }
-                           if (is.null(names(tr))) {
-                             if (is.function(tr)) {
-                               # can't set names of function
-                               # tr <- c(names(self$arglist)[i]=tr)
-                               # row_list[names(self$arglist)[i]] <- tr
-                               # row_list <- c(row_list,
-                               #               names(self$arglist)[i]=tr)
-                               row_list <<- c(row_list, tmpnameforfunc=tr)
-                               names(row_list)[
-                                 names(row_list)=="tmpnameforfunc"] <<-
-                                 names(self$arglist)[i]
-                               return()
-                             } else {
-                               names(tr) <- names(self$arglist)[i]
-                             }
-                           }
-                           row_list <<- c(row_list, tr)
-                           # tr
-                         })
+      row_list <- list()
+      lapply(1:ncol(self$nvars),
+             function(i) {
+               ar <- self$arglist[[i]]
+               if (is.data.frame(ar)) {
+                 tr <- as.list(ar[row_grid[1,i],])
+               } else if (is.list(ar)) {
+                 tr <- ar[[row_grid[1,i]]]
+               } else if (is.function(ar)) {
+                 tr <- ar # If single value is a function
+               } else {
+                 tr <- ar[row_grid[1,i]]
+               }
+               if (is.null(names(tr))) {
+                 if (is.function(tr)) {
+                   # can't set names of function
+                   # tr <- c(names(self$arglist)[i]=tr)
+                   # row_list[names(self$arglist)[i]] <- tr
+                   # row_list <- c(row_list,
+                   #               names(self$arglist)[i]=tr)
+                   row_list <<- c(row_list, tmpnameforfunc=tr)
+                   names(row_list)[
+                     names(row_list)=="tmpnameforfunc"] <<-
+                     names(self$arglist)[i]
+                   return()
+                 } else {
+                   names(tr) <- names(self$arglist)[i]
+                 }
+               }
+               row_list <<- c(row_list, tr)
+               # tr
+             })
       # Need to get list of lists out into single list
       # row_list <- as.list(unlist(row_list, recursive = FALSE))
       print(row_list)
@@ -251,27 +252,27 @@ ffexp <- R6::R6Class(
 
       # Get df for output row, must be number of string, no functions
       row_df <- lapply(1:ncol(self$nvars),
-                                function(i) {
-                                  ar <- self$arglist[[i]]
-                                  if (is.data.frame(ar)) {
-                                    tr <- as.list(ar[row_grid[1,i],])
-                                  } else if (is.list(ar)) {
-                                    tr <- ar[[row_grid[1,i]]]
-                                  } else if (is.function(ar)) {
-                                    tr <- ar # If single value is a function
-                                  } else {
-                                    tr <- ar[row_grid[1,i]]
-                                  }
-                                  # Can't use functions
-                                  #  and deparse(quote(tr)) gives "tr"
-                                  if (is.function(tr)) {
-                                    tr <- row_grid[1,i]
-                                  }
-                                  if (is.null(names(tr))) {
-                                    names(tr) <- names(self$arglist)[i]
-                                  }
-                                  tr
-                                })
+                       function(i) {
+                         ar <- self$arglist[[i]]
+                         if (is.data.frame(ar)) {
+                           tr <- as.list(ar[row_grid[1,i],])
+                         } else if (is.list(ar)) {
+                           tr <- ar[[row_grid[1,i]]]
+                         } else if (is.function(ar)) {
+                           tr <- ar # If single value is a function
+                         } else {
+                           tr <- ar[row_grid[1,i]]
+                         }
+                         # Can't use functions
+                         #  and deparse(quote(tr)) gives "tr"
+                         if (is.function(tr)) {
+                           tr <- row_grid[1,i]
+                         }
+                         if (is.null(names(tr))) {
+                           names(tr) <- names(self$arglist)[i]
+                         }
+                         tr
+                       })
       # Need to get list of lists out into single list
       row_df <- as.list(unlist(row_df, recursive = FALSE))
 
@@ -368,6 +369,41 @@ ffexp <- R6::R6Class(
         ggplot2::ylab("Run number")
       invisible(self)
     },
+    calculate_effects = function() {
+      nvar <- ncol(self$rungrid)
+      sapply(1:nvar,
+             function(i) {
+               outputcols <- (nvar+1):(ncol(self$outrawdf)-3)
+               tdf <- plyr::ddply(self$outrawdf[,c(i, outputcols)],
+                                  names(self$rungrid)[i],
+                                  colMeans)
+               if (is.vector(self$arglist[[i]])) {
+                 tdf[,1] <- self$arglist[[i]][tdf[,1]]
+               } else if (is.data.frame(self$arglist[[i]])) {
+                 tdf[,1] <- rownames(self$arglist[[i]])[tdf[,1]]
+               }
+               nlev <- nrow(tdf)
+               if (nlev > 1) {
+               for (j in (2:nlev)) {
+                 for (k in 1:(j-1)) {
+                   # newdf <- data.frame(diffname=paste0(tdf[j,1],"-",tdf[k,1]),
+                   #                     mean=tdf[j,2]-tdf[k,2],
+                   #                     se=tdf[j,3]-tdf[k,3],
+                   #                     runtime=tdf[j,4]-tdf[k,4])
+                   newdf <- data.frame(tempname=paste0(tdf[j,1],"-",tdf[k,1]))
+                   colnames(newdf)[1] <- names(self$rungrid)[i]
+                   newdf <- cbind(newdf, tdf[j,outputcols-nvar+1]-tdf[k,outputcols-nvar+1])
+                   tdf <- rbind(tdf, newdf)
+                 }
+               }
+               }
+               # Convert to list here so I can give it a name
+               tl <- list(tdf)
+               names(tl) <- paste0("Mean for levels of ", names(self$rungrid)[i])
+               tl
+             }
+      )
+    },
     save_self = function() {
       file_path <- paste0(self$folder_path,"/object.rds")
       cat("Saving to ", file_path, "\n")
@@ -418,43 +454,56 @@ ffexp <- R6::R6Class(
 )
 if (F) {
   cc <- ffexp$new(a=1:3,b=2, cd=data.frame(c=3:4,d=5:6),
-                     eval_func=function(...) {list(...)})
+                  eval_func=function(...) {list(...)})
   cc <- ffexp$new(a=1:3,b=2, cd=data.frame(c=3:4,d=5:6),
-                     eval_func=function(...,a,b) {data.frame(apb=a+b)})
+                  eval_func=function(...,a,b) {data.frame(apb=a+b)})
   cc$arglist
   cc$run_one()
   cc$run_all()
   # Try parallel
   cc <- ffexp$new(a=1:3,b=2, cd=data.frame(c=3:4,d=5:6),
-                     eval_func=function(...,a,b) {
-                       Sys.sleep(rexp(1, 10));data.frame(apb=a+b)},
-                     parallel=T)
+                  eval_func=function(...,a,b) {
+                    Sys.sleep(rexp(1, 10));data.frame(apb=a+b)},
+                  parallel=T)
   cc <- ffexp$new(a=1:10, b=list(sin),
-                     eval_func=function(...,a) {
-                       Sys.sleep(rexp(1, 5));data.frame(apb=a^2)}, parallel=F)
+                  eval_func=function(...,a) {
+                    Sys.sleep(rexp(1, 5));data.frame(apb=a^2)}, parallel=F)
   system.time(cc$run_all())
   cc$outrawdf
   cd <- ffexp$new(a=5:2,
-                     bc=data.frame(b=LETTERS[14:17], c=6:9,
-                                   stringsAsFactors=F),
-                     eval_func=function(a,b,c){data.frame(ac=a+c)}
-                     ); cd$run_all()
+                  bc=data.frame(b=LETTERS[14:17], c=6:9,
+                                stringsAsFactors=F),
+                  eval_func=function(a,b,c){data.frame(ac=a+c)}
+  ); cd$run_all()
   cd <- ffexp$new(a=5:2,
-                     bc=data.frame(b=LETTERS[14:17], c=6:9,
-                                   stringsAsFactors=F), d=cos,
-                     eval_func=function(a,b,c,...){data.frame(ac=a+c)}
-                     ); cd$run_all()
+                  bc=data.frame(b=LETTERS[14:17], c=6:9,
+                                stringsAsFactors=F), d=cos,
+                  eval_func=function(a,b,c,...){data.frame(ac=a+c)}
+  ); cd$run_all()
   cd <- ffexp$new(a=5:2,
-                     bc=data.frame(b=LETTERS[14:17], c=6:9,
-                                   stringsAsFactors=F), g='a',
-                     eval_func=function(a,b,c,...){data.frame(ac=a)}
-                     ); cd$run_all(); cd$outcleandf
+                  bc=data.frame(b=LETTERS[14:17], c=6:9,
+                                stringsAsFactors=F), g='a',
+                  eval_func=function(a,b,c,...){data.frame(ac=a)}
+  ); cd$run_all(); cd$outcleandf
   # Calculate parallel efficiency
   with(data = cc$outcleandf,
        sum(runtime) / as.numeric(max(end_time) - min(start_time)),
        units="secs")
   # parallel 'detect-1'
   system.time(ffexp$new(a=1:4, eval_func=function(a){Sys.sleep(1)},
-                           parallel = T,
-                           parallel_cores = 'detect-1')$run_all())
+                        parallel = T,
+                        parallel_cores = 'detect-1')$run_all())
+
+  # Try to get useful output
+  f1 <- ffexp$new(n=c(100, 1000, 10000),
+                  nulleff=c(0,1),
+            eval_func=function(n, nulleff) {
+              samp <- rnorm(n)
+              data.frame(mean=mean(samp), se=sd(samp)/sqrt(n))}
+            )
+  f1$run_all()
+  f1$outcleandf
+  f1$calculate_effects()
+  cc <- ffexp$new(a=5:7,b=22, cd=data.frame(c=3:4,d=5:6, row.names = c("35", "46")),
+                  eval_func=function(...,a,b) {data.frame(apb=a+b)}); cc$run_all(); cc$calculate_effects()
 }
