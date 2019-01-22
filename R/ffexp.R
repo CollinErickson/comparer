@@ -367,7 +367,7 @@ ffexp <- R6::R6Class(
                        y=run_number, yend=run_number)) +
         ggplot2::xlab("Start and end time") +
         ggplot2::ylab("Run number")
-      invisible(self)
+      # invisible(self)
     },
     calculate_effects = function() {
       nvar <- ncol(self$rungrid)
@@ -426,7 +426,7 @@ ffexp <- R6::R6Class(
       }
       invisible(self)
     },
-    recover_parallel_temp_save = function() {
+    recover_parallel_temp_save = function(delete_after=TRUE) {
       # Read in and save
       for (ii in 1:nrow(self$rungrid)) {
         # Check for file
@@ -436,7 +436,9 @@ ffexp <- R6::R6Class(
           oneout <- readRDS(file=file_ii)
           do.call(self$add_result_of_one, oneout)
           # Delete it
-          unlink(file_ii)
+          if (delete_after) {
+            unlink(file_ii)
+          }
         }
       }
       self$delete_save_folder_if_empty()
