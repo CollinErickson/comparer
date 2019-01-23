@@ -135,7 +135,8 @@ ffexp <- R6::R6Class(
         }
       }
     },
-    run_all = function(redo = FALSE, run_order, parallel_temp_save=FALSE) {
+    run_all = function(redo = FALSE, run_order, parallel_temp_save=FALSE,
+                       delete_parallel_temp_save_after=FALSE) {
       if (missing(run_order)) { # random for parallel for load balancing
         if (self$parallel) {run_order <- "random"}
         else {run_order <- "inorder"}
@@ -182,7 +183,8 @@ ffexp <- R6::R6Class(
                      paste0(self$folder_path,
                             "/parallel_temp_output_",ii,".rds"))
                  })
-          self$delete_save_folder_if_empty()
+          self$delete_save_folder_if_empty(delete_after=
+                                             delete_parallel_temp_save_after)
         }
       } else {
         sapply(to_run,function(ii){self$run_one(ii)})
@@ -422,7 +424,7 @@ ffexp <- R6::R6Class(
                             all.files = TRUE, no.. = TRUE)) == 0) {
         unlink(self$folder_path, recursive = TRUE)
       } else {
-        stop("Folder is not empty")
+        message("Folder is not empty")
       }
       invisible(self)
     },
@@ -507,5 +509,6 @@ if (F) {
   f1$outcleandf
   f1$calculate_effects()
   cc <- ffexp$new(a=5:7,b=22, cd=data.frame(c=3:4,d=5:6, row.names = c("35", "46")),
-                  eval_func=function(...,a,b) {data.frame(apb=a+b)}); cc$run_all(); cc$calculate_effects()
+                  eval_func=function(...,a,b) {data.frame(apb=a+b)});
+  cc$run_all(); cc$calculate_effects()
 }
