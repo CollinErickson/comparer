@@ -135,10 +135,12 @@ ffexp <- R6::R6Class(
         }
       }
     },
-    run_all = function(redo = FALSE, run_order, parallel_temp_save=FALSE,
+    run_all = function(redo = FALSE, run_order,
+                       parallel=self$parallel,
+                       parallel_temp_save=FALSE,
                        delete_parallel_temp_save_after=FALSE) {
       if (missing(run_order)) { # random for parallel for load balancing
-        if (self$parallel) {run_order <- "random"}
+        if (parallel) {run_order <- "random"}
         else {run_order <- "inorder"}
       }
       if (!redo) { # Only run ones that haven't been run yet
@@ -151,7 +153,7 @@ ffexp <- R6::R6Class(
       else if (run_order == "random") {to_run <- sample(to_run)}
       else {stop("run_order not recognized #567128")}
 
-      if (self$parallel) {#browser()
+      if (parallel) {
         # pc <- parallel::detectCores()
         # cl1 <- parallel::makeCluster(spec=pc, type="SOCK")
         # parallel::parSapply(cl=cl1, to_run,function(ii){self$run_one(ii)})
@@ -160,6 +162,9 @@ ffexp <- R6::R6Class(
             spec=self$parallel_cores, type = "SOCK")
         }
         if (parallel_temp_save) {self$create_save_folder_if_nonexistent()}
+        cat("About to start run in parallel, run order is:\n    ",
+            to_run,
+            "\n")
         parout <- parallel::clusterApplyLB(
           cl=self$parallel_cluster,
           to_run,
@@ -176,15 +181,15 @@ ffexp <- R6::R6Class(
                function(oneout) {do.call(self$add_result_of_one, oneout)})
         parallel::stopCluster(self$parallel_cluster)
         self$parallel_cluster <- NULL
-        if (parallel_temp_save) {
+        # Delete temp files if needed
+        if (parallel_temp_save && delete_parallel_temp_save_after) {
           sapply(to_run,
                  function(ii) {
                    unlink(
                      paste0(self$folder_path,
                             "/parallel_temp_output_",ii,".rds"))
                  })
-          self$delete_save_folder_if_empty(delete_after=
-                                             delete_parallel_temp_save_after)
+          self$delete_save_folder_if_empty()
         }
       } else {
         sapply(to_run,function(ii){self$run_one(ii)})
