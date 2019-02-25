@@ -150,8 +150,14 @@ ffexp <- R6::R6Class(
       }
       if (run_order == "inorder") {} # Leave it in order
       else if (run_order == "reverse") {to_run <- rev(to_run)}
-      else if (run_order == "random") {to_run <- sample(to_run)}
-      else {stop("run_order not recognized #567128")}
+      else if (run_order == "random") {
+        # sample of a single number is bad
+        if (length(to_run)> 1) {
+          to_run <- sample(to_run)
+        } else {
+          to_run <- to_run
+        }
+      } else {stop("run_order not recognized #567128")}
 
       if (parallel) {
         # pc <- parallel::detectCores()
@@ -198,7 +204,9 @@ ffexp <- R6::R6Class(
       invisible(self)
     },
     run_one = function(irow=NULL, save_output=self$save_output,
-                       is_parallel=FALSE) {#browser()
+                       write_start_files=FALSE,
+                       is_parallel=FALSE) {
+      # Set up single row to run
       if (is.null(irow)) { # If irow not given, set to next not run
         if (any(self$completed_runs == FALSE)) {
           irow <- which(self$completed_runs == 0)[1]
@@ -212,7 +220,8 @@ ffexp <- R6::R6Class(
       } else if (self$completed_runs[irow] == TRUE) {
         warning("irow already run, will run again anyways")
       }
-      # browser()
+
+      # Get ready for single run
       cat("Running ", irow, ", completed ", sum(self$completed_runs),"/",
           length(self$completed_runs), " ",
           format(Sys.time(), "%a %b %d %X %Y"), "\n", sep="")
@@ -255,7 +264,6 @@ ffexp <- R6::R6Class(
       # Need to get list of lists out into single list
       # row_list <- as.list(unlist(row_list, recursive = FALSE))
       print(row_list)
-      # return()
 
       # Get df for output row, must be number of string, no functions
       row_df <- lapply(1:ncol(self$nvars),
@@ -283,6 +291,14 @@ ffexp <- R6::R6Class(
       # Need to get list of lists out into single list
       row_df <- as.list(unlist(row_df, recursive = FALSE))
 
+      # Write start file so user can see which ones are currently
+      #  running and when they started.
+      if (write_start_files) {
+        write_start_file_path <- paste0(self$folder_path,
+                                        "/STARTED_parallel_temp_output_",ii,".rds")
+        cat(timestamp(), file=write_start_file_path)
+      }
+
       # Run and time it
       start_time <- Sys.time()
       systime <- system.time(output <- do.call(self$eval_func, row_list))
@@ -301,11 +317,19 @@ ffexp <- R6::R6Class(
                              row_grid=row_grid, row_df=row_df,
                              start_time=start_time, end_time=end_time,
                              save_output=save_output)
+
+      # Delete write start file
+      if (write_start_files && file.exists(write_start_file_path)) {
+        unlink(write_start_file_path)
+      }
+
       # Return invisible self
       invisible(self)
     },
     add_result_of_one = function(output, systime, irow, row_grid, row_df,
                                  start_time, end_time, save_output) {
+      # This is used to save results after running an item
+
       self$outlist[[irow]] <- output
       if (is.data.frame(output)) {
         output$runtime <- systime[3]
@@ -344,7 +368,7 @@ ffexp <- R6::R6Class(
           matrix(data=NA, nrow=nrow(self$rungrid) * nrow(newdf_clean),
                  ncol=ncol(newdf_clean)))
         colnames(self$outcleandf) <- colnames(newdf_clean)
-        # browser()
+
         for (i in 1:ncol(self$outcleandf)) {
           class(self$outcleandf[,i]) <- class(newdf_clean[1,i])
         }
@@ -391,18 +415,18 @@ ffexp <- R6::R6Class(
                }
                nlev <- nrow(tdf)
                if (nlev > 1) {
-               for (j in (2:nlev)) {
-                 for (k in 1:(j-1)) {
-                   # newdf <- data.frame(diffname=paste0(tdf[j,1],"-",tdf[k,1]),
-                   #                     mean=tdf[j,2]-tdf[k,2],
-                   #                     se=tdf[j,3]-tdf[k,3],
-                   #                     runtime=tdf[j,4]-tdf[k,4])
-                   newdf <- data.frame(tempname=paste0(tdf[j,1],"-",tdf[k,1]))
-                   colnames(newdf)[1] <- names(self$rungrid)[i]
-                   newdf <- cbind(newdf, tdf[j,outputcols-nvar+1]-tdf[k,outputcols-nvar+1])
-                   tdf <- rbind(tdf, newdf)
+                 for (j in (2:nlev)) {
+                   for (k in 1:(j-1)) {
+                     # newdf <- data.frame(diffname=paste0(tdf[j,1],"-",tdf[k,1]),
+                     #                     mean=tdf[j,2]-tdf[k,2],
+                     #                     se=tdf[j,3]-tdf[k,3],
+                     #                     runtime=tdf[j,4]-tdf[k,4])
+                     newdf <- data.frame(tempname=paste0(tdf[j,1],"-",tdf[k,1]))
+                     colnames(newdf)[1] <- names(self$rungrid)[i]
+                     newdf <- cbind(newdf, tdf[j,outputcols-nvar+1]-tdf[k,outputcols-nvar+1])
+                     tdf <- rbind(tdf, newdf)
+                   }
                  }
-               }
                }
                # Convert to list here so I can give it a name
                tl <- list(tdf)
@@ -506,10 +530,10 @@ if (F) {
   # Try to get useful output
   f1 <- ffexp$new(n=c(100, 1000, 10000),
                   nulleff=c(0,1),
-            eval_func=function(n, nulleff) {
-              samp <- rnorm(n)
-              data.frame(mean=mean(samp), se=sd(samp)/sqrt(n))}
-            )
+                  eval_func=function(n, nulleff) {
+                    samp <- rnorm(n)
+                    data.frame(mean=mean(samp), se=sd(samp)/sqrt(n))}
+  )
   f1$run_all()
   f1$outcleandf
   f1$calculate_effects()
