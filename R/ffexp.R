@@ -138,6 +138,7 @@ ffexp <- R6::R6Class(
     run_all = function(redo = FALSE, run_order,
                        parallel=self$parallel,
                        parallel_temp_save=FALSE,
+                       write_start_files=FALSE,
                        delete_parallel_temp_save_after=FALSE) {
       if (missing(run_order)) { # random for parallel for load balancing
         if (parallel) {run_order <- "random"}
@@ -175,7 +176,8 @@ ffexp <- R6::R6Class(
           cl=self$parallel_cluster,
           to_run,
           function(ii){
-            tout <- self$run_one(ii, is_parallel=TRUE)
+            tout <- self$run_one(ii, is_parallel=TRUE,
+                                 write_start_files=write_start_files)
             if (parallel_temp_save) {
               saveRDS(object=tout,
                       file=paste0(self$folder_path,
@@ -198,7 +200,7 @@ ffexp <- R6::R6Class(
           self$delete_save_folder_if_empty()
         }
       } else {
-        sapply(to_run,function(ii){self$run_one(ii)})
+        sapply(to_run,function(ii){self$run_one(ii, write_start_files=write_start_files)})
       }
       # self$postprocess_outdf()
       invisible(self)
@@ -295,7 +297,7 @@ ffexp <- R6::R6Class(
       #  running and when they started.
       if (write_start_files) {
         write_start_file_path <- paste0(self$folder_path,
-                                        "/STARTED_parallel_temp_output_",ii,".rds")
+                                        "/STARTED_parallel_temp_output_",irow,".rds")
         cat(timestamp(), file=write_start_file_path)
       }
 
@@ -303,6 +305,12 @@ ffexp <- R6::R6Class(
       start_time <- Sys.time()
       systime <- system.time(output <- do.call(self$eval_func, row_list))
       end_time <- Sys.time()
+
+
+      # Delete write start file
+      if (write_start_files && file.exists(write_start_file_path)) {
+        unlink(write_start_file_path)
+      }
 
       # If parallel need to return everything to be added to original object
       if (is_parallel) {
@@ -317,11 +325,6 @@ ffexp <- R6::R6Class(
                              row_grid=row_grid, row_df=row_df,
                              start_time=start_time, end_time=end_time,
                              save_output=save_output)
-
-      # Delete write start file
-      if (write_start_files && file.exists(write_start_file_path)) {
-        unlink(write_start_file_path)
-      }
 
       # Return invisible self
       invisible(self)
@@ -423,7 +426,8 @@ ffexp <- R6::R6Class(
                      #                     runtime=tdf[j,4]-tdf[k,4])
                      newdf <- data.frame(tempname=paste0(tdf[j,1],"-",tdf[k,1]))
                      colnames(newdf)[1] <- names(self$rungrid)[i]
-                     newdf <- cbind(newdf, tdf[j,outputcols-nvar+1]-tdf[k,outputcols-nvar+1])
+                     newdf <- cbind(newdf,
+                                    tdf[j,outputcols-nvar+1]-tdf[k,outputcols-nvar+1])
                      tdf <- rbind(tdf, newdf)
                    }
                  }
