@@ -139,6 +139,7 @@ ffexp <- R6::R6Class(
                        parallel=self$parallel,
                        parallel_temp_save=FALSE,
                        write_start_files=FALSE,
+                       write_error_files=FALSE,
                        delete_parallel_temp_save_after=FALSE) {
       if (missing(run_order)) { # random for parallel for load balancing
         if (parallel) {run_order <- "random"}
@@ -177,7 +178,8 @@ ffexp <- R6::R6Class(
           to_run,
           function(ii){
             tout <- self$run_one(ii, is_parallel=TRUE,
-                                 write_start_files=write_start_files)
+                                 write_start_files=write_start_files,
+                                 write_error_files=write_error_files)
             if (parallel_temp_save) {
               saveRDS(object=tout,
                       file=paste0(self$folder_path,
@@ -200,13 +202,15 @@ ffexp <- R6::R6Class(
           self$delete_save_folder_if_empty()
         }
       } else {
-        sapply(to_run,function(ii){self$run_one(ii, write_start_files=write_start_files)})
+        sapply(to_run,function(ii){self$run_one(ii, write_start_files=write_start_files,
+                                                write_error_files=write_error_files)})
       }
       # self$postprocess_outdf()
       invisible(self)
     },
     run_one = function(irow=NULL, save_output=self$save_output,
                        write_start_files=FALSE,
+                       write_error_files=T,
                        is_parallel=FALSE) {
       # Set up single row to run
       if (is.null(irow)) { # If irow not given, set to next not run
@@ -297,20 +301,34 @@ ffexp <- R6::R6Class(
       #  running and when they started.
       if (write_start_files) {
         write_start_file_path <- paste0(self$folder_path,
-                                        "/STARTED_parallel_temp_output_",irow,".rds")
+                                        "/STARTED_parallel_temp_output_",irow,".txt")
         cat(timestamp(), file=write_start_file_path)
       }
 
       # Run and time it
-      start_time <- Sys.time()
-      systime <- system.time(output <- do.call(self$eval_func, row_list))
-      end_time <- Sys.time()
-
+      try.run <- try({
+        start_time <- Sys.time()
+        systime <- system.time(output <- do.call(self$eval_func, row_list))
+        end_time <- Sys.time()
+      })
 
       # Delete write start file
       if (write_start_files && file.exists(write_start_file_path)) {
         unlink(write_start_file_path)
       }
+
+      # If error while running, write out error file/message
+      #  Want this after delete write start file so that file gets deleted either way
+      if (inherits(try.run, "try-error")) {
+        if (write_error_files) {
+          write_error_file_path <- paste0(self$folder_path,
+                                          "/ERROR_parallel_temp_output_",irow,".txt")
+          cat(timestamp(),"\n\n",
+              try.run, file=write_start_file_path)
+        }
+        stop(paste0("Error in run_one for irow=",irow,"\n",try.run))
+      }
+
 
       # If parallel need to return everything to be added to original object
       if (is_parallel) {

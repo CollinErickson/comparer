@@ -12,8 +12,9 @@ Description: Makes comparisons quickly for different functions or code
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-Imports: progress
+Imports: R6
 Suggests: plyr,
+    progress,
     testthat,
     covr,
     knitr,
