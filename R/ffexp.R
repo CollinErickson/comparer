@@ -394,8 +394,12 @@ ffexp <- R6::R6Class(
           class(self$outcleandf[,i]) <- class(newdf_clean[1,i])
         }
       }
-      self$outrawdf[((irow-1)*nr+1):(irow*nr), ] <- newdf1
-      self$outcleandf[((irow-1)*nr+1):(irow*nr), ] <- newdf_clean
+
+      # Put it in place, but only if dimensions match up
+      if (self$number_runs * nrow(newdf1) == nrow(self$outrawdf)) {
+        self$outrawdf[((irow-1)*nr+1):(irow*nr), ] <- newdf1
+        self$outcleandf[((irow-1)*nr+1):(irow*nr), ] <- newdf_clean
+      }
 
 
       if (save_output) {
