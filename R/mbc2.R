@@ -26,7 +26,7 @@
 #'
 #' @examples
 #' # Compare distribution of mean for different sample sizes
-#' mbc(mean(rnorm(1e2)),
+#' mbc2(mean(rnorm(1e2)),
 #'     mean(rnorm(1e4)),
 #'     times=20)
 #'
