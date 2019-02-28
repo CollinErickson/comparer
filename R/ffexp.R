@@ -210,7 +210,7 @@ ffexp <- R6::R6Class(
     },
     run_one = function(irow=NULL, save_output=self$save_output,
                        write_start_files=FALSE,
-                       write_error_files=T,
+                       write_error_files=TRUE,
                        is_parallel=FALSE) {
       # Set up single row to run
       if (is.null(irow)) { # If irow not given, set to next not run
@@ -323,8 +323,8 @@ ffexp <- R6::R6Class(
         if (write_error_files) {
           write_error_file_path <- paste0(self$folder_path,
                                           "/ERROR_parallel_temp_output_",irow,".txt")
-          cat(timestamp(),"\n\n",
-              try.run, file=write_start_file_path)
+          cat(Sys.time(),"\n", file=write_error_file_path)
+          cat(try.run[1], "\n", file=write_error_file_path)
         }
         stop(paste0("Error in run_one for irow=",irow,"\n",try.run))
       }
