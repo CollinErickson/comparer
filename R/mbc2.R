@@ -1,3 +1,19 @@
+# This was an attempt to use microbenchmark for the mbc timings.
+# It failed because repeated calls to microbenchmark are slow.
+# Each call takes about .1 seconds.
+# So to run a bunch, they need to all be run at once.
+# But then all the data (inputi) would have to generated
+# in the beginning, not one at a time as is done now.
+# This would only be a problem when creating big data for each
+# iteration or running many iterations.
+# Also I found that using Sys.time differences is accurate to 3
+# decimal places, whereas system.time was 2.
+# This seems good enough. Anything that is faster than that
+# maybe isn't worth timing.
+# Or it would be simple to use mbc to compare outputs and then
+# microbenchmark for timing. Since it would be so fast,
+# doing these separately wouldn't add much time.
+
 #' Model benchmark compare
 #'
 #' Compare the run time and output of various code chunks

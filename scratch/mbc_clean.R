@@ -26,30 +26,30 @@
 #'
 #' @examples
 #' # Compare distribution of mean for different sample sizes
-#' mbc(mean(rnorm(1e2)),
+#' mbc3(mean(rnorm(1e2)),
 #'     mean(rnorm(1e4)),
 #'     times=20)
 #'
 #' # Compare mean and median on same data
-#' mbc(mean(x),
+#' mbc3(mean(x),
 #'     median(x),
 #'     inputi={x=rexp(1e2)})
 #'
 #' # input given, no post
-#' mbc(function(x) {Sys.sleep(rexp(1, 30));mean(x)},
-#'     function(x) {Sys.sleep(rexp(1, 5));median(x)},
+#' mbc3({Sys.sleep(rexp(1, 30));mean(x)},
+#'      {Sys.sleep(rexp(1, 5));median(x)},
 #'     inputi={x=runif(100)})
 #'
 #' # input given with post
-#' mbc(function(x) {Sys.sleep(rexp(1, 30));mean(x)},
-#'     function(x) {Sys.sleep(rexp(1, 5));median(x)},
+#' mbc3({Sys.sleep(rexp(1, 30));mean(x)},
+#'     {Sys.sleep(rexp(1, 5));median(x)},
 #'     inputi={x=runif(100)},
 #'     post=function(x){c(x+1, 12)})
 #'
 #' # input given with post, 30 times
-#' mbc(function(x) {Sys.sleep(rexp(1, 30));mean(x)+runif(1)},
-#'     function(x) {Sys.sleep(rexp(1, 50));median(x)+runif(1)},
-#'     inputi={runif(100)},
+#' mbc3({Sys.sleep(rexp(1, 30));mean(x)+runif(1)},
+#'     {Sys.sleep(rexp(1, 50));median(x)+runif(1)},
+#'     inputi={x=runif(100)},
 #'     post=function(x){c(x+1, 12)}, times=10)
 #'
 #' # Name one function and post
@@ -59,8 +59,8 @@
 #'     post=function(x){c(rr=x+1, gg=12)}, times=10)
 #'
 #' # No input
-#' m1 <- mbc(function() {x <- runif(100);Sys.sleep(rexp(1, 30));mean(x)},
-#'           function() {x <- runif(100);Sys.sleep(rexp(1, 50));median(x)})
+#' m1 <- mbc3({x <- runif(100);Sys.sleep(rexp(1, 30));mean(x)},
+#'           {x <- runif(100);Sys.sleep(rexp(1, 50));median(x)})
 mbc3 <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
                  metric="rmse", paired, kfold) {
   if (!missing(input) && !missing(inputi)) {
