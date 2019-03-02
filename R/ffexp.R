@@ -159,7 +159,8 @@ ffexp <- R6::R6Class(
         } else {
           to_run <- to_run
         }
-      } else {stop("run_order not recognized #567128")}
+      } else {stop(paste("run_order not recognized, should be one of inorder,",
+                         "reverse, or random #567128"))}
 
       if (parallel) {
         # pc <- parallel::detectCores()
@@ -242,7 +243,8 @@ ffexp <- R6::R6Class(
                if (is.data.frame(ar)) {
                  tr <- as.list(ar[row_grid[1,i],])
                } else if (is.list(ar)) {
-                 tr <- ar[[row_grid[1,i]]]
+                 # tr <- ar[[row_grid[1,i]]]
+                 tr <- lapply(ar, function(x) x[[i]])
                } else if (is.function(ar)) {
                  tr <- ar # If single value is a function
                } else {
@@ -278,7 +280,8 @@ ffexp <- R6::R6Class(
                          if (is.data.frame(ar)) {
                            tr <- as.list(ar[row_grid[1,i],])
                          } else if (is.list(ar)) {
-                           tr <- ar[[row_grid[1,i]]]
+                           # tr <- ar[[row_grid[1,i]]]
+                           tr <- lapply(ar, function(x) x[[i]])
                          } else if (is.function(ar)) {
                            tr <- ar # If single value is a function
                          } else {
@@ -321,6 +324,7 @@ ffexp <- R6::R6Class(
       #  Want this after delete write start file so that file gets deleted either way
       if (inherits(try.run, "try-error")) {
         if (write_error_files) {
+          self$create_save_folder_if_nonexistent()
           write_error_file_path <- paste0(self$folder_path,
                                           "/ERROR_parallel_temp_output_",irow,".txt")
           cat(Sys.time(),"\n", file=write_error_file_path)
@@ -428,15 +432,18 @@ ffexp <- R6::R6Class(
     calculate_effects = function() {
       nvar <- ncol(self$rungrid)
       sapply(1:nvar,
-             function(i) {
+             function(i) {browser()
                outputcols <- (nvar+1):(ncol(self$outrawdf)-3)
                tdf <- plyr::ddply(self$outrawdf[,c(i, outputcols)],
                                   names(self$rungrid)[i],
                                   colMeans)
-               if (is.vector(self$arglist[[i]])) {
-                 tdf[,1] <- self$arglist[[i]][tdf[,1]]
-               } else if (is.data.frame(self$arglist[[i]])) {
+               # Need df first, then list, then vector
+               if (is.data.frame(self$arglist[[i]])) {
                  tdf[,1] <- rownames(self$arglist[[i]])[tdf[,1]]
+               } else if (is.list(self$arglist[[i]])) {
+                 tdf[,1] <- names(self$arglist[[i]][[1]])[tdf[,1]]
+               } else if (is.vector(self$arglist[[i]])) {
+                 tdf[,1] <- self$arglist[[i]][tdf[,1]]
                }
                nlev <- nrow(tdf)
                if (nlev > 1) {

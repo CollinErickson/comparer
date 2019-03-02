@@ -114,3 +114,50 @@ test_that("ffexp parallel detect cores - 1, don't run", {
   expect_error(f1$delete(), NA)
   rm(f1)
 })
+
+
+
+
+test_that("ffexp with list", {
+  expect_error(f1 <- ffexp$new(x=list(a=list(r=1,s=2,t=3),b=list(r=4,s=6,t=8)),
+                               y=1:4,
+                               eval_func=function(a, b, y) {
+                                 samp <- rnorm(b)
+                                 data.frame(mean=mean(samp), se=sd(samp)/sqrt(b))}
+  ), NA)
+  expect_error(f1$run_all(run_order = "reverse", redo = T), NA)
+
+  prt <- f1$plot_run_times()
+  expect_is(prt, "gg")
+  calc.eff <- f1$calculate_effects()
+  expect_is(calc.eff, "list")
+  expect_true(length(calc.eff) == 2)
+
+  # Delete at end
+  expect_error(f1$delete(), NA)
+})
+
+test_that("ffexp with error", {
+  expect_error(f1 <- ffexp$new(x=list(a=list(r=1,s=2,t=3),b=list(r=4,s=6,t=8)),
+                               y=1:4,
+                               eval_func=function(a, b, y) {
+                                 if (y>2) stop()
+                                 samp <- rnorm(b)
+                                 data.frame(mean=mean(samp), se=sd(samp)/sqrt(b))},
+                               save_output=T,parallel = T, parallel_cores = 1,
+                               folder_path = tempdir()
+  ), NA)
+  expect_error(f1$run_all(run_order = "inorder", redo = T, parallel_temp_save = T))
+  expect_true(sum(f1$completed_runs)==0)
+  expect_error(f1$recover_parallel_temp_save(delete_after = T), NA)
+  expect_true(sum(f1$completed_runs)==6)
+
+  prt <- f1$plot_run_times()
+  expect_is(prt, "gg")
+  calc.eff <- f1$calculate_effects()
+  expect_is(calc.eff, "list")
+  expect_true(length(calc.eff) == 2)
+
+  # Delete at end
+  expect_error(f1$delete(), NA)
+})
