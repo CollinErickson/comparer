@@ -18,6 +18,8 @@ Suggests: plyr,
     testthat,
     covr,
     knitr,
+    ggplot2,
+    snow,
     rmarkdown,
     reshape,
     microbenchmark

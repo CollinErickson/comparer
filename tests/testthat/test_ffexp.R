@@ -9,7 +9,8 @@ test_that("ffexp", {
   expect_is(f1, "ffexp")
   expect_error(f1$run_all(), NA)
 
-  expect_is(f1$plot_run_times(), "gg")
+  prt <- f1$plot_run_times()
+  expect_is(prt, "gg")
   calc.eff <- f1$calculate_effects()
   expect_is(calc.eff, "list")
   expect_true(length(calc.eff) == 2)
