@@ -53,8 +53,8 @@ test_that("ffexp parallel 2", {
   expect_error(f1$run_all(parallel_temp_save = T, write_start_files = T,
                           write_error_files = T,
                           delete_parallel_temp_save_after = T), NA)
-  expect_error(f1$save_self(), NA)
-
+  # expect_error(f1$save_self(), NA)
+  expect_error(f1$delete_save_folder_if_empty(), NA)
   # Delete at end
   expect_error(f1$delete(), NA)
 })
@@ -147,7 +147,8 @@ test_that("ffexp with error", {
                                save_output=T,parallel = T, parallel_cores = 1,
                                folder_path = tempdir()
   ), NA)
-  expect_error(f1$run_all(run_order = "inorder", redo = T, parallel_temp_save = T))
+  expect_error(f1$run_all(run_order = "inorder", redo = T, parallel_temp_save = T,
+                          write_error_files=T))
   expect_true(sum(f1$completed_runs)==0)
   expect_error(f1$recover_parallel_temp_save(delete_after = T), NA)
   expect_true(sum(f1$completed_runs)==6)
@@ -157,6 +158,33 @@ test_that("ffexp with error", {
   calc.eff <- f1$calculate_effects()
   expect_is(calc.eff, "list")
   expect_true(length(calc.eff) == 2)
+
+  # Delete at end
+  expect_error(f1$delete(), NA)
+})
+
+
+
+test_that("ffexp with function input", {
+  expect_error(f1 <- ffexp$new(n=c(100, 1000, 10000),
+                               nulleff=c(0,1),
+                               functi=sin,
+                               eval_func=function(n, nulleff, functi) {
+                                 samp <- rnorm(n)
+                                 data.frame(mean=mean(samp), se=sd(samp)/sqrt(n), functi_0=functi(0))}
+  ), NA)
+  expect_is(f1, "R6")
+  expect_is(f1, "ffexp")
+  expect_error(f1$run_one(), NA)
+  expect_error(f1$run_all(), NA)
+  expect_error(f1$run_all(), NA)
+  expect_error(f1$run_one())
+
+  prt <- f1$plot_run_times()
+  expect_is(prt, "gg")
+  calc.eff <- f1$calculate_effects()
+  expect_is(calc.eff, "list")
+  expect_true(length(calc.eff) == 3)
 
   # Delete at end
   expect_error(f1$delete(), NA)

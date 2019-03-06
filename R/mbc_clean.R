@@ -26,43 +26,43 @@
 #'
 #' @examples
 #' # Compare distribution of mean for different sample sizes
-#' mbc3(mean(rnorm(1e2)),
+#' mbc(mean(rnorm(1e2)),
 #'     mean(rnorm(1e4)),
 #'     times=20)
 #'
 #' # Compare mean and median on same data
-#' mbc3(mean(x),
+#' mbc(mean(x),
 #'     median(x),
 #'     inputi={x=rexp(1e2)})
 #'
 #' # input given, no post
-#' mbc3({Sys.sleep(rexp(1, 30));mean(x)},
+#' mbc({Sys.sleep(rexp(1, 30));mean(x)},
 #'      {Sys.sleep(rexp(1, 5));median(x)},
 #'     inputi={x=runif(100)})
 #'
 #' # input given with post
-#' mbc3({Sys.sleep(rexp(1, 30));mean(x)},
-#'     {Sys.sleep(rexp(1, 5));median(x)},
+#' mbc(mean={Sys.sleep(rexp(1, 30));mean(x)},
+#'     med={Sys.sleep(rexp(1, 5));median(x)},
 #'     inputi={x=runif(100)},
-#'     post=function(x){c(x+1, 12)})
+#'     post=function(x){c(x+1, x^2)})
 #'
 #' # input given with post, 30 times
-#' mbc3({Sys.sleep(rexp(1, 30));mean(x)+runif(1)},
-#'     {Sys.sleep(rexp(1, 50));median(x)+runif(1)},
+#' mbc(mean={Sys.sleep(rexp(1, 30));mean(x)+runif(1)},
+#'     med={Sys.sleep(rexp(1, 50));median(x)+runif(1)},
 #'     inputi={x=runif(100)},
-#'     post=function(x){c(x+1, 12)}, times=10)
+#'     post=function(x){c(x+1, x^2)}, times=10)
 #'
 #' # Name one function and post
-#' mbc(function(x) {mean(x)+runif(1)},
-#'     a1=function(x) {median(x)+runif(1)},
+#' mbc({mean(x)+runif(1)},
+#'     a1={median(x)+runif(1)},
 #'     inputi={x=runif(100)},
-#'     post=function(x){c(rr=x+1, gg=12)}, times=10)
+#'     post=function(x){c(rr=x+1, gg=x^2)}, times=10)
 #'
 #' # No input
-#' m1 <- mbc3({x <- runif(100);Sys.sleep(rexp(1, 30));mean(x)},
-#'           {x <- runif(100);Sys.sleep(rexp(1, 50));median(x)})
-mbc3 <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
-                 metric="rmse", paired, kfold) {
+#' m1 <- mbc(mean={x <- runif(100);Sys.sleep(rexp(1, 30));mean(x)},
+#'           med={x <- runif(100);Sys.sleep(rexp(1, 50));median(x)})
+mbc <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
+                metric="rmse", paired, kfold) {
   if (!missing(input) && !missing(inputi)) {
     stop("input and inputi should not both be given in")
   }
@@ -138,7 +138,8 @@ mbc3 <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
         # If it was single value instead of setting variable, e.g. "rnorm(10)"
         #   instead of "x <- rnorm(10)", then store that
         if (length(ls(input)) == 0) { # Store the output in input
-          input$inputi_expr_out <- inputi_expr_out
+          # input$inputi_expr_out <- inputi_expr_out
+          input$x <- inputi_expr_out
         }
       } else if (is.function(inputi)) { # Next see if it is a function
         input <- inputi(j)
@@ -149,7 +150,8 @@ mbc3 <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
         input <- new.env(parent = parent.frame())
         inputi_expr_out <- eval(inputi_expr, input)
         if (length(ls(input)) == 0) { # Store the output in input
-          input$inputi_expr_out <- inputi_expr_out
+          # input$inputi_expr_out <- inputi_expr_out
+          input$x <- inputi_expr_out
         }
       }
     } else { # inputi not given, so not paired
@@ -248,6 +250,7 @@ mbc3 <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
         if (!missing(target)) {
           po.metric <- c()
           if ("rmse" %in% metric) {
+            if (is.function(po)) {stop("Can't calculate rmse for function output")}
             targetj <- if (is.function(target)) {target(j)}
             else if (is.list(target)) {target[[j]]}
             else if (is.character(target) && !is.character(po) && (target%in%names(targetinj))) {targetinj[[target]]}
@@ -487,8 +490,9 @@ mbc3 <- function(..., times=5, input, inputi, evaluator, post, target, targetin,
 #' @export
 #'
 #' @examples
-#' m1 <- mbc(function(x) {Sys.sleep(rexp(1, 30));mean(x)},
-#'   function(x) {Sys.sleep(rexp(1, 5));median(x)}, input=runif(100))
+#' m1 <- mbc(mn= {Sys.sleep(rexp(1, 30));mean(x)},
+#'           med={Sys.sleep(rexp(1, 5));median(x)},
+#'           input=runif(100))
 #' plot(m1)
 plot.mbc <- function(x, ...) {
   # stripchart(x$Run_times)
@@ -507,8 +511,9 @@ plot.mbc <- function(x, ...) {
 #' @export
 #'
 #' @examples
-#' m1 <- mbc(function(x) {Sys.sleep(rexp(1, 30));mean(x)},
-#'   function(x) {Sys.sleep(rexp(1, 5));median(x)}, input=runif(100))
+#' m1 <- mbc({Sys.sleep(rexp(1, 30));mean(x)},
+#'           {Sys.sleep(rexp(1, 5));median(x)},
+#'           input=runif(100))
 #' print(m1)
 print.mbc <- function(x, ...) {
   nam <- names(x)

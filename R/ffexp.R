@@ -135,7 +135,8 @@ ffexp <- R6::R6Class(
         }
       }
     },
-    run_all = function(redo = FALSE, run_order,
+    run_all = function(to_run=NULL,
+                       redo = FALSE, run_order,
                        parallel=self$parallel,
                        parallel_temp_save=FALSE,
                        write_start_files=FALSE,
@@ -145,7 +146,9 @@ ffexp <- R6::R6Class(
         if (parallel) {run_order <- "random"}
         else {run_order <- "inorder"}
       }
-      if (!redo) { # Only run ones that haven't been run yet
+      if (!is.null(to_run)) {
+        # to_run given
+      } else if (!redo) { # Only run ones that haven't been run yet
         to_run <- which(self$completed_runs == FALSE)
       } else {
         to_run <- 1:self$number_runs
@@ -244,7 +247,7 @@ ffexp <- R6::R6Class(
                  tr <- as.list(ar[row_grid[1,i],])
                } else if (is.list(ar)) {
                  # tr <- ar[[row_grid[1,i]]]
-                 tr <- lapply(ar, function(x) x[[i]])
+                 tr <- lapply(ar, function(x) x[[row_grid[1,i]]])
                } else if (is.function(ar)) {
                  tr <- ar # If single value is a function
                } else {
@@ -281,7 +284,7 @@ ffexp <- R6::R6Class(
                            tr <- as.list(ar[row_grid[1,i],])
                          } else if (is.list(ar)) {
                            # tr <- ar[[row_grid[1,i]]]
-                           tr <- lapply(ar, function(x) x[[i]])
+                           tr <- lapply(ar, function(x) x[[row_grid[1,i]]])
                          } else if (is.function(ar)) {
                            tr <- ar # If single value is a function
                          } else {
@@ -432,7 +435,7 @@ ffexp <- R6::R6Class(
     calculate_effects = function() {
       nvar <- ncol(self$rungrid)
       sapply(1:nvar,
-             function(i) {browser()
+             function(i) {
                outputcols <- (nvar+1):(ncol(self$outrawdf)-3)
                tdf <- plyr::ddply(self$outrawdf[,c(i, outputcols)],
                                   names(self$rungrid)[i],

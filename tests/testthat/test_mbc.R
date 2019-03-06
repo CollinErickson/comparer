@@ -52,14 +52,17 @@ test_that("mbc basic runs", {
   expect_error(mbc(12, evaluator=function() mean(.)), NA)
 
   expect_error(mbc(identity, function(x) x, inputi=12, times=3, post=12), NA)
-  expect_error(mbc(mean, median, input=rnorm(100), times=7, target=0), NA)
-  expect_error(mbc(mean, median, inputi=0:10, times=7, target=0), NA)
+  # This doesn't work anymore, need to put (x)
+  expect_error(mbc(mean, median, input=rnorm(100), times=7, target=0))
+  expect_error(mbc(mean(x), median(x), input=rnorm(100), times=7, target=0), NA)
+  expect_error(mbc(mean(x), median(x), inputi=0:10, times=7, target=0), NA)
 
   # Test duplicate names
   expect_error(mbc(mean,mean,input=rnorm(3), times=2), NA)
   expect_error(mbc(mean,mean,mean,input=rnorm(3), times=2), NA)
   expect_error(mbc(m=mean,m=mean, m2=mean,input=rnorm(3), times=2), NA)
 })
+
 test_that("test mbc print", {
   # Basic with compare
   m1 <- mbc(mean, median, inputi=function(i)rnorm(100))
@@ -68,12 +71,12 @@ test_that("test mbc print", {
 
 test_that("test mbc metrics", {
 
-  expect_error(m1 <- mbc(mean, median, inputi=function(i)rnorm(10)), NA)
+  expect_error(m1 <- mbc(mean(x), median(x), inputi=function(i)rnorm(10)), NA)
 
-  expect_error(m1 <- mbc(mean, median, inputi=function(i)rnorm(10), target=10), NA)
+  expect_error(m1 <- mbc(mean(x), median(x), inputi=function(i)rnorm(10), target=10), NA)
   # Give function for target
-  expect_error(m1 <- mbc(mean, median, inputi=function(i)rnorm(10), target=function(i){i}), NA)
-  expect_error(m1 <- mbc(mean, median, inputi=function(i)rnorm(10), target=list(1,2,3,4,5)), NA)
+  expect_error(m1 <- mbc(mean(x), median(x), inputi=function(i)rnorm(10), target=function(i){i}), NA)
+  expect_error(m1 <- mbc(mean(x), median(x), inputi=function(i)rnorm(10), target=list(1,2,3,4,5)), NA)
 
   # Test t and mis90 using lm
   x1 <- runif(10)
