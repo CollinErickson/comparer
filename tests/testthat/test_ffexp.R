@@ -20,7 +20,7 @@ test_that("ffexp", {
 })
 
 test_that("ffexp parallel", {
-  folder <- paste0(tempdir(),"\\")
+  folder <- paste0(tempdir(),"//")
   expect_error(f1 <- ffexp$new(n=c(100, 1000, 10000),
                                nulleff=c(0,1),
                                eval_func=function(n, nulleff) {
@@ -145,7 +145,7 @@ test_that("ffexp with error", {
                                  samp <- rnorm(b)
                                  data.frame(mean=mean(samp), se=sd(samp)/sqrt(b))},
                                save_output=T,parallel = T, parallel_cores = 1,
-                               folder_path = tempdir()
+                               folder_path = paste0(tempdir(), "//")
   ), NA)
   expect_error(f1$run_all(run_order = "inorder", redo = T, parallel_temp_save = T,
                           write_error_files=T))
