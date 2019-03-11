@@ -137,10 +137,11 @@ ffexp <- R6::R6Class(
     },
     run_all = function(to_run=NULL,
                        redo = FALSE, run_order,
+                       save_output=self$save_output,
                        parallel=self$parallel,
-                       parallel_temp_save=FALSE,
-                       write_start_files=FALSE,
-                       write_error_files=FALSE,
+                       parallel_temp_save=save_output,
+                       write_start_files=save_output,
+                       write_error_files=save_output,
                        delete_parallel_temp_save_after=FALSE) {
       if (missing(run_order)) { # random for parallel for load balancing
         if (parallel) {run_order <- "random"}
@@ -207,14 +208,15 @@ ffexp <- R6::R6Class(
         }
       } else {
         sapply(to_run,function(ii){self$run_one(ii, write_start_files=write_start_files,
-                                                write_error_files=write_error_files)})
+                                                write_error_files=write_error_files,
+                                                save_output=save_output)})
       }
       # self$postprocess_outdf()
       invisible(self)
     },
     run_one = function(irow=NULL, save_output=self$save_output,
-                       write_start_files=FALSE,
-                       write_error_files=TRUE,
+                       write_start_files=save_output,
+                       write_error_files=save_output,
                        is_parallel=FALSE) {
       # Set up single row to run
       if (is.null(irow)) { # If irow not given, set to next not run
@@ -306,6 +308,7 @@ ffexp <- R6::R6Class(
       # Write start file so user can see which ones are currently
       #  running and when they started.
       if (write_start_files) {
+        self$create_save_folder_if_nonexistent()
         write_start_file_path <- paste0(self$folder_path,
                                         "/STARTED_parallel_temp_output_",irow,".txt")
         cat(timestamp(), file=write_start_file_path)
@@ -321,6 +324,7 @@ ffexp <- R6::R6Class(
       # Delete write start file
       if (write_start_files && file.exists(write_start_file_path)) {
         unlink(write_start_file_path)
+        self$delete_save_folder_if_empty()
       }
 
       # If error while running, write out error file/message
@@ -364,6 +368,9 @@ ffexp <- R6::R6Class(
         newdf0 <- output
         # newdf0$start_time <- start_time
         # newdf0$end_time <- end_time
+      } else if (is.vector(output)) {
+        newdf0 <- data.frame(t(output), stringsAsFactors=FALSE)
+        newdf0$runtime <- systime[3]
       } else {
         newdf0 <- data.frame(runtime=systime[3])
         # newdf0 <- data.frame()
@@ -376,7 +383,8 @@ ffexp <- R6::R6Class(
       newdf0$run_number <- irow
 
       # Add to outrawdf
-      newdf1 <- cbind(row_grid, newdf0, row.names=NULL)
+      newdf1 <- cbind(row_grid, newdf0, row.names=NULL,
+                      stringsAsFactors=FALSE)
       newdf_clean <- cbind(row_df, newdf0, row.names=NULL,
                            stringsAsFactors=FALSE)
       nr <- nrow(newdf1)
