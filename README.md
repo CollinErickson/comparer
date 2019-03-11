@@ -1,81 +1,221 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-comparer
-========
 
-[![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/comparer)](https://cran.r-project.org/package=comparer) [![Travis-CI Build Status](https://travis-ci.org/CollinErickson/comparer.svg?branch=master)](https://travis-ci.org/CollinErickson/comparer) <!-- [![Coverage Status](https://img.shields.io/codecov/c/github/CollinErickson/comparer/master.svg)](https://codecov.io/github/CollinErickson/comparer?branch=master) --> [![Coverage Status](https://codecov.io/gh/CollinErickson/comparer/branch/master/graph/badge.svg)](https://codecov.io/github/CollinErickson/comparer?branch=master) <!-- [![Coverage Status](https://img.shields.io/coveralls/CollinErickson/comparer.svg)](https://coveralls.io/r/CollinErickson/comparer?branch=master) --> [![Coverage Status](https://coveralls.io/repos/github/CollinErickson/comparer/badge.svg?branch=master)](https://coveralls.io/github/CollinErickson/comparer?branch=master)
+# comparer
 
-The goal of comparer is to make it easy to compare the results of different code chunks that are trying to do the same thing. The R package `microbenchmark` is great for comparing the speed of code, but there's no way to compare their ouput to see which is more accurate.
+[![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/comparer)](https://cran.r-project.org/package=comparer)
+[![Travis-CI Build
+Status](https://travis-ci.org/CollinErickson/comparer.svg?branch=master)](https://travis-ci.org/CollinErickson/comparer)
+<!-- [![Coverage Status](https://img.shields.io/codecov/c/github/CollinErickson/comparer/master.svg)](https://codecov.io/github/CollinErickson/comparer?branch=master) -->
+[![Coverage
+Status](https://codecov.io/gh/CollinErickson/comparer/branch/master/graph/badge.svg)](https://codecov.io/github/CollinErickson/comparer?branch=master)
+<!-- [![Coverage Status](https://img.shields.io/coveralls/CollinErickson/comparer.svg)](https://coveralls.io/r/CollinErickson/comparer?branch=master) -->
+[![Coverage
+Status](https://coveralls.io/repos/github/CollinErickson/comparer/badge.svg?branch=master)](https://coveralls.io/github/CollinErickson/comparer?branch=master)
 
-Installation
-------------
+The goal of comparer is to make it easy to compare the results of
+different code chunks that are trying to do the same thing. The R
+package `microbenchmark` is great for comparing the speed of code, but
+there’s no way to compare their ouput to see which is more accurate.
+
+## Installation
 
 You can install comparer from github with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("CollinErickson/comparer")
+# devtools::install_github("CollinErickson/comparer")
 ```
 
-Example
--------
+## `mbc`
 
-The main function of this package is `mbc`, for "model benchmark compare". It is designed to be similar to the package `microbenchmark`, allow for fast comparisons except including the output/accuracy of the code evaluated instead of just timing.
+One of the two main functions of this package is `mbc`, for “model
+benchmark compare.” It is designed to be similar to the package
+`microbenchmark`, allow for fast comparisons except including the
+output/accuracy of the code evaluated instead of just timing.
 
-Suppose you want to see how the mean and median of a sample of 100 randomly generated data points from an exponential compare. Then, as demonstrated below, you can use the function `mbc`, with the functions mean and median, and then `input=rexp(100)`. It outputs the run times of each, and then the results from the five trials, where five is the default setting for `times`. The run times aren't useful because they are all fast. For more precise timing (&lt;0.01 seconds), you should use `microbenchmark`. The trials all have the same output since there is no randomness, the same data is used for each trial. The "Output summary" shows that the mean is near 1, while the median is near 0.6.
+Suppose you want to see how the mean and median of a sample of 100
+randomly generated data points from an exponential distribution compare.
+Then, as demonstrated below, you can use the function `mbc`, with the
+functions mean and median, and then `input=rexp(100)`. The value of
+`input` will be stored as `x`, so `mean(x)` will find the mean of that
+data. It outputs the run times of each, and then the results from the
+five trials, where five is the default setting for `times`. The run
+times aren’t useful because they are all fast. For more precise timing
+(\<0.01 seconds), you should use `microbenchmark`. The trials all have
+the same output since there is no randomness, the same data is used for
+each trial. The “Output summary” shows that the mean is near 1, while
+the median is near 0.6.
 
 ``` r
 ## basic example code
 library(comparer)
-mbc(mean, median, input=rexp(100))
+mbc(mean(x), median(x), input=rexp(100))
 #> Run times (sec)
-#>   Function Sort1 Sort2 Sort3 Sort4 Sort5 mean sd
-#> 1     mean     0     0     0     0     0    0  0
-#> 2   median     0     0     0     0     0    0  0
-#> 
-#> Output summary
-#>     Func Stat     Sort1     Sort2     Sort3     Sort4     Sort5      mean
-#> 1   mean    1 1.0321470 1.0321470 1.0321470 1.0321470 1.0321470 1.0321470
-#> 2 median    1 0.8087696 0.8087696 0.8087696 0.8087696 0.8087696 0.8087696
-#>   sd
-#> 1  0
-#> 2  0
-```
-
-To get the data to be generated for each trial, use the `inputi` argument to set a variable that the functions call. The arguments `mean(x)` and `median(x)` are captured as expressions, as is `{x=rexp(100)}` for `inputi`. Note that `x` is stored in that code chunk, and the functions both call `x` in the evaluation. You can see that the values are now different for each trial.
-
-``` r
-## Regenerate the data each time
-mbc(mean(x), median(x), inputi={x=rexp(100)})
-#> Run times (sec)
-#>    Function Sort1 Sort2 Sort3 Sort4 Sort5 mean sd
-#> 1   mean(x)     0     0     0     0     0    0  0
-#> 2 median(x)     0     0     0     0     0    0  0
+#>    Function Sort1 Sort2 Sort3 Sort4 Sort5 mean sd neval
+#> 1   mean(x)     0     0     0     0     0    0  0     5
+#> 2 median(x)     0     0     0     0     0    0  0     5
 #> 
 #> Output summary
 #>        Func Stat     Sort1     Sort2     Sort3     Sort4     Sort5
-#> 1   mean(x)    1 0.8813966 0.9069863 0.9513831 0.9890381 1.2063718
-#> 2 median(x)    1 0.6404516 0.6488801 0.6836623 0.7563764 0.7901115
-#>        mean         sd
-#> 1 0.9870352 0.12937442
-#> 2 0.7038964 0.06642411
+#> 1   mean(x)    1 1.0321470 1.0321470 1.0321470 1.0321470 1.0321470
+#> 2 median(x)    1 0.8087696 0.8087696 0.8087696 0.8087696 0.8087696
+#>        mean sd
+#> 1 1.0321470  0
+#> 2 0.8087696  0
 ```
 
-If the code chunks to compare are all simple functions that take a single input, then the value in `inputi` does not need to be saved as any variable, and the code chunks can just be the functions. For example, the previous code can be simplified as below.
+To get the data to be generated for each trial, use the `inputi`
+argument to set a variable that the functions call. The arguments
+`mean(x)` and `median(x)` are captured as expressions. `rexp(100)` will
+be stored as `x` by default. You can see that the values are now
+different for each trial.
 
 ``` r
-## Simplify the call when the input is single object
-mbc(mean, median, inputi=rexp(100))
+## Regenerate the data each time
+mbc(mean(x), median(x), inputi=rexp(100))
 #> Run times (sec)
-#>   Function Sort1 Sort2 Sort3 Sort4 Sort5 mean sd
-#> 1     mean     0     0     0     0     0    0  0
-#> 2   median     0     0     0     0     0    0  0
+#>    Function Sort1 Sort2 Sort3 Sort4        Sort5         mean           sd
+#> 1   mean(x)     0     0     0     0 0.0000000000 0.0000000000 0.0000000000
+#> 2 median(x)     0     0     0     0 0.0009999275 0.0001999855 0.0004471812
+#>   neval
+#> 1     5
+#> 2     5
 #> 
 #> Output summary
-#>     Func Stat     Sort1     Sort2     Sort3     Sort4     Sort5      mean
-#> 1   mean    1 0.8781278 1.0184794 1.1029084 1.1511791 1.1535740 1.0608537
-#> 2 median    1 0.6119180 0.6358414 0.7141539 0.7832192 0.9887379 0.7467741
-#>          sd
-#> 1 0.1158757
-#> 2 0.1511878
+#>        Func Stat        V1        V2        V3        V4        V5
+#> 1   mean(x)    1 0.9890381 0.9069863 0.8813966 1.2063718 1.0568761
+#> 2 median(x)    1 0.6836623 0.6488801 0.6404516 0.7901115 0.7825493
+#>       mean        sd
+#> 1 1.008134 0.1307018
+#> 2 0.709131 0.0723598
+```
+
+The variable name, or multiple variables, can be set in `inputi` by
+using braces `{}` In the example below, values are set for `a` and `b`,
+which can then be called by the expressions to be compared.
+
+``` r
+mbc(mean(a+b), mean(a-b), inputi={a=rexp(100);b=runif(100)})
+#> Run times (sec)
+#>      Function Sort1 Sort2 Sort3 Sort4        Sort5         mean
+#> 1 mean(a + b)     0     0     0     0 0.0010008812 0.0002001762
+#> 2 mean(a - b)     0     0     0     0 0.0009999275 0.0001999855
+#>             sd neval
+#> 1 0.0004476077     5
+#> 2 0.0004471812     5
+#> 
+#> Output summary
+#>          Func Stat        V1        V2        V3       V4        V5
+#> 1 mean(a + b)    1 1.4851116 1.5601898 1.3481168 1.600197 1.4810187
+#> 2 mean(a - b)    1 0.5518472 0.5843345 0.4168324 0.628536 0.4586843
+#>        mean         sd
+#> 1 1.4949268 0.09641584
+#> 2 0.5280469 0.08805201
+```
+
+## `ffexp`
+
+The other main function of the package is `ffexp`, an abbreviation for
+full-factorial experiment. It will run a function using all possible
+combinations of input parameters given. It is useful for running
+experiments that take a long time to complete.
+
+The first arguments given to `ffexp$new` should give the possible values
+for each input parameter. In the example below, `a` can be 1, 2, or 3,
+and `b` can “a”, “b”, or “c”. Then `eval_func` should be given that can
+operate on these parameters. For example, using `eval_func = paste` will
+paste together the value of `a` with the value of `b`.
+
+``` r
+f1 <- ffexp$new(
+  a=1:3,
+  b=c("a","b","c"),
+  eval_func=paste
+)
+```
+
+After creating the `ffexp` object, we can call `f1$run_all` to run
+`eval_func` on every combination of `a` and `b`.
+
+``` r
+f1$run_all()
+#> Running 1, completed 0/9 Mon Mar 11 4:25:38 PM 2019
+#> $a
+#> [1] 1
+#> 
+#> $b
+#> [1] "a"
+#> 
+#> Running 2, completed 1/9 Mon Mar 11 4:25:38 PM 2019
+#> $a
+#> [1] 2
+#> 
+#> $b
+#> [1] "a"
+#> 
+#> Running 3, completed 2/9 Mon Mar 11 4:25:38 PM 2019
+#> $a
+#> [1] 3
+#> 
+#> $b
+#> [1] "a"
+#> 
+#> Running 4, completed 3/9 Mon Mar 11 4:25:38 PM 2019
+#> $a
+#> [1] 1
+#> 
+#> $b
+#> [1] "b"
+#> 
+#> Running 5, completed 4/9 Mon Mar 11 4:25:38 PM 2019
+#> $a
+#> [1] 2
+#> 
+#> $b
+#> [1] "b"
+#> 
+#> Running 6, completed 5/9 Mon Mar 11 4:25:38 PM 2019
+#> $a
+#> [1] 3
+#> 
+#> $b
+#> [1] "b"
+#> 
+#> Running 7, completed 6/9 Mon Mar 11 4:25:38 PM 2019
+#> $a
+#> [1] 1
+#> 
+#> $b
+#> [1] "c"
+#> 
+#> Running 8, completed 7/9 Mon Mar 11 4:25:38 PM 2019
+#> $a
+#> [1] 2
+#> 
+#> $b
+#> [1] "c"
+#> 
+#> Running 9, completed 8/9 Mon Mar 11 4:25:38 PM 2019
+#> $a
+#> [1] 3
+#> 
+#> $b
+#> [1] "c"
+```
+
+Now to see the results in a clean format, look at `f1$outcleandf`.
+
+``` r
+f1$outcleandf
+#>   a b t.output. runtime          start_time            end_time run_number
+#> 1 1 a       1 a       0 2019-03-11 16:25:38 2019-03-11 16:25:38          1
+#> 2 2 a       2 a       0 2019-03-11 16:25:38 2019-03-11 16:25:38          2
+#> 3 3 a       3 a       0 2019-03-11 16:25:38 2019-03-11 16:25:38          3
+#> 4 1 b       1 b       0 2019-03-11 16:25:38 2019-03-11 16:25:38          4
+#> 5 2 b       2 b       0 2019-03-11 16:25:38 2019-03-11 16:25:38          5
+#> 6 3 b       3 b       0 2019-03-11 16:25:38 2019-03-11 16:25:38          6
+#> 7 1 c       1 c       0 2019-03-11 16:25:38 2019-03-11 16:25:38          7
+#> 8 2 c       2 c       0 2019-03-11 16:25:38 2019-03-11 16:25:38          8
+#> 9 3 c       3 c       0 2019-03-11 16:25:38 2019-03-11 16:25:38          9
 ```

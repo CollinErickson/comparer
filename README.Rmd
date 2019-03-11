@@ -8,7 +8,7 @@ output: github_document
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.path = "README-"
+  fig.path = "tools/README-"
 )
 ```
 
@@ -37,21 +37,23 @@ You can install comparer from github with:
 
 ```{r gh-installation, eval = FALSE}
 # install.packages("devtools")
-devtools::install_github("CollinErickson/comparer")
+# devtools::install_github("CollinErickson/comparer")
 ```
 
-## Example
+## `mbc`
 
-The main function of this package is `mbc`, for "model benchmark compare".
+One of the two main functions of this package is `mbc`, for "model benchmark compare."
 It is designed to be similar to the package `microbenchmark`,
 allow for fast comparisons except including the output/accuracy of the
 code evaluated instead of just timing.
 
 
 Suppose you want to see how the mean and median of a sample of 100 randomly
-generated data points from an exponential compare.
+generated data points from an exponential distribution compare.
 Then, as demonstrated below, you can use the function `mbc`,
 with the functions mean and median, and then `input=rexp(100)`.
+The value of `input` will be stored as `x`, so `mean(x)` will
+find the mean of that data.
 It outputs the run times of each, and then the results from the
 five trials, where five is the default setting for `times`.
 The run times aren't useful because they are all fast.
@@ -64,28 +66,65 @@ is near 0.6.
 ```{r mbc_example}
 ## basic example code
 library(comparer)
-mbc(mean, median, input=rexp(100))
+mbc(mean(x), median(x), input=rexp(100))
 ```
 
 To get the data to be generated for each trial,
 use the `inputi` argument to set a variable that the 
 functions call.
-The arguments `mean(x)` and `median(x)` are captured as expressions,
-as is `{x=rexp(100)}` for `inputi`. Note that `x` is stored in that code chunk,
-and the functions both call `x` in the evaluation.
+The arguments `mean(x)` and `median(x)` are captured as expressions.
+`rexp(100)` will be stored as `x` by default.
 You can see that the values are now different for each trial.
 
 ```{r mbc_example2}
 ## Regenerate the data each time
-mbc(mean(x), median(x), inputi={x=rexp(100)})
+mbc(mean(x), median(x), inputi=rexp(100))
 ```
 
-If the code chunks to compare are all simple functions that take a single
-input, then the value in `inputi` does not need to be saved as any variable,
-and the code chunks can just be the functions.
-For example, the previous code can be simplified as below.
+The variable name, or multiple variables, can be set in `inputi` by
+using braces `{}`
+In the example below, values are set for `a` and `b`, which can then
+be called by the expressions to be compared.
 
 ```{r mbc_example3}
-## Simplify the call when the input is single object
-mbc(mean, median, inputi=rexp(100))
+mbc(mean(a+b), mean(a-b), inputi={a=rexp(100);b=runif(100)})
 ```
+
+
+## `ffexp`
+
+The other main function of the package is `ffexp`, an abbreviation for
+full-factorial experiment.
+It will run a function using all possible combinations of input parameters
+given.
+It is useful for running experiments that take a long time to complete.
+
+The first arguments given to `ffexp$new` should give the possible values for
+each input parameter.
+In the example below, `a` can be 1, 2, or 3,
+and `b` can "a", "b", or "c".
+Then `eval_func` should be given that can operate on these parameters.
+For example, using `eval_func = paste` will paste together the value
+of `a` with the value of `b`.
+
+```{r}
+f1 <- ffexp$new(
+  a=1:3,
+  b=c("a","b","c"),
+  eval_func=paste
+)
+```
+
+After creating the `ffexp` object, we can call
+`f1$run_all` to run `eval_func` on every combination of `a` and `b`.
+
+```{R}
+f1$run_all()
+```
+
+Now to see the results in a clean format, look at `f1$outcleandf`.
+
+```{r}
+f1$outcleandf
+```
+
