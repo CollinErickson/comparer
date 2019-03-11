@@ -1,3 +1,16 @@
+test_that("test tempdir on Travis", {
+  print("getting a tempdir now")
+  td <- tempdir()
+  print(paste("tempdir is", td))
+  print("going to save a temp file")
+  tf <- paste0(td, "//", "test.rds")
+  print(paste('temp file path is', tf))
+  saveRDS(1:10, tf)
+  print("saved a file, does it exist")
+  print(file.exists(tf))
+  print("done checking Travis and tempdir")
+})
+
 test_that("ffexp", {
   expect_error(f1 <- ffexp$new(n=c(100, 1000, 10000),
                                nulleff=c(0,1),
