@@ -142,7 +142,8 @@ ffexp <- R6::R6Class(
                        parallel_temp_save=save_output,
                        write_start_files=save_output,
                        write_error_files=save_output,
-                       delete_parallel_temp_save_after=FALSE) {
+                       delete_parallel_temp_save_after=FALSE,
+                       warn_repeat=TRUE) {
       if (missing(run_order)) { # random for parallel for load balancing
         if (parallel) {run_order <- "random"}
         else {run_order <- "inorder"}
@@ -209,6 +210,7 @@ ffexp <- R6::R6Class(
       } else {
         sapply(to_run,function(ii){self$run_one(ii, write_start_files=write_start_files,
                                                 write_error_files=write_error_files,
+                                                warn_repeat=warn_repeat,
                                                 save_output=save_output)})
       }
       # self$postprocess_outdf()
@@ -217,6 +219,7 @@ ffexp <- R6::R6Class(
     run_one = function(irow=NULL, save_output=self$save_output,
                        write_start_files=save_output,
                        write_error_files=save_output,
+                       warn_repeat=TRUE,
                        is_parallel=FALSE) {
       # Set up single row to run
       if (is.null(irow)) { # If irow not given, set to next not run
@@ -227,9 +230,10 @@ ffexp <- R6::R6Class(
         }
       } else if (length(irow) > 1) { # If more than one, run each separately
         sapply(irow,
-               function(ii){self$run_one(irow=ii, save_output=save_output)})
+               function(ii){self$run_one(irow=ii, save_output=save_output,
+                                         warn_repeat=warn_repeat)})
         return(invisible(self))
-      } else if (self$completed_runs[irow] == TRUE) {
+      } else if ((self$completed_runs[irow] == TRUE) && warn_repeat) {
         warning("irow already run, will run again anyways")
       }
 
@@ -487,8 +491,13 @@ ffexp <- R6::R6Class(
       invisible(self)
     },
     create_save_folder_if_nonexistent = function() {
-      if (!dir.exists(self$folder_path)) {
-        dir.create(self$folder_path)
+      # Need to remove tailing slashes when using dir.exists
+      fp <- self$folder_path
+      while(substr(fp, nchar(fp), nchar(fp)) %in% c("/", "\\")) {
+        fp <- substr(fp, 1, nchar(fp) - 1)
+      }
+      if (!dir.exists(fp)) {
+        dir.create(fp)
       }
       invisible(self)
     },

@@ -37,7 +37,7 @@ test_that("mbc basic runs", {
   expect_error(m1 <- mbc(mean(x), median(x), inputi={x=rnorm(100)}, times=2, target=.5), regexp = NA)
   expect_error(m1 <- mbc(mean(x), median(x), inputi={x=rnorm(100)}, times=20), regexp = NA)
   expect_error(m1 <- mbc(mean(x), median(x), inputi={x=rnorm(100)}, times=20, target=.5), regexp = NA)
-  expect_error(print(m1), NA)
+  expect_true(length(capture.output(print(m1)))>1)
 
   # Check inputi as unnamed data
   expect_error(mbc(mean, inputi=rnorm(10)), NA)
@@ -66,7 +66,8 @@ test_that("mbc basic runs", {
 test_that("test mbc print", {
   # Basic with compare
   m1 <- mbc(mean, median, inputi=function(i)rnorm(100))
-  expect_error(print(m1), regexp = NA)
+  # expect_error(print(m1), regexp = NA)
+  expect_true(length(capture.output(print(m1)))>1)
 })
 
 test_that("test mbc metrics", {

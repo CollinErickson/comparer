@@ -1,6 +1,11 @@
+context("ffexp")
+
 test_that("test tempdir on Travis", {
   print("getting a tempdir now")
-  td <- tempdir()
+  td <- paste0(tempdir(), "//ffexptmpdir")
+  if (!dir.exists(td)) {
+    dir.create(td)
+  }
   print(paste("tempdir is", td))
   print("going to save a temp file")
   tf <- paste0(td, "//", "test.rds")
@@ -8,6 +13,7 @@ test_that("test tempdir on Travis", {
   saveRDS(1:10, tf)
   print("saved a file, does it exist")
   print(file.exists(tf))
+  expect_true(file.exists(tf))
   print("done checking Travis and tempdir")
 })
 
@@ -33,7 +39,7 @@ test_that("ffexp", {
 })
 
 test_that("ffexp parallel", {
-  folder <- paste0(tempdir(),"//")
+  folder <- paste0(tempdir(),"//ffexp3//")
   expect_error(f1 <- ffexp$new(n=c(100, 1000, 10000),
                                nulleff=c(0,1),
                                eval_func=function(n, nulleff) {
@@ -47,8 +53,11 @@ test_that("ffexp parallel", {
   expect_error(f1$save_self(), NA)
   expect_error(f1$recover_parallel_temp_save(), NA)
 
-
   # Delete at end
+  for (tmpfile in list.files(f1$folder_path)) {
+    unlink(paste0(f1$folder_path, tmpfile))
+  }
+  unlink(f1$folder_path, recursive=T)
   expect_error(f1$delete(), NA)
 })
 
@@ -82,12 +91,12 @@ test_that("ffexp with runone", {
   ), NA)
   expect_is(f1, "R6")
   expect_is(f1, "ffexp")
-  expect_error(f1$run_one(1), NA)
-  expect_error(f1$run_one(1:3), NA)
+  expect_error(f1$run_one(1, warn_repeat=F), NA)
+  expect_error(f1$run_one(1:3, warn_repeat=F), NA)
 
   # Give bad run_order
   expect_error(f1$run_all(run_order = "reversebackwards", redo = T))
-  expect_error(f1$run_all(run_order = "reverse", redo = T), NA)
+  expect_error(f1$run_all(run_order = "reverse", redo = T, warn_repeat=F), NA)
 
   prt <- f1$plot_run_times()
   expect_is(prt, "gg")
@@ -158,7 +167,7 @@ test_that("ffexp with error", {
                                  samp <- rnorm(b)
                                  data.frame(mean=mean(samp), se=sd(samp)/sqrt(b))},
                                save_output=T,parallel = T, parallel_cores = 1,
-                               folder_path = paste0(tempdir(), "//")
+                               folder_path = paste0(tempdir(), "//ffexp5//")
   ), NA)
   expect_error(f1$run_all(run_order = "inorder", redo = T, parallel_temp_save = T,
                           write_error_files=T))
@@ -173,6 +182,10 @@ test_that("ffexp with error", {
   expect_true(length(calc.eff) == 2)
 
   # Delete at end
+  for (tmpfile in list.files(f1$folder_path)) {
+    unlink(paste0(f1$folder_path, tmpfile))
+  }
+  unlink(f1$folder_path, recursive=T)
   expect_error(f1$delete(), NA)
 })
 
