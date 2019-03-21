@@ -76,6 +76,7 @@ ffexp <- R6::R6Class(
     rungrid = NULL,
     # rungridlist = NULL,
     nvars = NULL,
+    varlist = NULL,
     arglist = NULL,
     number_runs = NULL,
     completed_runs = NULL,
@@ -87,13 +88,15 @@ ffexp <- R6::R6Class(
     parallel_cluster = NULL,
     folder_path = NULL,
     initialize = function(..., eval_func, save_output=FALSE, parallel=FALSE,
-                          parallel_cores="detect", folder_path) {
+                          parallel_cores="detect", folder_path,
+                          varlist=NULL) {
       self$eval_func <- eval_func
       self$save_output <- save_output
       self$folder_path <- if (missing(folder_path)) {
         paste0(getwd(),
                "/ffexpobj_",gsub(" ","_",gsub(":","-",Sys.time())))}
       else {folder_path}
+      self$varlist <- varlist
       self$arglist <- list(...)
       self$nvars <- sapply(self$arglist,
                            function(i) {
@@ -143,6 +146,7 @@ ffexp <- R6::R6Class(
                        write_start_files=save_output,
                        write_error_files=save_output,
                        delete_parallel_temp_save_after=FALSE,
+                       varlist=self$varlist,
                        warn_repeat=TRUE) {
       if (missing(run_order)) { # random for parallel for load balancing
         if (parallel) {run_order <- "random"}
@@ -172,8 +176,14 @@ ffexp <- R6::R6Class(
         # cl1 <- parallel::makeCluster(spec=pc, type="SOCK")
         # parallel::parSapply(cl=cl1, to_run,function(ii){self$run_one(ii)})
         if (is.null(self$parallel_cluster)) {
+          # Make cluster
           self$parallel_cluster <- parallel::makeCluster(
             spec=self$parallel_cores, type = "SOCK")
+          # Export any variables
+          if (!is.null(varlist)) {
+            parallel::clusterExport(cl=self$parallel_cluster,
+                                    varlist=varlist)
+          }
         }
         if (parallel_temp_save) {self$create_save_folder_if_nonexistent()}
         cat("About to start run in parallel, run order is:\n    ",
@@ -181,8 +191,8 @@ ffexp <- R6::R6Class(
             "\n")
         parout <- parallel::clusterApplyLB(
           cl=self$parallel_cluster,
-          to_run,
-          function(ii){
+          x=to_run,
+          fun=function(ii){
             tout <- self$run_one(ii, is_parallel=TRUE,
                                  write_start_files=write_start_files,
                                  write_error_files=write_error_files)
@@ -315,7 +325,14 @@ ffexp <- R6::R6Class(
         self$create_save_folder_if_nonexistent()
         write_start_file_path <- paste0(self$folder_path,
                                         "/STARTED_parallel_temp_output_",irow,".txt")
-        cat(timestamp(), file=write_start_file_path)
+        cat(timestamp(), "\n", file=write_start_file_path)
+        # cat row_list, but can't cat a list, so convert to string
+        format_row_list <- format(row_list)
+        for (i in seq.int(1, length(format_row_list), 1)) {
+          cat(names(format_row_list)[i], "\n",   file=write_start_file_path, append=TRUE)
+          cat(format_row_list[i],        "\n\n", file=write_start_file_path, append=TRUE)
+        }
+        rm(i, format_row_list)
       }
 
       # Run and time it
@@ -339,6 +356,13 @@ ffexp <- R6::R6Class(
           write_error_file_path <- paste0(self$folder_path,
                                           "/ERROR_parallel_temp_output_",irow,".txt")
           cat(Sys.time(),"\n", file=write_error_file_path)
+          format_row_list <- format(row_list)
+          for (i in seq.int(1, length(format_row_list), 1)) {
+            cat(names(format_row_list)[i], "\n",   file=write_error_file_path, append=TRUE)
+            cat(format_row_list[i],        "\n\n", file=write_error_file_path, append=TRUE)
+          }
+          rm(i, format_row_list)
+          cat("Error was:\n\n", file=write_error_file_path)
           cat(try.run[1], "\n", file=write_error_file_path)
         }
         stop(paste0("Error in run_one for irow=",irow,"\n",try.run))
@@ -527,11 +551,15 @@ ffexp <- R6::R6Class(
       }
       self$delete_save_folder_if_empty()
     },
-    delete = function() {
-      cat("Deleting...\n")
+    stop_cluster = function() {
+      # cat("Deleting...\n")
       if (!is.null(self$parallel_cluster)) {
         parallel::stopCluster(self$parallel_cluster)
+        message("Stopped cluster")
       }
+    },
+    finalize = function() {
+      self$stop_cluster()
     }
   ),
   private = list(
