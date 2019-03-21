@@ -35,7 +35,7 @@ test_that("ffexp", {
   expect_true(length(calc.eff) == 2)
 
   # Delete at end
-  expect_error(f1$delete(), NA)
+  expect_error({rm(f1); gc()}, NA)
 })
 
 test_that("ffexp parallel", {
@@ -61,7 +61,7 @@ test_that("ffexp parallel", {
     unlink(paste0(f1$folder_path, tmpfile))
   }
   unlink(f1$folder_path, recursive=T)
-  expect_error(f1$delete(), NA)
+  expect_error({rm(f1); gc()}, NA)
 })
 
 
@@ -84,7 +84,7 @@ test_that("ffexp parallel 2", {
   # expect_error(f1$save_self(), NA)
   expect_error(f1$delete_save_folder_if_empty(), NA)
   # Delete at end
-  expect_error(f1$delete(), NA)
+  expect_error({rm(f1); gc()}, NA)
 })
 
 test_that("ffexp with runone", {
@@ -111,7 +111,7 @@ test_that("ffexp with runone", {
   expect_true(length(calc.eff) == 3)
 
   # Delete at end
-  expect_error(f1$delete(), NA)
+  expect_error({rm(f1); gc()}, NA)
 })
 
 test_that("ffexp parallel detect cores, don't run", {
@@ -125,7 +125,7 @@ test_that("ffexp parallel detect cores, don't run", {
                                save_output = T, folder_path=folder
   ), NA)
   # Delete at end
-  expect_error(f1$delete(), NA)
+  expect_error({rm(f1); gc()}, NA)
   rm(f1)
 })
 test_that("ffexp parallel detect cores - 1, don't run", {
@@ -139,7 +139,7 @@ test_that("ffexp parallel detect cores - 1, don't run", {
                                save_output = T, folder_path=folder
   ), NA)
   # Delete at end
-  expect_error(f1$delete(), NA)
+  expect_error({rm(f1); gc()}, NA)
   rm(f1)
 })
 
@@ -162,7 +162,7 @@ test_that("ffexp with list", {
   expect_true(length(calc.eff) == 2)
 
   # Delete at end
-  expect_error(f1$delete(), NA)
+  expect_error({rm(f1); gc()}, NA)
 })
 
 test_that("ffexp with error", {
@@ -195,7 +195,7 @@ test_that("ffexp with error", {
     unlink(paste0(f1$folder_path, tmpfile))
   }
   unlink(f1$folder_path, recursive=T)
-  expect_error(f1$delete(), NA)
+  expect_error({rm(f1); gc()}, NA)
 })
 
 
@@ -222,5 +222,5 @@ test_that("ffexp with function input", {
   expect_true(length(calc.eff) == 3)
 
   # Delete at end
-  expect_error(f1$delete(), NA)
+  expect_error({rm(f1); gc()}, NA)
 })
