@@ -177,8 +177,11 @@ ffexp <- R6::R6Class(
         # parallel::parSapply(cl=cl1, to_run,function(ii){self$run_one(ii)})
         if (is.null(self$parallel_cluster)) {
           # Make cluster
+          self$create_save_folder_if_nonexistent()
           self$parallel_cluster <- parallel::makeCluster(
-            spec=self$parallel_cores, type = "SOCK")
+            spec=self$parallel_cores, type = "SOCK",
+            outfile=paste0(self$folder_path,
+                                 "/parallel_MASTEROUTPUT.txt"))
           # Export any variables
           if (!is.null(varlist)) {
             parallel::clusterExport(cl=self$parallel_cluster,
