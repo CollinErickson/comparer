@@ -554,6 +554,18 @@ ffexp <- R6::R6Class(
       }
       self$delete_save_folder_if_empty()
     },
+    print = function() {
+      s <- paste0(
+        c(
+          "ffexp object from the comparer package\n",
+          "   ", sum(self$completed_runs), " / ", length(self$completed_runs), " completed\n",
+          "   parallel : ", self$parallel, "\n",
+          "   Use $run_all() to run all remaining\n",
+          "   Use $run_one() to run a single\n"
+        )
+      )
+      cat(s, sep="")
+    },
     stop_cluster = function() {
       # cat("Deleting...\n")
       if (!is.null(self$parallel_cluster)) {
