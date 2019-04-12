@@ -563,6 +563,42 @@ ffexp <- R6::R6Class(
       }
       self$delete_save_folder_if_empty()
     },
+    rungrid2 = function() {
+      # Most of this was taken from run_one where it starts to make outcleandf
+      rowsdf <- lapply(
+        1:nrow(self$rungrid),
+        function(iirow) {
+          row_grid <- self$rungrid[iirow,]
+          row_df <- lapply(1:ncol(self$nvars),
+                           function(i) {
+                             ar <- self$arglist[[i]]
+                             if (is.data.frame(ar)) {
+                               tr <- as.list(ar[row_grid[1,i],])
+                             } else if (is.list(ar)) {
+                               # tr <- ar[[row_grid[1,i]]]
+                               tr <- lapply(ar, function(x) x[[row_grid[1,i]]])
+                             } else if (is.function(ar)) {
+                               tr <- ar # If single value is a function
+                             } else {
+                               tr <- ar[row_grid[1,i]]
+                             }
+                             # Can't use functions
+                             #  and deparse(quote(tr)) gives "tr"
+                             if (is.function(tr)) {
+                               tr <- row_grid[1,i]
+                             }
+                             if (is.null(names(tr))) {
+                               names(tr) <- names(self$arglist)[i]
+                             }
+                             tr
+                           })
+
+          row_df <- as.list(unlist(row_df, recursive = FALSE))
+          as.data.frame(row_df)
+        })
+      do.call(rbind, rowsdf)
+
+    },
     print = function() {
       s <- paste0(
         c(
