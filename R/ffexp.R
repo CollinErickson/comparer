@@ -171,7 +171,7 @@ ffexp <- R6::R6Class(
       } else {stop(paste("run_order not recognized, should be one of inorder,",
                          "reverse, or random #567128"))}
 
-      if (parallel) {
+      if (parallel && length(to_run > 0)) {
         # pc <- parallel::detectCores()
         # cl1 <- parallel::makeCluster(spec=pc, type="SOCK")
         # parallel::parSapply(cl=cl1, to_run,function(ii){self$run_one(ii)})
