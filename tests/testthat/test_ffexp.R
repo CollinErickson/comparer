@@ -126,7 +126,7 @@ test_that("ffexp parallel detect cores, don't run", {
   ), NA)
   # Delete at end
   expect_error({rm(f1); gc()}, NA)
-  rm(f1)
+  # rm(f1)
 })
 test_that("ffexp parallel detect cores - 1, don't run", {
   folder <- paste0(tempdir(),"\\")
@@ -140,7 +140,7 @@ test_that("ffexp parallel detect cores - 1, don't run", {
   ), NA)
   # Delete at end
   expect_error({rm(f1); gc()}, NA)
-  rm(f1)
+  # rm(f1)
 })
 
 
