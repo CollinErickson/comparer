@@ -34,6 +34,20 @@ test_that("ffexp", {
   expect_is(calc.eff, "list")
   expect_true(length(calc.eff) == 2)
 
+  # Print
+  t1 <- capture.output(f1)
+  expect_is(t1, "character")
+  expect_length(t1, 5)
+
+  # rungrid2
+  t2 <- f1$rungrid2()
+  expect_is(t2, "data.frame")
+  expect_equal(dim(t2), c(6, 2))
+  t3 <- f1$rungrid2(rows=c(2,5,6)) # Select out rows
+  expect_is(t3, "data.frame")
+  expect_equal(dim(t3), c(3, 2))
+  expect_true(all(t3 == t2[c(2,5,6),]))
+
   # Delete at end
   expect_error({rm(f1); gc()}, NA)
 })
