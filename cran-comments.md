@@ -1,3 +1,8 @@
+I submitted this yesterday and it was rejected by the autocheck system.
+There was one test that doesn't work on Linux systems, so I removed it
+and now it passed on win-builder devel and release and all four
+R-hub checks with no errors, warnings, or notes.
+
 Major changes to the main function mbc(), and added another major function
 `ffexp`.
 
