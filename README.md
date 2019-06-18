@@ -16,11 +16,11 @@ Status](https://coveralls.io/repos/github/CollinErickson/comparer/badge.svg?bran
 The goal of comparer is to make it easy to compare the results of
 different code chunks that are trying to do the same thing. The R
 package `microbenchmark` is great for comparing the speed of code, but
-there’s no way to compare their ouput to see which is more accurate.
+there’s no way to compare their output to see which is more accurate.
 
 ## Installation
 
-You can install comparer from github with:
+You can install comparer from GitHub with:
 
 ``` r
 # install.packages("devtools")
@@ -52,9 +52,12 @@ the median is near 0.6.
 library(comparer)
 mbc(mean(x), median(x), input=rexp(100))
 #> Run times (sec)
-#>    Function Sort1 Sort2 Sort3 Sort4 Sort5 mean sd neval
-#> 1   mean(x)     0     0     0     0     0    0  0     5
-#> 2 median(x)     0     0     0     0     0    0  0     5
+#>    Function Sort1 Sort2 Sort3 Sort4       Sort5         mean           sd
+#> 1   mean(x)     0     0     0     0 0.001000166 0.0002000332 0.0004472878
+#> 2 median(x)     0     0     0     0 0.000000000 0.0000000000 0.0000000000
+#>   neval
+#> 1     5
+#> 2     5
 #> 
 #> Output summary
 #>        Func Stat     Sort1     Sort2     Sort3     Sort4     Sort5
@@ -75,12 +78,9 @@ different for each trial.
 ## Regenerate the data each time
 mbc(mean(x), median(x), inputi=rexp(100))
 #> Run times (sec)
-#>    Function Sort1 Sort2 Sort3 Sort4        Sort5         mean           sd
-#> 1   mean(x)     0     0     0     0 0.0000000000 0.0000000000 0.0000000000
-#> 2 median(x)     0     0     0     0 0.0009999275 0.0001999855 0.0004471812
-#>   neval
-#> 1     5
-#> 2     5
+#>    Function Sort1 Sort2 Sort3 Sort4 Sort5 mean sd neval
+#> 1   mean(x)     0     0     0     0     0    0  0     5
+#> 2 median(x)     0     0     0     0     0    0  0     5
 #> 
 #> Output summary
 #>        Func Stat        V1        V2        V3        V4        V5
@@ -98,12 +98,9 @@ which can then be called by the expressions to be compared.
 ``` r
 mbc(mean(a+b), mean(a-b), inputi={a=rexp(100);b=runif(100)})
 #> Run times (sec)
-#>      Function Sort1 Sort2 Sort3 Sort4        Sort5         mean
-#> 1 mean(a + b)     0     0     0     0 0.0010008812 0.0002001762
-#> 2 mean(a - b)     0     0     0     0 0.0009999275 0.0001999855
-#>             sd neval
-#> 1 0.0004476077     5
-#> 2 0.0004471812     5
+#>      Function Sort1 Sort2 Sort3 Sort4 Sort5 mean sd neval
+#> 1 mean(a + b)     0     0     0     0     0    0  0     5
+#> 2 mean(a - b)     0     0     0     0     0    0  0     5
 #> 
 #> Output summary
 #>          Func Stat        V1        V2        V3       V4        V5
@@ -140,63 +137,63 @@ After creating the `ffexp` object, we can call `f1$run_all` to run
 
 ``` r
 f1$run_all()
-#> Running 1, completed 0/9 Mon Mar 11 4:25:38 PM 2019
+#> Running 1, completed 0/9 Mon Jun 17 8:22:53 PM 2019
 #> $a
 #> [1] 1
 #> 
 #> $b
 #> [1] "a"
 #> 
-#> Running 2, completed 1/9 Mon Mar 11 4:25:38 PM 2019
+#> Running 2, completed 1/9 Mon Jun 17 8:22:53 PM 2019
 #> $a
 #> [1] 2
 #> 
 #> $b
 #> [1] "a"
 #> 
-#> Running 3, completed 2/9 Mon Mar 11 4:25:38 PM 2019
+#> Running 3, completed 2/9 Mon Jun 17 8:22:53 PM 2019
 #> $a
 #> [1] 3
 #> 
 #> $b
 #> [1] "a"
 #> 
-#> Running 4, completed 3/9 Mon Mar 11 4:25:38 PM 2019
+#> Running 4, completed 3/9 Mon Jun 17 8:22:53 PM 2019
 #> $a
 #> [1] 1
 #> 
 #> $b
 #> [1] "b"
 #> 
-#> Running 5, completed 4/9 Mon Mar 11 4:25:38 PM 2019
+#> Running 5, completed 4/9 Mon Jun 17 8:22:53 PM 2019
 #> $a
 #> [1] 2
 #> 
 #> $b
 #> [1] "b"
 #> 
-#> Running 6, completed 5/9 Mon Mar 11 4:25:38 PM 2019
+#> Running 6, completed 5/9 Mon Jun 17 8:22:54 PM 2019
 #> $a
 #> [1] 3
 #> 
 #> $b
 #> [1] "b"
 #> 
-#> Running 7, completed 6/9 Mon Mar 11 4:25:38 PM 2019
+#> Running 7, completed 6/9 Mon Jun 17 8:22:54 PM 2019
 #> $a
 #> [1] 1
 #> 
 #> $b
 #> [1] "c"
 #> 
-#> Running 8, completed 7/9 Mon Mar 11 4:25:38 PM 2019
+#> Running 8, completed 7/9 Mon Jun 17 8:22:54 PM 2019
 #> $a
 #> [1] 2
 #> 
 #> $b
 #> [1] "c"
 #> 
-#> Running 9, completed 8/9 Mon Mar 11 4:25:38 PM 2019
+#> Running 9, completed 8/9 Mon Jun 17 8:22:54 PM 2019
 #> $a
 #> [1] 3
 #> 
@@ -209,13 +206,13 @@ Now to see the results in a clean format, look at `f1$outcleandf`.
 ``` r
 f1$outcleandf
 #>   a b t.output. runtime          start_time            end_time run_number
-#> 1 1 a       1 a       0 2019-03-11 16:25:38 2019-03-11 16:25:38          1
-#> 2 2 a       2 a       0 2019-03-11 16:25:38 2019-03-11 16:25:38          2
-#> 3 3 a       3 a       0 2019-03-11 16:25:38 2019-03-11 16:25:38          3
-#> 4 1 b       1 b       0 2019-03-11 16:25:38 2019-03-11 16:25:38          4
-#> 5 2 b       2 b       0 2019-03-11 16:25:38 2019-03-11 16:25:38          5
-#> 6 3 b       3 b       0 2019-03-11 16:25:38 2019-03-11 16:25:38          6
-#> 7 1 c       1 c       0 2019-03-11 16:25:38 2019-03-11 16:25:38          7
-#> 8 2 c       2 c       0 2019-03-11 16:25:38 2019-03-11 16:25:38          8
-#> 9 3 c       3 c       0 2019-03-11 16:25:38 2019-03-11 16:25:38          9
+#> 1 1 a       1 a       0 2019-06-17 20:22:53 2019-06-17 20:22:53          1
+#> 2 2 a       2 a       0 2019-06-17 20:22:53 2019-06-17 20:22:53          2
+#> 3 3 a       3 a       0 2019-06-17 20:22:53 2019-06-17 20:22:53          3
+#> 4 1 b       1 b       0 2019-06-17 20:22:53 2019-06-17 20:22:53          4
+#> 5 2 b       2 b       0 2019-06-17 20:22:53 2019-06-17 20:22:54          5
+#> 6 3 b       3 b       0 2019-06-17 20:22:54 2019-06-17 20:22:54          6
+#> 7 1 c       1 c       0 2019-06-17 20:22:54 2019-06-17 20:22:54          7
+#> 8 2 c       2 c       0 2019-06-17 20:22:54 2019-06-17 20:22:54          8
+#> 9 3 c       3 c       0 2019-06-17 20:22:54 2019-06-17 20:22:54          9
 ```

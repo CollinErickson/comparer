@@ -56,7 +56,7 @@ they have been run in parallel.
 \code{$recover_parallel_temp_save()} If you ran the experiment using
 parallel with \code{parallel_temp_save=TRUE} and it crashes partway
 through, call this to recover the runs that were completed.
-Runs that were stopped midexecution are not recoverable.
+Runs that were stopped mid-execution are not recoverable.
 }
 
 \examples{

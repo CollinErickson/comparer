@@ -216,7 +216,7 @@ mbc(predict(lm(ynoise ~ x), data.frame(x)),
 ## Simplifying with `evaluator`
 
 Many times the code chunks we want to compare only differ by a small amount,
-such as asingle argument.
+such as a single argument.
 In the example above, the only difference is the formula in the `lm` command.
 With `mbc`, the `evaluator` can be set to make these cases easier.
 The argument for `evaluator` should be an expression including `.`,
@@ -333,7 +333,7 @@ as having a small error and small predicted error.
 as described by @gneiting [Equation 43].
 
 $$ 3.28s + 20 \left( \hat{y} - y - 1.64s \right)^+ + 20 \left( y - \hat{y} - 1.64s \right)^+  $$
-where $()+$ denotes the positive part of what is in the parantheses.
+where $()^+$ denotes the positive part of what is in the parentheses.
 Smaller values are better.
 This metric penalizes having large predicted errors and having
 actual errors different from the predicted errors,

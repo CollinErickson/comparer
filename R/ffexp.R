@@ -47,7 +47,7 @@
 #' \code{$recover_parallel_temp_save()} If you ran the experiment using
 #' parallel with \code{parallel_temp_save=TRUE} and it crashes partway
 #' through, call this to recover the runs that were completed.
-#' Runs that were stopped midexecution are not recoverable.
+#' Runs that were stopped mid-execution are not recoverable.
 #'
 #' @name ffexp
 #' @examples
@@ -619,9 +619,16 @@ ffexp <- R6::R6Class(
     stop_cluster = function() {
       # cat("Deleting...\n")
       if (!is.null(self$parallel_cluster)) {
-        parallel::stopCluster(self$parallel_cluster)
-        message("Stopped cluster")
+        # This gives error for unknown reason
+        try(
+          {
+            parallel::stopCluster(self$parallel_cluster)
+            message("Stopped cluster")
+          },
+          silent=FALSE
+        )
       }
+      invisible(self)
     },
     finalize = function() {
       self$stop_cluster()

@@ -29,11 +29,11 @@ set.seed(0)
 The goal of comparer is to make it easy to compare the results of different code
 chunks that are trying to do the same thing.
 The R package `microbenchmark` is great for comparing the speed of code,
-but there's no way to compare their ouput to see which is more accurate.
+but there's no way to compare their output to see which is more accurate.
 
 ## Installation
 
-You can install comparer from github with:
+You can install comparer from GitHub with:
 
 ```{r gh-installation, eval = FALSE}
 # install.packages("devtools")

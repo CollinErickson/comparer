@@ -195,7 +195,13 @@ test_that("ffexp with error", {
   expect_error(f1$run_all(run_order = "inorder", redo = T, parallel_temp_save = T,
                           write_error_files=T))
   expect_true(sum(f1$completed_runs)==0)
+  # print(paste('folder path is', f1$folder_path))
+  # print(list.files(f1$folder_path))
   expect_error(f1$recover_parallel_temp_save(delete_after = T), NA)
+  # print(list.files(f1$folder_path))
+  # Sys.sleep(2)
+  # print(f1)
+  print(paste("Completed runs is", sum(f1$completed_runs)))
   expect_true(sum(f1$completed_runs)==6)
 
   prt <- f1$plot_run_times()
