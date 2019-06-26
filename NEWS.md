@@ -1,8 +1,12 @@
+# comparer 0.2.0.9000
+
 # comparer 0.2.0
 
 * Revamped `mbc` for more accurate timing.
 
 * Added `ffexp` for running full factorial experiments.
+
+* Accepted to CRAN on 6/18/2019.
 
 # comparer 0.1.1
 
