@@ -572,7 +572,7 @@ ffexp <- R6::R6Class(
         # 1:nrow(self$rungrid),
         rows,
         function(iirow) {
-          row_grid <- self$rungrid[iirow,]
+          row_grid <- self$rungrid[iirow, , drop=FALSE]
           row_df <- lapply(1:ncol(self$nvars),
                            function(i) {
                              ar <- self$arglist[[i]]
