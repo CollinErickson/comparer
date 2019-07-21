@@ -245,3 +245,16 @@ test_that("ffexp with function input", {
   # Delete at end
   expect_error({rm(f1); gc()}, NA)
 })
+
+test_that("ffexp with single row, rungrid2 was giving error", {
+  f1 <- ffexp$new(
+    df=data.frame(a=1:4,b=5:8,c=letters[1:4], stringsAsFactors = F),
+    eval_func=function(a,b,c) {
+      a^2
+    }
+  )
+  expect_error(f1$rungrid2(), NA)
+  # f1$run_all()
+  # Delete at end
+  expect_error({rm(f1); gc()}, NA)
+})
