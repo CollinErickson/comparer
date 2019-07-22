@@ -604,6 +604,12 @@ ffexp <- R6::R6Class(
       rownames(rowsdf) <- rows
       rowsdf
     },
+    add_variable = function(name, existing_value, new_values) {
+      # new_exp <- self$copy(deep=TRUE)
+      # Need to update outlist, completed_runs, number_runs,
+      # arglist, varlist, nvars, rungrid, enddf, outdf, outcleandf,
+      # outrawdf,
+    },
     print = function() {
       s <- paste0(
         c(
