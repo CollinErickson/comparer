@@ -71,8 +71,8 @@ ffexp <- R6::R6Class(
   public = list(
     outrawdf = data.frame(),
     outcleandf = data.frame(),
-    outdf = NULL,
-    enddf = NULL,
+    # outdf = NULL,
+    # enddf = NULL,
     rungrid = NULL,
     # rungridlist = NULL,
     nvars = NULL,
@@ -607,7 +607,7 @@ ffexp <- R6::R6Class(
     add_variable = function(name, existing_value, new_values) {
       # new_exp <- self$copy(deep=TRUE)
       # Need to update outlist, completed_runs, number_runs,
-      # arglist, varlist, nvars, rungrid, enddf, outdf, outcleandf,
+      # arglist, varlist, nvars, rungrid, outcleandf,
       # outrawdf,
     },
     print = function() {
