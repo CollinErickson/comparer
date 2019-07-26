@@ -608,16 +608,23 @@ ffexp <- R6::R6Class(
       # Need to update outlist, completed_runs, number_runs,
       # arglist, varlist, nvars, rungrid, outcleandf,
       # outrawdf
+      browser()
       all_values <- c(existing_value, new_values)
       new_exp <- self$copy(deep=TRUE)
       new_exp$arglist[[name]] <- all_values
       new_exp$number_runs <- new_exp$number_runs * length(all_values)
-      new_exp$completed_runs <- c(new_exp$completed_runs,
-                                  rep(FALSE, (length(all_values))-1)*(
-                                    self$number_runs
-                                  ))
+      new_exp$completed_runs <- rep(FALSE, new_exp$number_runs)
+                                #c(new_exp$completed_runs,
+                                #  rep(FALSE, (length(all_values))-1)*(
+                                #    self$number_runs
+                                #  ))
       # outlist should be good, or else set them all to null
-
+      for(old_index in existing_indexes) {
+        new_index <- 1
+        new_exp$completed_runs[new_index] <- self$completed_runs[old_index]
+        new_exp$outlist[[new_index]] <- self$outlist[[old_index]]
+      }
+      return(new_exp)
     },
     print = function() {
       s <- paste0(
