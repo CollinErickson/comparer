@@ -609,10 +609,13 @@ ffexp <- R6::R6Class(
       # arglist, varlist, nvars, rungrid, outcleandf,
       # outrawdf
       browser()
+      if (name %in% names(self$arglist)) {
+        stop("name is already the name of an argument")
+      }
       all_values <- c(existing_value, new_values)
-      new_exp <- self$copy(deep=TRUE)
+      new_exp <- self$clone(deep=TRUE)
       new_exp$arglist[[name]] <- all_values
-      new_exp$number_runs <- new_exp$number_runs * length(all_values)
+      new_exp$number_runs <- self$number_runs * length(all_values)
       new_exp$completed_runs <- rep(FALSE, new_exp$number_runs)
                                 #c(new_exp$completed_runs,
                                 #  rep(FALSE, (length(all_values))-1)*(
