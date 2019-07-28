@@ -622,6 +622,30 @@ ffexp <- R6::R6Class(
                                 #    self$number_runs
                                 #  ))
       # outlist should be good, or else set them all to null
+      # rungrid
+      new_exp$nvars <- sapply(new_exp$arglist,
+                           function(i) {
+                             if (is.data.frame(i)) {
+                               rev(dim(i))
+                             } else if (is.list(i)) {
+                               c(length(i), length(i[[1]]))
+                             } else {
+                               c(1, length(i))
+                             }
+                           }
+      )
+      new_exp$rungrid <- do.call(reshape::expand.grid.df,
+                              lapply(1:ncol(new_exp$nvars),
+                                     function(i){
+                                       x <- new_exp$nvars[2,i]
+                                       td <- data.frame(tt=1:x)
+                                       names(td) <- names(x)
+                                       td
+                                     }
+                              )
+      )
+      # self$number_runs <- nrow(self$rungrid)
+      new_exp$rungrid
       for(old_index in existing_indexes) {
         new_index <- 1
         new_exp$completed_runs[new_index] <- self$completed_runs[old_index]
