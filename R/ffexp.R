@@ -606,8 +606,7 @@ ffexp <- R6::R6Class(
     },
     add_variable = function(name, existing_value, new_values) {
       # Need to update outlist, completed_runs, number_runs,
-      # arglist, varlist, nvars, rungrid, outcleandf,
-      # outrawdf
+      # arglist, nvars, rungrid, outcleandf, outrawdf
       browser()
       if (name %in% names(self$arglist)) {
         stop("name is already the name of an argument")
@@ -617,10 +616,6 @@ ffexp <- R6::R6Class(
       new_exp$arglist[[name]] <- all_values
       new_exp$number_runs <- self$number_runs * length(all_values)
       new_exp$completed_runs <- rep(FALSE, new_exp$number_runs)
-                                #c(new_exp$completed_runs,
-                                #  rep(FALSE, (length(all_values))-1)*(
-                                #    self$number_runs
-                                #  ))
       # outlist should be good, or else set them all to null
       # rungrid
       new_exp$nvars <- sapply(new_exp$arglist,
@@ -645,9 +640,11 @@ ffexp <- R6::R6Class(
                               )
       )
       # self$number_runs <- nrow(self$rungrid)
-      new_exp$rungrid
+      existing_indexes <- which(new_exp$rungrid[,name]==1)
       for(old_index in existing_indexes) {
-        new_index <- 1
+        old_rg_row <- self$rungrid[old_index,]
+        new_index <- which(apply(new_exp$rungrid,1, function(x) {all(x==c(old_rg_row, 1))}))
+        # new_index <- 1
         new_exp$completed_runs[new_index] <- self$completed_runs[old_index]
         new_exp$outlist[[new_index]] <- self$outlist[[old_index]]
       }
