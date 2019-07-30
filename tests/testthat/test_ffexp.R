@@ -258,3 +258,19 @@ test_that("ffexp with single row, rungrid2 was giving error", {
   # Delete at end
   expect_error({rm(f1); gc()}, NA)
 })
+
+test_that("Test add_variable", {
+  f1 <- ffexp$new(n=c(100, 1000, 10000),
+                  nulleff=c(0,1),
+                  eval_func=function(n, nulleff) {
+                    samp <- rnorm(n)
+                    data.frame(mean=mean(samp), se=sd(samp)/sqrt(n))}
+  )
+  f1$run_all()
+  g1 <- f1$add_variable("newvar", 0, 1:2)
+  expect_equal(sum(f1$completed_runs), sum(g1$completed_runs))
+  expect_equal(length(g1$completed_runs), 3*length(f1$completed_runs))
+
+  # Delete at end
+  expect_error({rm(f1, g1); gc()}, NA)
+})
