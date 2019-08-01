@@ -604,7 +604,9 @@ ffexp <- R6::R6Class(
                            })
 
           row_df <- as.list(unlist(row_df, recursive = FALSE))
-          as.data.frame(row_df)
+          tmpdf <- as.data.frame(row_df)
+          names(tmpdf) <- sapply(row_df, names) # Only needed b/c of factor vars
+          tmpdf
         })
       rowsdf <- do.call(rbind, rowsdf)
       rownames(rowsdf) <- rows
