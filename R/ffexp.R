@@ -615,7 +615,6 @@ ffexp <- R6::R6Class(
     add_variable = function(name, existing_value, new_values) {
       # Need to update outlist, completed_runs, number_runs,
       # arglist, nvars, rungrid, outcleandf, outrawdf
-      browser()
       if (name %in% names(self$arglist)) {
         stop("name is already the name of an argument")
       }
@@ -656,6 +655,7 @@ ffexp <- R6::R6Class(
         new_exp$completed_runs[new_index] <- self$completed_runs[old_index]
         new_exp$outlist[[new_index]] <- self$outlist[[old_index]]
       }
+      message("Returning new object with added variable")
       return(new_exp)
     },
     print = function() {
