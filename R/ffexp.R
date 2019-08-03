@@ -658,6 +658,52 @@ ffexp <- R6::R6Class(
       message("Returning new object with added variable")
       return(new_exp)
     },
+    add_level = function(arg_name, new_values) {
+      # Need to update outlist, completed_runs, number_runs,
+      # arglist, nvars, rungrid, outcleandf, outrawdf
+      if (!(arg_name %in% names(self$arglist))) {
+        stop("arg_name is not the name of an existing argument")
+      }
+      all_values <- c(existing_value, new_values)
+      new_exp <- self$clone(deep=TRUE)
+      new_exp$arglist[[name]] <- all_values
+      new_exp$number_runs <- self$number_runs * length(all_values)
+      new_exp$completed_runs <- rep(FALSE, new_exp$number_runs)
+      # outlist should be good, or else set them all to null
+      # rungrid
+      new_exp$nvars <- sapply(new_exp$arglist,
+                              function(i) {
+                                if (is.data.frame(i)) {
+                                  rev(dim(i))
+                                } else if (is.list(i)) {
+                                  c(length(i), length(i[[1]]))
+                                } else {
+                                  c(1, length(i))
+                                }
+                              }
+      )
+      new_exp$rungrid <- do.call(reshape::expand.grid.df,
+                                 lapply(1:ncol(new_exp$nvars),
+                                        function(i){
+                                          x <- new_exp$nvars[2,i]
+                                          td <- data.frame(tt=1:x)
+                                          names(td) <- names(x)
+                                          td
+                                        }
+                                 )
+      )
+      # self$number_runs <- nrow(self$rungrid)
+      existing_indexes <- which(new_exp$rungrid[,name]==1)
+      for(old_index in existing_indexes) {
+        old_rg_row <- self$rungrid[old_index,]
+        new_index <- which(apply(new_exp$rungrid,1, function(x) {all(x==c(old_rg_row, 1))}))
+        # new_index <- 1
+        new_exp$completed_runs[new_index] <- self$completed_runs[old_index]
+        new_exp$outlist[[new_index]] <- self$outlist[[old_index]]
+      }
+      message("Returning new object with added variable")
+      return(new_exp)
+    },
     print = function() {
       s <- paste0(
         c(
