@@ -664,7 +664,8 @@ ffexp <- R6::R6Class(
       if (!(arg_name %in% names(self$arglist))) {
         stop("arg_name is not the name of an existing argument")
       }
-      all_values <- c(existing_value, new_values)
+      existing_values <- self$arglist[[arg_name]]
+      all_values <- c(existing_values, new_values)
       new_exp <- self$clone(deep=TRUE)
       new_exp$arglist[[name]] <- all_values
       new_exp$number_runs <- self$number_runs * length(all_values)
