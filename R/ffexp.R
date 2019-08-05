@@ -272,7 +272,7 @@ ffexp <- R6::R6Class(
              function(i) {
                ar <- self$arglist[[i]]
                if (is.data.frame(ar)) {
-                 tr <- as.list(ar[row_grid[1,i],])
+                 tr <- as.list(ar[row_grid[1,i, drop=TRUE],])
                } else if (is.list(ar)) {
                  # tr <- ar[[row_grid[1,i]]]
                  tr <- lapply(ar, function(x) x[[row_grid[1,i]]])
@@ -305,11 +305,11 @@ ffexp <- R6::R6Class(
       print(row_list)
 
       # Get df for output row, must be number of string, no functions
-      row_df <- lapply(1:ncol(self$nvars),
+      row_df_list <- lapply(1:ncol(self$nvars),
                        function(i) {
                          ar <- self$arglist[[i]]
                          if (is.data.frame(ar)) {
-                           tr <- as.list(ar[row_grid[1,i],])
+                           tr <- as.list(ar[row_grid[1,i, drop=TRUE],])
                          } else if (is.list(ar)) {
                            # tr <- ar[[row_grid[1,i]]]
                            tr <- lapply(ar, function(x) x[[row_grid[1,i]]])
@@ -329,7 +329,7 @@ ffexp <- R6::R6Class(
                          tr
                        })
       # Need to get list of lists out into single list
-      row_df <- as.list(unlist(row_df, recursive = FALSE))
+      row_df <- as.list(unlist(row_df_list, recursive = FALSE))
 
       # Write start file so user can see which ones are currently
       #  running and when they started.
@@ -583,7 +583,7 @@ ffexp <- R6::R6Class(
                            function(i) {
                              ar <- self$arglist[[i]]
                              if (is.data.frame(ar)) {
-                               tr <- as.list(ar[row_grid[1,i],])
+                               tr <- as.list(ar[row_grid[1,i, drop=TRUE],])
                              } else if (is.list(ar)) {
                                # tr <- ar[[row_grid[1,i]]]
                                tr <- lapply(ar, function(x) x[[row_grid[1,i]]])
