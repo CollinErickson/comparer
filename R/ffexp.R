@@ -449,7 +449,7 @@ ffexp <- R6::R6Class(
           if ("factor" %in% class(newdf_clean[1,i])) {
             # Use %in% since POSIXct and POSIXt
             self$outcleandf[,i] <- factor(self$outcleandf[,i],
-                                          levels=levels(self$arglist[[i]]))
+                                          levels=levels(row_df[[i]]))
           } else {
             class(self$outcleandf[,i]) <- class(newdf_clean[1,i])
           }
