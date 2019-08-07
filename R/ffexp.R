@@ -579,7 +579,7 @@ ffexp <- R6::R6Class(
         rows,
         function(iirow) {
           row_grid <- self$rungrid[iirow, , drop=FALSE]
-          row_df <- lapply(1:ncol(self$nvars),
+          row_list <- lapply(1:ncol(self$nvars),
                            function(i) {
                              ar <- self$arglist[[i]]
                              if (is.data.frame(ar)) {
@@ -597,16 +597,25 @@ ffexp <- R6::R6Class(
                              if (is.function(tr)) {
                                tr <- row_grid[1,i]
                              }
+                             # browser()
                              if (is.null(names(tr))) {
                                names(tr) <- names(self$arglist)[i]
                              }
                              tr
+                             # Convert to list so names work
+                             tl <- list(tr)
+                             # Don't rename lists since it will be unlisted,
+                             #  and we only want the inner name.
+                             if (!is.list(tr)) {
+                               names(tl) <- names(self$arglist)[i]
+                             }
+                             tl
                            })
-
-          row_df <- as.list(unlist(row_df, recursive = FALSE))
-          tmpdf <- as.data.frame(row_df)
-          names(tmpdf) <- sapply(row_df, names) # Only needed b/c of factor vars
-          tmpdf
+          # browser()
+          row_list2 <- as.list(unlist(row_list, recursive = FALSE))
+          row_df <- as.data.frame(row_list2)
+          # names(row_df) <- sapply(row_list2, names) # Only needed b/c of factor vars
+          row_df
         })
       rowsdf <- do.call(rbind, rowsdf)
       rownames(rowsdf) <- rows
