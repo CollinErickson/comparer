@@ -274,3 +274,15 @@ test_that("Test add_variable", {
   # Delete at end
   expect_error({rm(f1, g1); gc()}, NA)
 })
+
+test_that("ffexp with factor input and df multirow output", {
+  f1 <- ffexp$new(a=1:2,b=c("b",'c'), c=factor(c(5,6)),
+                  eval_func=function(a,b,c) {tibble::tibble(a=1:3,b=letters[1:3])})
+  expect_equal(length(f1$arglist), 3)
+  expect_is(f1$arglist[[3]], "factor")
+  expect_error(f1$run_all(), NA)
+  expect_true(all(f1$completed_runs))
+  expect_error(f1$rungrid2(), NA)
+  # Delete at end
+  expect_error({rm(f1); gc()}, NA)
+})
