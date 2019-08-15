@@ -275,6 +275,23 @@ test_that("Test add_variable", {
   expect_error({rm(f1, g1); gc()}, NA)
 })
 
+test_that("ffexp with factor input", {
+  f1 <- ffexp$new(n=factor(c(100, 1000, 10000)),
+                  nulleff=factor(c(0,1)),
+                  eval_func=function(n, nulleff) {
+                    samp <- rnorm(n)
+                    data.frame(mean=mean(samp), se=sd(samp)/sqrt(n))}
+  )
+  expect_is(f1$arglist[[1]], "factor")
+  expect_is(f1$arglist[[2]], "factor")
+  f1$run_all()
+  expect_true(all(f1$completed_runs))
+  expect_error(f1$rungrid2(), NA)
+  expect_equal(colnames(f1$rungrid2()), c('n', 'nulleff'))
+  # Delete at end
+  expect_error({rm(f1); gc()}, NA)
+})
+
 test_that("ffexp with factor input and df multirow output", {
   f1 <- ffexp$new(a=1:2,b=c("b",'c'), c=factor(c(5,6)),
                   eval_func=function(a,b,c) {tibble::tibble(a=1:3,b=letters[1:3])})
