@@ -303,3 +303,16 @@ test_that("ffexp with factor input and df multirow output", {
   # Delete at end
   expect_error({rm(f1); gc()}, NA)
 })
+
+test_that("ffexp with single df input and df multirow output", {
+  f1 <- ffexp$new(data.frame(a=1:2,b=c("b",'c'), c=factor(c(5,6))),
+                   eval_func=function(a,b,c) {tibble::tibble(a=1:3,b=letters[1:3])})
+  expect_equal(length(f1$arglist), 1)
+  expect_is(f1$arglist[[1]][,3], "factor")
+  expect_error(f1$run_all(), NA)
+  expect_true(all(f1$completed_runs))
+  expect_error(f1$rungrid2(), NA)
+  expect_equal(colnames(f1$rungrid2()), c('a','b','c'))
+  # Delete at end
+  expect_error({rm(f1); gc()}, NA)
+})
