@@ -676,9 +676,7 @@ ffexp <- R6::R6Class(
       existing_values <- self$arglist[[arg_name]]
       all_values <- c(existing_values, new_values)
       new_exp <- self$clone(deep=TRUE)
-      new_exp$arglist[[name]] <- all_values
-      new_exp$number_runs <- self$number_runs * length(all_values)
-      new_exp$completed_runs <- rep(FALSE, new_exp$number_runs)
+      new_exp$arglist[[arg_name]] <- all_values
       # outlist should be good, or else set them all to null
       # rungrid
       new_exp$nvars <- sapply(new_exp$arglist,
@@ -702,11 +700,17 @@ ffexp <- R6::R6Class(
                                         }
                                  )
       )
+      new_exp$number_runs <- nrow(new_exp$rungrid)
+      new_exp$completed_runs <- rep(FALSE, new_exp$number_runs)
       # self$number_runs <- nrow(self$rungrid)
-      existing_indexes <- which(new_exp$rungrid[,name]==1)
+      # Or could use rungrid and replace new_values with biggest number
+      existing_indexes <- which(!(new_exp$rungrid2()[,arg_name] %in% new_values))
       for(old_index in existing_indexes) {
         old_rg_row <- self$rungrid[old_index,]
-        new_index <- which(apply(new_exp$rungrid,1, function(x) {all(x==c(old_rg_row, 1))}))
+        new_index <- which(apply(new_exp$rungrid,1,
+                                 function(x) {
+                                   all(x==old_rg_row)
+                                 }))
         # new_index <- 1
         new_exp$completed_runs[new_index] <- self$completed_runs[old_index]
         new_exp$outlist[[new_index]] <- self$outlist[[old_index]]
