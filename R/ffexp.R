@@ -306,28 +306,28 @@ ffexp <- R6::R6Class(
 
       # Get df for output row, must be number of string, no functions
       row_df_list <- lapply(1:ncol(self$nvars),
-                       function(i) {
-                         ar <- self$arglist[[i]]
-                         if (is.data.frame(ar)) {
-                           tr <- as.list(ar[row_grid[1,i, drop=TRUE],])
-                         } else if (is.list(ar)) {
-                           # tr <- ar[[row_grid[1,i]]]
-                           tr <- lapply(ar, function(x) x[[row_grid[1,i]]])
-                         } else if (is.function(ar)) {
-                           tr <- ar # If single value is a function
-                         } else {
-                           tr <- ar[row_grid[1,i]]
-                         }
-                         # Can't use functions
-                         #  and deparse(quote(tr)) gives "tr"
-                         if (is.function(tr)) {
-                           tr <- row_grid[1,i]
-                         }
-                         if (is.null(names(tr))) {
-                           names(tr) <- names(self$arglist)[i]
-                         }
-                         tr
-                       })
+                            function(i) {
+                              ar <- self$arglist[[i]]
+                              if (is.data.frame(ar)) {
+                                tr <- as.list(ar[row_grid[1,i, drop=TRUE],])
+                              } else if (is.list(ar)) {
+                                # tr <- ar[[row_grid[1,i]]]
+                                tr <- lapply(ar, function(x) x[[row_grid[1,i]]])
+                              } else if (is.function(ar)) {
+                                tr <- ar # If single value is a function
+                              } else {
+                                tr <- ar[row_grid[1,i]]
+                              }
+                              # Can't use functions
+                              #  and deparse(quote(tr)) gives "tr"
+                              if (is.function(tr)) {
+                                tr <- row_grid[1,i]
+                              }
+                              if (is.null(names(tr))) {
+                                names(tr) <- names(self$arglist)[i]
+                              }
+                              tr
+                            })
       # Need to get list of lists out into single list
       row_df <- as.list(unlist(row_df_list, recursive = FALSE))
 
@@ -336,13 +336,16 @@ ffexp <- R6::R6Class(
       if (write_start_files) {
         self$create_save_folder_if_nonexistent()
         write_start_file_path <- paste0(self$folder_path,
-                                        "/STARTED_parallel_temp_output_",irow,".txt")
+                                        "/STARTED_parallel_temp_output_",
+                                        irow,".txt")
         cat(timestamp(), "\n", file=write_start_file_path)
         # cat row_list, but can't cat a list, so convert to string
         format_row_list <- format(row_list)
         for (i in seq.int(1, length(format_row_list), 1)) {
-          cat(names(format_row_list)[i], "\n",   file=write_start_file_path, append=TRUE)
-          cat(format_row_list[i],        "\n\n", file=write_start_file_path, append=TRUE)
+          cat(names(format_row_list)[i], "\n",
+              file=write_start_file_path, append=TRUE)
+          cat(format_row_list[i],        "\n\n",
+              file=write_start_file_path, append=TRUE)
         }
         rm(i, format_row_list)
       }
@@ -361,17 +364,21 @@ ffexp <- R6::R6Class(
       }
 
       # If error while running, write out error file/message
-      #  Want this after delete write start file so that file gets deleted either way
+      #  Want this after delete write start file so that file
+      #  gets deleted either way
       if (inherits(try.run, "try-error")) {
         if (write_error_files) {
           self$create_save_folder_if_nonexistent()
           write_error_file_path <- paste0(self$folder_path,
-                                          "/ERROR_parallel_temp_output_",irow,".txt")
+                                          "/ERROR_parallel_temp_output_",
+                                          irow,".txt")
           cat(Sys.time(),"\n", file=write_error_file_path)
           format_row_list <- format(row_list)
           for (i in seq.int(1, length(format_row_list), 1)) {
-            cat(names(format_row_list)[i], "\n",   file=write_error_file_path, append=TRUE)
-            cat(format_row_list[i],        "\n\n", file=write_error_file_path, append=TRUE)
+            cat(names(format_row_list)[i], "\n",
+                file=write_error_file_path, append=TRUE)
+            cat(format_row_list[i],        "\n\n",
+                file=write_error_file_path, append=TRUE)
           }
           rm(i, format_row_list)
           cat("Error was:\n\n", file=write_error_file_path)
@@ -506,14 +513,16 @@ ffexp <- R6::R6Class(
                if (nlev > 1) {
                  for (j in (2:nlev)) {
                    for (k in 1:(j-1)) {
-                     # newdf <- data.frame(diffname=paste0(tdf[j,1],"-",tdf[k,1]),
+                     # newdf <- data.frame(diffname=paste0(tdf[j,1],"-",
+                     #                     tdf[k,1]),
                      #                     mean=tdf[j,2]-tdf[k,2],
                      #                     se=tdf[j,3]-tdf[k,3],
                      #                     runtime=tdf[j,4]-tdf[k,4])
                      newdf <- data.frame(tempname=paste0(tdf[j,1],"-",tdf[k,1]))
                      colnames(newdf)[1] <- names(self$rungrid)[i]
                      newdf <- cbind(newdf,
-                                    tdf[j,outputcols-nvar+1]-tdf[k,outputcols-nvar+1])
+                                    tdf[j,outputcols-nvar+1]-
+                                      tdf[k,outputcols-nvar+1])
                      tdf <- rbind(tdf, newdf)
                    }
                  }
@@ -580,41 +589,41 @@ ffexp <- R6::R6Class(
         function(iirow) {
           row_grid <- self$rungrid[iirow, , drop=FALSE]
           row_list <- lapply(1:ncol(self$nvars),
-                           function(i) {
-                             ar <- self$arglist[[i]]
-                             if (is.data.frame(ar)) {
-                               tr <- as.list(ar[row_grid[1,i, drop=TRUE],])
-                             } else if (is.list(ar)) {
-                               # tr <- ar[[row_grid[1,i]]]
-                               tr <- lapply(ar, function(x) x[[row_grid[1,i]]])
-                             } else if (is.function(ar)) {
-                               tr <- ar # If single value is a function
-                             } else {
-                               tr <- ar[row_grid[1,i]]
-                             }
-                             # Can't use functions
-                             #  and deparse(quote(tr)) gives "tr"
-                             if (is.function(tr)) {
-                               tr <- row_grid[1,i]
-                             }
-                             # browser()
-                             if (is.null(names(tr))) {
-                               names(tr) <- names(self$arglist)[i]
-                             }
-                             tr
-                             # Convert to list so names work
-                             tl <- list(tr)
-                             # Don't rename lists since it will be unlisted,
-                             #  and we only want the inner name.
-                             if (!is.list(tr)) {
-                               names(tl) <- names(self$arglist)[i]
-                             }
-                             tl
-                           })
-          # browser()
+                             function(i) {
+                               ar <- self$arglist[[i]]
+                               if (is.data.frame(ar)) {
+                                 tr <- as.list(ar[row_grid[1,i, drop=TRUE],])
+                               } else if (is.list(ar)) {
+                                 # tr <- ar[[row_grid[1,i]]]
+                                 tr <- lapply(ar,
+                                              function(x) x[[row_grid[1,i]]])
+                               } else if (is.function(ar)) {
+                                 tr <- ar # If single value is a function
+                               } else {
+                                 tr <- ar[row_grid[1,i]]
+                               }
+                               # Can't use functions
+                               #  and deparse(quote(tr)) gives "tr"
+                               if (is.function(tr)) {
+                                 tr <- row_grid[1,i]
+                               }
+                               if (is.null(names(tr))) {
+                                 names(tr) <- names(self$arglist)[i]
+                               }
+                               tr
+                               # Convert to list so names work
+                               tl <- list(tr)
+                               # Don't rename lists since it will be unlisted,
+                               #  and we only want the inner name.
+                               if (!is.list(tr)) {
+                                 names(tl) <- names(self$arglist)[i]
+                               }
+                               tl
+                             })
           row_list2 <- as.list(unlist(row_list, recursive = FALSE))
           row_df <- as.data.frame(row_list2)
-          # names(row_df) <- sapply(row_list2, names) # Only needed b/c of factor vars
+          # names(row_df) <- sapply(row_list2, names)
+          # Only needed b/c of factor vars
           row_df
         })
       rowsdf <- do.call(rbind, rowsdf)
@@ -635,31 +644,32 @@ ffexp <- R6::R6Class(
       # outlist should be good, or else set them all to null
       # rungrid
       new_exp$nvars <- sapply(new_exp$arglist,
-                           function(i) {
-                             if (is.data.frame(i)) {
-                               rev(dim(i))
-                             } else if (is.list(i)) {
-                               c(length(i), length(i[[1]]))
-                             } else {
-                               c(1, length(i))
-                             }
-                           }
+                              function(i) {
+                                if (is.data.frame(i)) {
+                                  rev(dim(i))
+                                } else if (is.list(i)) {
+                                  c(length(i), length(i[[1]]))
+                                } else {
+                                  c(1, length(i))
+                                }
+                              }
       )
       new_exp$rungrid <- do.call(reshape::expand.grid.df,
-                              lapply(1:ncol(new_exp$nvars),
-                                     function(i){
-                                       x <- new_exp$nvars[2,i]
-                                       td <- data.frame(tt=1:x)
-                                       names(td) <- names(x)
-                                       td
-                                     }
-                              )
+                                 lapply(1:ncol(new_exp$nvars),
+                                        function(i){
+                                          x <- new_exp$nvars[2,i]
+                                          td <- data.frame(tt=1:x)
+                                          names(td) <- names(x)
+                                          td
+                                        }
+                                 )
       )
       # self$number_runs <- nrow(self$rungrid)
       existing_indexes <- which(new_exp$rungrid[,name]==1)
       for(old_index in existing_indexes) {
         old_rg_row <- self$rungrid[old_index,]
-        new_index <- which(apply(new_exp$rungrid,1, function(x) {all(x==c(old_rg_row, 1))}))
+        new_index <- which(apply(new_exp$rungrid,1,
+                                 function(x) {all(x==c(old_rg_row, 1))}))
         # new_index <- 1
         new_exp$completed_runs[new_index] <- self$completed_runs[old_index]
         new_exp$outlist[[new_index]] <- self$outlist[[old_index]]
@@ -704,7 +714,8 @@ ffexp <- R6::R6Class(
       new_exp$completed_runs <- rep(FALSE, new_exp$number_runs)
       # self$number_runs <- nrow(self$rungrid)
       # Or could use rungrid and replace new_values with biggest number
-      existing_indexes <- which(!(new_exp$rungrid2()[,arg_name] %in% new_values))
+      existing_indexes <- which(!(new_exp$rungrid2()[,arg_name]
+                                  %in% new_values))
       for(old_index in existing_indexes) {
         old_rg_row <- self$rungrid[old_index,]
         new_index <- which(apply(new_exp$rungrid,1,
@@ -722,7 +733,8 @@ ffexp <- R6::R6Class(
       s <- paste0(
         c(
           "ffexp object from the comparer package\n",
-          "   ", sum(self$completed_runs), " / ", length(self$completed_runs), " completed\n",
+          "   ", sum(self$completed_runs), " / ",
+          length(self$completed_runs), " completed\n",
           "   parallel : ", self$parallel, "\n",
           "   Use $run_all() to run all remaining\n",
           "   Use $run_one() to run a single\n"
@@ -804,7 +816,8 @@ if (F) {
   f1$run_all()
   f1$outcleandf
   f1$calculate_effects()
-  cc <- ffexp$new(a=5:7,b=22, cd=data.frame(c=3:4,d=5:6, row.names = c("35", "46")),
+  cc <- ffexp$new(a=5:7,b=22, cd=data.frame(c=3:4,d=5:6,
+                                            row.names = c("35", "46")),
                   eval_func=function(...,a,b) {data.frame(apb=a+b)});
   cc$run_all(); cc$calculate_effects()
 }
