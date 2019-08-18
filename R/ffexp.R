@@ -684,7 +684,11 @@ ffexp <- R6::R6Class(
         stop("arg_name is not the name of an existing argument")
       }
       existing_values <- self$arglist[[arg_name]]
-      all_values <- c(existing_values, new_values)
+      if (is.data.frame(existing_values)) {
+        all_values <- rbind(existing_values, new_values)
+      } else {
+        all_values <- c(existing_values, new_values)
+      }
       new_exp <- self$clone(deep=TRUE)
       new_exp$arglist[[arg_name]] <- all_values
       # outlist should be good, or else set them all to null
@@ -714,8 +718,8 @@ ffexp <- R6::R6Class(
       new_exp$completed_runs <- rep(FALSE, new_exp$number_runs)
       # self$number_runs <- nrow(self$rungrid)
       # Or could use rungrid and replace new_values with biggest number
-      existing_indexes <- which(!(new_exp$rungrid2()[,arg_name]
-                                  %in% new_values))
+      existing_indexes <- which(
+        new_exp$rungrid[,arg_name] < max(new_exp$rungrid[,arg_name]))
       for(old_index in existing_indexes) {
         old_rg_row <- self$rungrid[old_index,]
         new_index <- which(apply(new_exp$rungrid,1,
