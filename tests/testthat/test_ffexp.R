@@ -293,6 +293,24 @@ test_that("Test add_level", {
   expect_error({rm(f1, g1); gc()}, NA)
 })
 
+test_that("Test add_level with data frame", {
+  f1 <- ffexp$new(df=data.frame(n=c(100, 1000, 10000),
+                                nulleff=c(0,1,2)
+  ),
+  eval_func=function(n, nulleff) {
+    samp <- rnorm(n)
+    data.frame(mean=mean(samp), se=sd(samp)/sqrt(n))}
+  )
+  f1$run_all()
+  g1 <- f1$add_level("df", data.frame(n=20, nulleff=3))
+  expect_equal(4, length(g1$completed_runs))
+  expect_equal(sum(f1$completed_runs), sum(g1$completed_runs))
+  expect_equal(length(g1$completed_runs), 1 + length(f1$completed_runs))
+
+  # Delete at end
+  expect_error({rm(f1, g1); gc()}, NA)
+})
+
 test_that("ffexp with factor input", {
   f1 <- ffexp$new(n=factor(c(100, 1000, 10000)),
                   nulleff=factor(c(0,1)),
