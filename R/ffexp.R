@@ -636,10 +636,16 @@ ffexp <- R6::R6Class(
       if (name %in% names(self$arglist)) {
         stop("name is already the name of an argument")
       }
-      all_values <- c(existing_value, new_values)
+      if (is.data.frame(new_values)) {
+        all_values <- rbind(existing_value, new_values)
+        length_all_values <- nrow(all_values)
+      } else {
+        all_values <- c(existing_value, new_values)
+        length_all_values <- length(all_values)
+      }
       new_exp <- self$clone(deep=TRUE)
       new_exp$arglist[[name]] <- all_values
-      new_exp$number_runs <- self$number_runs * length(all_values)
+      new_exp$number_runs <- self$number_runs * length_all_values
       new_exp$completed_runs <- rep(FALSE, new_exp$number_runs)
       # outlist should be good, or else set them all to null
       # rungrid
