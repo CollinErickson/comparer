@@ -26,7 +26,7 @@ if (F) {
 
 hype <- R6::R6Class(
   classname="hype",
-  inherit=ffexp,
+  # inherit=ffexp,
   public=list(
     ffexp = NULL,
     eval_func = NULL,
@@ -73,10 +73,13 @@ hype <- R6::R6Class(
 
     },
     add_EI = function(n) {
-
+      browser()
+      mod <- DiceKriging::km(formula = ~1,
+                             design = self$X,
+                             response = self$Z)
     },
     run_all = function(...) {
-      self$exp$run_all(...)
+      self$ffexp$run_all(...)
     }
   )
 )
@@ -87,3 +90,7 @@ h1 <- hype$new(
   b = par_unif$new('b', -10, 10),
   n_lhs = 20
 )
+h1
+h1$ffexp
+h1$run_all()
+h1$ffexp
