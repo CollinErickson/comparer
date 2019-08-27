@@ -10,12 +10,12 @@ par_unif <- R6::R6Class(
   inherit = par_hype,
   public=list(
     name=NULL,
-    low=NULL,
-    high=NULL,
-    initialize = function(name, low, high) {
+    lower=NULL,
+    upper=NULL,
+    initialize = function(name, lower, upper) {
       self$name <- name
-      self$low <- low
-      self$high <- high
+      self$lower <- lower
+      self$upper <- upper
     }
   )
 )
@@ -28,23 +28,29 @@ hype <- R6::R6Class(
   classname="hype",
   # inherit=ffexp,
   public=list(
+    X=NULL,
+    Z=NULL,
+    params=NULL,
+    parnames=NULL,
+    parlower=NULL,
+    parupper=NULL,
     ffexp = NULL,
     eval_func = NULL,
     initialize = function(eval_func, ..., X0=NULL, n_lhs) { # ... is params
       self$eval_func <- eval_func
       dots <- list(...)
       parlist <- data.frame()
-      parnames <- c()
-      parlows <- c()
-      parhighs <- c()
+      self$parnames <- c()
+      self$parlower <- c()
+      self$parupper <- c()
       for (pari in dots) {
         if (!("par_hype" %in% class(pari))) {
           stop("All ... should be par_hype objects")
         }
         parlist <- c(parlist, pari)
-        parnames <- c(parnames, pari$name)
-        parlows <- c(parlows, pari$low)
-        parhighs <- c(parhighs, pari$high)
+        self$parnames <- c(self$parnames, pari$name)
+        self$parlower <- c(self$parlower, pari$lower)
+        self$parupper <- c(self$parupper, pari$upper)
       }
       if (!missing(n_lhs)) {
         Xlhs <- lhs::maximinLHS(n=n_lhs, k=length(parnames))
@@ -77,9 +83,15 @@ hype <- R6::R6Class(
       mod <- DiceKriging::km(formula = ~1,
                              design = self$X,
                              response = self$Z)
+      DiceOptim::max_EI(model=self$mod,
+                        lower=self$parlows,
+                        upper=self$parhighs)
     },
     run_all = function(...) {
       self$ffexp$run_all(...)
+      self$X <- self$ffexp$rungrid2()
+      self$Z <- self$ffexp$outlist
+      invisible(self)
     }
   )
 )
@@ -94,3 +106,4 @@ h1
 h1$ffexp
 h1$run_all()
 h1$ffexp
+h1$add_EI(1)
