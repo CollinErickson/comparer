@@ -30,6 +30,7 @@ hype <- R6::R6Class(
   public=list(
     X=NULL,
     Z=NULL,
+    mod=NULL,
     params=NULL,
     parnames=NULL,
     parlower=NULL,
@@ -53,19 +54,19 @@ hype <- R6::R6Class(
         self$parupper <- c(self$parupper, pari$upper)
       }
       if (!missing(n_lhs)) {
-        Xlhs <- lhs::maximinLHS(n=n_lhs, k=length(parnames))
+        Xlhs <- lhs::maximinLHS(n=n_lhs, k=length(self$parnames))
         Xlhs <- sweep(sweep(Xlhs,
-          2, parhighs - parlows, "*"
-        ), 2, parlows, "+")
+                            2, self$parupper - self$parlower, "*"
+        ), 2, self$parlower, "+")
         Xlhs <- as.data.frame(Xlhs)
-        names(Xlhs) <- parnames
+        names(Xlhs) <- self$parnames
         X0 <- rbind(X0, Xlhs)
       }
       if (is.null(X0)) {stop('X0 is null')}
       if (!is.data.frame(X0)) {browser(); stop("X0 is not a df?")}
       # Use an ffexp object to manage simulations
-      self$ffexp <- ffexp$new(eval_func = eval_func,
-                              Xdf <- X0
+      self$ffexp <- ffexp$new(eval_func=eval_func,
+                              Xdf=X0
       )
       invisible(self)
     },
@@ -79,13 +80,18 @@ hype <- R6::R6Class(
 
     },
     add_EI = function(n) {
-      browser()
-      mod <- DiceKriging::km(formula = ~1,
-                             design = self$X,
-                             response = self$Z)
-      DiceOptim::max_EI(model=self$mod,
-                        lower=self$parlows,
-                        upper=self$parhighs)
+      # browser()
+      self$mod <- DiceKriging::km(formula = ~1,
+                                  covtype="matern5_2",
+                                  design = self$X,
+                                  response = self$Z)
+      EIout <- DiceOptim::max_EI(model=self$mod,
+                                 lower=self$parlower,
+                                 upper=self$parupper)
+      newX <- EIout$par
+      updatedffexp <- self$ffexp$add_level("Xdf", newX)
+      self$ffexp <- updatedffexp
+      invisible(self)
     },
     run_all = function(...) {
       self$ffexp$run_all(...)
@@ -97,8 +103,8 @@ hype <- R6::R6Class(
 )
 
 h1 <- hype$new(
-  eval_func = function(a, b) {a+b},
-  a = par_unif$new('a', 1, 2),
+  eval_func = function(a, b) {a^2+b^2},
+  a = par_unif$new('a', -1, 2),
   b = par_unif$new('b', -10, 10),
   n_lhs = 20
 )
@@ -107,3 +113,6 @@ h1$ffexp
 h1$run_all()
 h1$ffexp
 h1$add_EI(1)
+h1$ffexp
+h1$run_all()
+h1$ffexp
