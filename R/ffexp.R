@@ -692,8 +692,10 @@ ffexp <- R6::R6Class(
       existing_values <- self$arglist[[arg_name]]
       if (is.data.frame(existing_values)) {
         all_values <- rbind(existing_values, new_values)
+        existing_level_indexes <- 1:nrow(existing_values)
       } else {
         all_values <- c(existing_values, new_values)
+        existing_level_indexes <- 1:length(existing_values)
       }
       new_exp <- self$clone(deep=TRUE)
       new_exp$arglist[[arg_name]] <- all_values
