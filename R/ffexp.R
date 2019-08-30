@@ -726,8 +726,10 @@ ffexp <- R6::R6Class(
       new_exp$completed_runs <- rep(FALSE, new_exp$number_runs)
       # self$number_runs <- nrow(self$rungrid)
       # Or could use rungrid and replace new_values with biggest number
+      # existing_indexes <- which(
+      #   new_exp$rungrid[,arg_name] < max(new_exp$rungrid[,arg_name]))
       existing_indexes <- which(
-        new_exp$rungrid[,arg_name] < max(new_exp$rungrid[,arg_name]))
+        new_exp$rungrid[,arg_name] %in% existing_level_indexes)
       for(old_index in existing_indexes) {
         old_rg_row <- self$rungrid[old_index,]
         new_index <- which(apply(new_exp$rungrid,1,
