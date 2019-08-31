@@ -81,13 +81,21 @@ hype <- R6::R6Class(
     },
     add_EI = function(n) {
       # browser()
+      # Just update mod? Set covtype?
       self$mod <- DiceKriging::km(formula = ~1,
                                   covtype="matern5_2",
                                   design = self$X,
                                   response = self$Z)
-      EIout <- DiceOptim::max_EI(model=self$mod,
-                                 lower=self$parlower,
-                                 upper=self$parupper)
+      if (n==1) {
+        EIout <- DiceOptim::max_EI(model=self$mod,
+                                   lower=self$parlower,
+                                   upper=self$parupper)
+      } else {
+        EIout <- DiceOptim::max_qEI(model=self$mod,
+                                    npoints=n,
+                                    lower=self$parlower,
+                                    upper=self$parupper)
+      }
       newX <- EIout$par
       updatedffexp <- self$ffexp$add_level("Xdf", newX)
       self$ffexp <- updatedffexp
@@ -98,6 +106,15 @@ hype <- R6::R6Class(
       self$X <- self$ffexp$rungrid2()
       self$Z <- self$ffexp$outlist
       invisible(self)
+    },
+    plotorder = function() {
+      ggplot2::ggplot(data.frame(index=1:length(self$Z), Z=self$Z,
+                                 col=ifelse(self$Z<=min(self$Z),'red','black')),
+                      ggplot2::aes(index, Z, color=col)) +
+        ggplot2::geom_point() +
+        ggplot2::scale_colour_manual(values = c("black" = "black", "red" = "red")) +
+        ggplot2::theme(legend.position = "none")
+
     }
   )
 )
@@ -116,3 +133,9 @@ h1$add_EI(1)
 h1$ffexp
 h1$run_all()
 h1$ffexp
+h1$add_EI(4)
+h1$ffexp
+h1$run_all()
+h1$ffexp
+h1
+h1$plotorder()
