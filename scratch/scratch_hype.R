@@ -115,6 +115,14 @@ hype <- R6::R6Class(
         ggplot2::scale_colour_manual(values = c("black" = "black", "red" = "red")) +
         ggplot2::theme(legend.position = "none")
 
+    },
+    plotX = function() {
+      tdf <- cbind(self$X, Z=self$Z, Zorder=order(order(self$Z)))
+      ggplot2::ggplot(reshape2::melt(tdf, id.vars=c('Z', 'Zorder')),
+                      ggplot2::aes(value, Z, color=Zorder)) +
+        ggplot2::geom_point() +
+        ggplot2::facet_wrap(. ~ variable, scales='free_x') +
+        ggplot2::scale_color_gradientn(colors=c('green', 'purple'))
     }
   )
 )
@@ -139,3 +147,4 @@ h1$run_all()
 h1$ffexp
 h1
 h1$plotorder()
+h1$plotX()
