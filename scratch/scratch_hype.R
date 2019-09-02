@@ -123,6 +123,25 @@ hype <- R6::R6Class(
         ggplot2::geom_point() +
         ggplot2::facet_wrap(. ~ variable, scales='free_x') +
         ggplot2::scale_color_gradientn(colors=c('green', 'purple'))
+    },
+    print = function(...) {
+      ts <- paste0(
+        "hype object:",
+        "\n\td = ", ncol(self$X),
+        "\n\tn = ", nrow(self$X),
+        "\n\tTo add data: $add_data(X, Y)",
+        "\n\tTo add points using EI: $add_EI",
+        "\n\tTo access underlying experiment: $ffexp",
+        "\n\tTo access model: $mod",
+        "\n\tTo access params: $params",
+        "\n\tTo plot output values in order: $plotorder",
+        "\n\tTo plot output vs each input: $plotX",
+        "\n\tTo run unevaluated points: $run_all",
+        "\n\tTo access inputs and output: $X and $Z",
+        "\n"
+      )
+      cat(ts)
+      invisible(self)
     }
   )
 )
