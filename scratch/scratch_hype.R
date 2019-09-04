@@ -85,11 +85,13 @@ hype <- R6::R6Class(
       self$mod <- DiceKriging::km(formula = ~1,
                                   covtype="matern5_2",
                                   design = self$X,
-                                  response = self$Z)
+                                  response = self$Z,
+                                  control=list(trace=FALSE))
       if (n==1) {
         EIout <- DiceOptim::max_EI(model=self$mod,
                                    lower=self$parlower,
-                                   upper=self$parupper)
+                                   upper=self$parupper,
+                                   control=list(print.level=0))
       } else {
         EIout <- DiceOptim::max_qEI(model=self$mod,
                                     npoints=n,
@@ -150,7 +152,7 @@ h1 <- hype$new(
   eval_func = function(a, b) {a^2+b^2},
   a = par_unif$new('a', -1, 2),
   b = par_unif$new('b', -10, 10),
-  n_lhs = 20
+  n_lhs = 10
 )
 h1
 h1$ffexp
