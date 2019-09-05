@@ -289,6 +289,14 @@ test_that("Test add_level", {
   expect_equal(sum(f1$completed_runs), sum(g1$completed_runs))
   expect_equal(length(g1$completed_runs), 3 + length(f1$completed_runs))
 
+  # Add two new levels
+  g1$run_all()
+  expect_equal(9, sum(g1$completed_runs))
+  h1 <- g1$add_level("nulleff", c(3,4))
+  expect_equal(15, length(h1$completed_runs))
+  expect_equal(sum(g1$completed_runs), sum(h1$completed_runs))
+  expect_equal(length(h1$completed_runs), 9 + length(f1$completed_runs))
+
   # Delete at end
   expect_error({rm(f1, g1); gc()}, NA)
 })
