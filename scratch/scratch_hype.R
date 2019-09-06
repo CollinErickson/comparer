@@ -79,11 +79,11 @@ hype <- R6::R6Class(
     add_LHS = function(n) {
 
     },
-    add_EI = function(n) {
+    add_EI = function(n, covtype="matern5_2") {
       # browser()
       # Just update mod? Set covtype?
       self$mod <- DiceKriging::km(formula = ~1,
-                                  covtype="matern5_2",
+                                  covtype=covtype,
                                   design = self$X,
                                   response = self$Z,
                                   control=list(trace=FALSE))
