@@ -268,6 +268,9 @@ test_that("Test add_variable", {
                     data.frame(mean=mean(samp), se=sd(samp)/sqrt(n))}
   )
   f1$run_all(run_order="random")
+  # Get error if try to use same name as existing
+  expect_error(f1$add_variable("nulleff"))
+  # Add numeric vector
   g1 <- f1$add_variable("newvar", 0, 1:2)
   expect_equal(sum(f1$completed_runs), sum(g1$completed_runs))
   expect_equal(length(g1$completed_runs), 3*length(f1$completed_runs))
