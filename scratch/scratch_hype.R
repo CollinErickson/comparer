@@ -82,6 +82,9 @@ hype <- R6::R6Class(
     add_EI = function(n, covtype="matern5_2", nugget.estim=TRUE) {
       # browser()
       # Just update mod? Set covtype?
+      if (covtype == "random") {
+        covtype <- sample(c("matern5_2", "matern3_2", "exp", "powexp", "gauss"), 1)
+      }
       self$mod <- DiceKriging::km(formula = ~1,
                                   covtype=covtype,
                                   design = self$X,
