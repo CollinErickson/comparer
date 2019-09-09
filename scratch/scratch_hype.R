@@ -79,13 +79,14 @@ hype <- R6::R6Class(
     add_LHS = function(n) {
 
     },
-    add_EI = function(n, covtype="matern5_2") {
+    add_EI = function(n, covtype="matern5_2", nugget.estim=TRUE) {
       # browser()
       # Just update mod? Set covtype?
       self$mod <- DiceKriging::km(formula = ~1,
                                   covtype=covtype,
                                   design = self$X,
                                   response = self$Z,
+                                  nugget.estim=nugget.estim,
                                   control=list(trace=FALSE))
       if (n==1) {
         EIout <- DiceOptim::max_EI(model=self$mod,
