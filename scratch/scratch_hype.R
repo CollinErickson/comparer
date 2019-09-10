@@ -74,7 +74,11 @@ hype <- R6::R6Class(
 
     },
     add_X = function(X) {
-
+      stopifnot(is.data.frame(X))
+      stopifnot(all(colnames(X) == colnames(self$X)))
+      updatedffexp <- self$ffexp$add_level("Xdf", X)
+      self$ffexp <- updatedffexp
+      invisible(self)
     },
     add_LHS = function(n) {
 
