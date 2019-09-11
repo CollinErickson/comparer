@@ -81,7 +81,14 @@ hype <- R6::R6Class(
       invisible(self)
     },
     add_LHS = function(n) {
-
+      Xlhs <- lhs::maximinLHS(n=n_lhs, k=length(self$parnames))
+      Xlhs <- sweep(sweep(Xlhs,
+                          2, self$parupper - self$parlower, "*"
+      ), 2, self$parlower, "+")
+      Xlhs <- as.data.frame(Xlhs)
+      names(Xlhs) <- self$parnames
+      self$add_X(Xlhs)
+      invisible(self)
     },
     add_EI = function(n, covtype="matern5_2", nugget.estim=TRUE) {
       # browser()
@@ -177,3 +184,5 @@ h1$ffexp
 h1
 h1$plotorder()
 h1$plotX()
+h1$add_X(data.frame(a=1.111, b=2.222))
+h1$add_LHS(3)
