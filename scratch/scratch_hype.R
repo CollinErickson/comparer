@@ -71,7 +71,10 @@ hype <- R6::R6Class(
       invisible(self)
     },
     add_data = function(X, Y) {
-
+      self$ffexp <- updatedffexp
+      updatedffexp <- self$ffexp$add_level("Xdf", X)
+      stop("need to add Y too")
+      invisible(self)
     },
     add_X = function(X) {
       stopifnot(is.data.frame(X))
