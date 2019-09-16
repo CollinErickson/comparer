@@ -124,7 +124,11 @@ hype <- R6::R6Class(
     run_all = function(...) {
       self$ffexp$run_all(...)
       self$X <- self$ffexp$rungrid2()
-      self$Z <- self$ffexp$outlist
+      if (is.null(self$extract_output_func)) {
+        self$Z <- self$ffexp$outlist
+      } else {
+        self$Z <- self$extract_output_func(sapply(self$ffexp$outlist))
+      }
       invisible(self)
     },
     plotorder = function() {
@@ -165,27 +169,40 @@ hype <- R6::R6Class(
     }
   )
 )
-
-h1 <- hype$new(
-  eval_func = function(a, b) {a^2+b^2},
-  a = par_unif$new('a', -1, 2),
-  b = par_unif$new('b', -10, 10),
-  n_lhs = 10
-)
-h1
-h1$ffexp
-h1$run_all()
-h1$ffexp
-h1$add_EI(1)
-h1$ffexp
-h1$run_all()
-h1$ffexp
-h1$add_EI(4)
-h1$ffexp
-h1$run_all()
-h1$ffexp
-h1
-h1$plotorder()
-h1$plotX()
-h1$add_X(data.frame(a=1.111, b=2.222))
-h1$add_LHS(3)
+if (F) {
+  h1 <- hype$new(
+    eval_func = function(a, b) {a^2+b^2},
+    a = par_unif$new('a', -1, 2),
+    b = par_unif$new('b', -10, 10),
+    n_lhs = 10
+  )
+  h1
+  h1$ffexp
+  h1$run_all()
+  h1$ffexp
+  h1$add_EI(1)
+  h1$ffexp
+  h1$run_all()
+  h1$ffexp
+  h1$add_EI(4)
+  h1$ffexp
+  h1$run_all()
+  h1$ffexp
+  h1
+  h1$plotorder()
+  h1$plotX()
+  h1$add_X(data.frame(a=1.111, b=2.222))
+  h1$add_LHS(3)
+}
+if (F) {
+  # Have df output, but only use one value from it
+  h1 <- hype$new(
+    eval_func = function(a, b) {data.frame(c=a^2+b^2, d=1:2)},
+    extract_output_func = function(odf) {odf$c[1]},
+    a = par_unif$new('a', -1, 2),
+    b = par_unif$new('b', -10, 10),
+    n_lhs = 10
+  )
+  h1$run_all()
+  h1$add_EI(n = 1)
+}
