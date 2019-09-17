@@ -131,6 +131,15 @@ hype <- R6::R6Class(
       }
       invisible(self)
     },
+    run_EI_for_time = function(sec, batch_size, covtype="matern5_2",
+                               nugget.estim=TRUE, ...) {
+      start_time <- proc.time()
+      while(proc.time()[3] - start_time < sec) {
+        self$add_EI(n=batch_size, covtype=covtype, nugget.estim=nugget.estim)
+        self$run_all(...)
+      }
+      invisible(self)
+    },
     plotorder = function() {
       ggplot2::ggplot(data.frame(index=1:length(self$Z), Z=self$Z,
                                  col=ifelse(self$Z<=min(self$Z),'red','black')),
