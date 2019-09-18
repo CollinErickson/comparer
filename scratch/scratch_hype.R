@@ -37,7 +37,12 @@ hype <- R6::R6Class(
     parupper=NULL,
     ffexp = NULL,
     eval_func = NULL,
-    initialize = function(eval_func, ..., X0=NULL, n_lhs) { # ... is params
+    extract_output_func = NULL,
+    initialize = function(eval_func,
+                          ..., # ... is params
+                          X0=NULL, n_lhs,
+                          extract_output_func
+    ) {
       self$eval_func <- eval_func
       dots <- list(...)
       parlist <- data.frame()
