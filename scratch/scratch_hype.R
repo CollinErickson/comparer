@@ -73,6 +73,9 @@ hype <- R6::R6Class(
       self$ffexp <- ffexp$new(eval_func=eval_func,
                               Xdf=X0
       )
+      if (!missing(extract_output_func)) {
+        self$extract_output_func <- extract_output_func
+      }
       invisible(self)
     },
     add_data = function(X, Y) {
@@ -132,7 +135,8 @@ hype <- R6::R6Class(
       if (is.null(self$extract_output_func)) {
         self$Z <- self$ffexp$outlist
       } else {
-        self$Z <- self$extract_output_func(sapply(self$ffexp$outlist))
+        # browser()
+        self$Z <- sapply(self$ffexp$outlist, self$extract_output_func)
       }
       invisible(self)
     },
