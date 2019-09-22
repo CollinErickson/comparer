@@ -80,7 +80,7 @@ hype <- R6::R6Class(
     },
     add_data = function(X, Y) {
       self$ffexp <- updatedffexp
-      updatedffexp <- self$ffexp$add_level("Xdf", X)
+      updatedffexp <- self$ffexp$add_level("Xdf", X, suppressMessage=TRUE)
       stop("need to add Y too")
       invisible(self)
     },
@@ -125,7 +125,7 @@ hype <- R6::R6Class(
                                     upper=self$parupper)
       }
       newX <- EIout$par
-      updatedffexp <- self$ffexp$add_level("Xdf", newX)
+      updatedffexp <- self$ffexp$add_level("Xdf", newX, suppressMessage=TRUE)
       self$ffexp <- updatedffexp
       invisible(self)
     },
