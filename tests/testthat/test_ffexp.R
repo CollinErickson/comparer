@@ -274,6 +274,10 @@ test_that("Test add_variable", {
   g1 <- f1$add_variable("newvar", 0, 1:2)
   expect_equal(sum(f1$completed_runs), sum(g1$completed_runs))
   expect_equal(length(g1$completed_runs), 3*length(f1$completed_runs))
+  # Add data frame
+  g1 <- f1$add_variable("newdf", data.frame(a="x",b=44), data.frame(a=c('y','z'), b=45:46))
+  expect_equal(sum(f1$completed_runs), sum(g1$completed_runs))
+  expect_equal(length(g1$completed_runs), 3*length(f1$completed_runs))
 
   # Delete at end
   expect_error({rm(f1, g1); gc()}, NA)
