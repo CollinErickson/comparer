@@ -322,8 +322,26 @@ test_that("Test add_level with data frame", {
   expect_equal(sum(f1$completed_runs), sum(g1$completed_runs))
   expect_equal(length(g1$completed_runs), 1 + length(f1$completed_runs))
 
+  # Add two new levels
+  g1$run_all()
+  expect_equal(4, sum(g1$completed_runs))
+  h1 <- g1$add_level("df", data.frame(n=c(30,40),
+                                      nulleff=c(4,5)))
+  expect_equal(6, length(h1$completed_runs))
+  expect_equal(sum(g1$completed_runs), sum(h1$completed_runs))
+  expect_equal(length(h1$completed_runs), 3 + length(f1$completed_runs))
+
+  # Add another level without running the previous
+  expect_equal(4, sum(h1$completed_runs))
+  i1 <- h1$add_level("df", data.frame(n=c(50),
+                                      nulleff=c(6)))
+  expect_equal(6, length(i1$completed_runs))
+  expect_equal(sum(h1$completed_runs), sum(i1$completed_runs))
+  expect_equal(length(i1$completed_runs), 3 + length(i1$completed_runs))
+
+
   # Delete at end
-  expect_error({rm(f1, g1); gc()}, NA)
+  expect_error({rm(f1, g1, h1, i1); gc()}, NA)
 })
 
 test_that("ffexp with factor input", {
