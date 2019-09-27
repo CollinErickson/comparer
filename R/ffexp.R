@@ -742,7 +742,13 @@ ffexp <- R6::R6Class(
         # new_index <- 1
         new_exp$completed_runs[new_index] <- self$completed_runs[old_index]
         new_exp$outlist[[new_index]] <- self$outlist[[old_index]]
+      }; rm(old_rg_row, new_index, old_index)
+      for (new_index in setdiff(1:new_exp$number_runs, existing_indexes)) {
+        stopifnot(!new_exp$completed_runs[new_index])
+        # Needed in order to run add_level twice in a row without having run it
+        new_exp$outlist[[new_index]] <- list(NULL)
       }
+      # Notify user that it wasn't changed in place
       if (!suppressMessage) {
         message("Returning new object with added variable")
       }
