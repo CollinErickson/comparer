@@ -81,7 +81,7 @@ ffexp <- R6::R6Class(
     number_runs = NULL,
     completed_runs = NULL, # Logical vector of whether each run is done
     eval_func = NULL,
-    outlist = NULL, # List of outputs from each run
+    outlist = list(), # List of outputs from each run
     save_output = NULL,
     parallel = NULL,
     parallel_cores = NULL,
@@ -409,7 +409,7 @@ ffexp <- R6::R6Class(
                                  start_time, end_time, save_output) {
       # This is used to save results after running an item
 
-      self$outlist[[irow]] <- as.list(output)
+      self$outlist[[irow]] <- output
       if (is.data.frame(output)) {
         output$runtime <- systime[3]
         newdf0 <- output
