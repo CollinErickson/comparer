@@ -310,11 +310,10 @@ test_that("Test add_level", {
 
 test_that("Test add_level with data frame", {
   f1 <- ffexp$new(df=data.frame(n=c(100, 1000, 10000),
-                                nulleff=c(0,1,2)
-  ),
-  eval_func=function(n, nulleff) {
-    samp <- rnorm(n)
-    data.frame(mean=mean(samp), se=sd(samp)/sqrt(n))}
+                                nulleff=c(0,1,2)),
+                  eval_func=function(n, nulleff) {
+                    samp <- rnorm(n)
+                    data.frame(mean=mean(samp), se=sd(samp)/sqrt(n))}
   )
   f1$run_all()
   g1 <- f1$add_level("df", data.frame(n=20, nulleff=3))
@@ -335,9 +334,9 @@ test_that("Test add_level with data frame", {
   expect_equal(4, sum(h1$completed_runs))
   i1 <- h1$add_level("df", data.frame(n=c(50),
                                       nulleff=c(6)))
-  expect_equal(6, length(i1$completed_runs))
+  expect_equal(7, length(i1$completed_runs))
   expect_equal(sum(h1$completed_runs), sum(i1$completed_runs))
-  expect_equal(length(i1$completed_runs), 3 + length(i1$completed_runs))
+  expect_equal(length(i1$completed_runs), 4 + length(f1$completed_runs))
 
 
   # Delete at end
@@ -375,7 +374,7 @@ test_that("ffexp with factor input and df multirow output", {
 
 test_that("ffexp with single df input and df multirow output", {
   f1 <- ffexp$new(data.frame(a=1:2,b=c("b",'c'), c=factor(c(5,6))),
-                   eval_func=function(a,b,c) {tibble::tibble(a=1:3,b=letters[1:3])})
+                  eval_func=function(a,b,c) {tibble::tibble(a=1:3,b=letters[1:3])})
   expect_equal(length(f1$arglist), 1)
   expect_is(f1$arglist[[1]][,3], "factor")
   expect_error(f1$run_all(), NA)
