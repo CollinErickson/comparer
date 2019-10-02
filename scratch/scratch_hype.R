@@ -103,6 +103,15 @@ hype <- R6::R6Class(
     },
     add_EI = function(n, covtype="matern5_2", nugget.estim=TRUE) {
       # browser()
+      # If unevaluated points, set lowest value.
+      X <- self$ffexp$rungrid2()
+      if (nrow(X) == length(self$Z)) { # All have been evaluated
+        Z <- self$Z
+      } else { # Unevaluated points exist, set to constant liar
+        Z <- c(self$Z, rep(min(self$Z), nrow(X) - length(self$Z)))
+        message("Unevaluated points already exist, using constant liar")
+      }
+
       # Just update mod? Set covtype?
       if (covtype == "random") {
         covtype <- sample(c("matern5_2", "matern3_2", "exp", "powexp", "gauss"), 1)
