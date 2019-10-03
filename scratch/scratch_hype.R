@@ -92,7 +92,7 @@ hype <- R6::R6Class(
       invisible(self)
     },
     add_LHS = function(n) {
-      Xlhs <- lhs::maximinLHS(n=n_lhs, k=length(self$parnames))
+      Xlhs <- lhs::maximinLHS(n=n, k=length(self$parnames))
       Xlhs <- sweep(sweep(Xlhs,
                           2, self$parupper - self$parlower, "*"
       ), 2, self$parlower, "+")
