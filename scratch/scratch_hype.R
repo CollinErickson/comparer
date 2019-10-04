@@ -143,6 +143,12 @@ hype <- R6::R6Class(
       self$X <- self$ffexp$rungrid2()
       if (is.null(self$extract_output_func)) {
         self$Z <- self$ffexp$outlist
+        if (!all(sapply(self$ffexp$outlist, length) == 1)) {
+          print(self$ffexp$outlist)
+          stop(paste("output from function must either all have length one",
+                     " or else you must give extract_output_func"))
+        }
+        self$Z <- unlist(self$ffexp$outlist)
       } else {
         # browser()
         self$Z <- sapply(self$ffexp$outlist, self$extract_output_func)
