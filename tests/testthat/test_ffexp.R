@@ -113,6 +113,7 @@ test_that("ffexp with runone", {
   expect_is(f1, "R6")
   expect_is(f1, "ffexp")
   expect_error(f1$run_one(1, warn_repeat=F), NA)
+  expect_warning(f1$run_one(1, warn_repeat=T))
   expect_error(f1$run_one(1:3, warn_repeat=F), NA)
 
   # Give bad run_order
