@@ -76,6 +76,7 @@ ffexp <- R6::R6Class(
     rungrid = NULL, # Input settings to be run
     # rungridlist = NULL,
     nvars = NULL, # Number of input variables
+    allvars = NULL, # df with name, class, and num levels for each var
     varlist = NULL, # List of variable names to pass through to parallel
     arglist = NULL, # List of values for each argument
     number_runs = NULL,
@@ -109,12 +110,12 @@ ffexp <- R6::R6Class(
                              }
                            }
       )
-      browser()
-      self$allvars <- do.call(rbind, sapply(self$arglist,
+      # browser()
+      self$allvars <- do.call(rbind, lapply(self$arglist,
                              function(i) {
                                if (is.data.frame(i)) {
                                  data.frame(name =colnames(i),
-                                            class=lapply(i, class),
+                                            class=unlist(lapply(i, class)),
                                             num  =nrow(i))
                                } else if (is.list(i)) {
                                  data.frame(name =name(i),
