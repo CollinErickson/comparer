@@ -646,6 +646,9 @@ ffexp <- R6::R6Class(
           row_df
         })
       rowsdf <- do.call(rbind, rowsdf)
+      for (i in 1:nrow(self$allvars)) {
+        class(rowsdf[,i]) <- as.character(self$allvars$class[i])
+      }
       rownames(rowsdf) <- rows
       rowsdf
     },
