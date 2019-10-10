@@ -111,23 +111,24 @@ ffexp <- R6::R6Class(
                            }
       )
       # browser()
-      self$allvars <- do.call(rbind, lapply(self$arglist,
-                             function(i) {
-                               if (is.data.frame(i)) {
-                                 data.frame(name =colnames(i),
-                                            class=unlist(lapply(i, class)),
-                                            num  =nrow(i))
-                               } else if (is.list(i)) {
-                                 data.frame(name =name(i),
-                                            class="list",
-                                            num  =1)
-                               } else {
-                                 data.frame(name =names(i),
-                                            class=class(i),
-                                            num  =1)
-                               }
-                             }
-      ))
+      self$allvars <- do.call(rbind,
+                              lapply(self$arglist,
+                                     function(i) {
+                                       if (is.data.frame(i)) {
+                                         data.frame(name =colnames(i),
+                                                    class=unlist(lapply(i, class)),
+                                                    num  =nrow(i))
+                                       } else if (is.list(i)) {
+                                         data.frame(name =name(i),
+                                                    class="list",
+                                                    num  =1)
+                                       } else {
+                                         data.frame(name =names(i),
+                                                    class=class(i),
+                                                    num  =1)
+                                       }
+                                     }
+                              ))
       self$rungrid <- do.call(reshape::expand.grid.df,
                               lapply(1:ncol(self$nvars),
                                      function(i){
