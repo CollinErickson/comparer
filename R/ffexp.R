@@ -641,7 +641,7 @@ ffexp <- R6::R6Class(
                                tl
                              })
           row_list2 <- as.list(unlist(row_list, recursive = FALSE))
-          row_df <- as.data.frame(row_list2)
+          row_df <- as.data.frame(row_list2, stringsAsFactors=FALSE)
           # names(row_df) <- sapply(row_list2, names)
           # Only needed b/c of factor vars
           row_df
