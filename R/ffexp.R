@@ -110,7 +110,6 @@ ffexp <- R6::R6Class(
                              }
                            }
       )
-      # browser()
       self$allvars <- do.call(rbind,
                               lapply(self$arglist,
                                      function(i) {
@@ -648,7 +647,9 @@ ffexp <- R6::R6Class(
         })
       rowsdf <- do.call(rbind, rowsdf)
       for (i in 1:nrow(self$allvars)) {
-        class(rowsdf[,i]) <- as.character(self$allvars$class[i])
+        if (class(rowsdf[,i]) != as.character(self$allvars$class[i])) {
+          class(rowsdf[,i]) <- as.character(self$allvars$class[i])
+        }
       }
       rownames(rowsdf) <- rows
       rowsdf
