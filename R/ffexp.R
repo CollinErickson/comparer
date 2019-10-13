@@ -110,9 +110,11 @@ ffexp <- R6::R6Class(
                              }
                            }
       )
+      # browser()
       self$allvars <- do.call(rbind,
-                              lapply(self$arglist,
-                                     function(i) {
+                              lapply(1:length(self$arglist),
+                                     function(j) {#browser()
+                                       i <- self$arglist[[j]]
                                        if (is.data.frame(i)) {
                                          data.frame(name =colnames(i),
                                                     class=unlist(lapply(i, class)),
@@ -122,7 +124,7 @@ ffexp <- R6::R6Class(
                                                     class="list",
                                                     num  =1)
                                        } else {
-                                         data.frame(name =names(i),
+                                         data.frame(name =names(self$arglist[j]),
                                                     class=class(i),
                                                     num  =1)
                                        }
