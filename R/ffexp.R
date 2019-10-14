@@ -120,7 +120,7 @@ ffexp <- R6::R6Class(
                                                     class=unlist(lapply(i, class)),
                                                     num  =nrow(i))
                                        } else if (is.list(i)) {
-                                         data.frame(name =name(i),
+                                         data.frame(name =names(self$arglist[j]),
                                                     class="list",
                                                     num  =1)
                                        } else {
