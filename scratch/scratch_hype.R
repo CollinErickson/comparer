@@ -226,6 +226,7 @@ if (F) {
   h1$plotX()
   h1$add_X(data.frame(a=1.111, b=2.222))
   h1$add_LHS(3)
+  h1$add_EI(1)
 }
 if (F) {
   # Have df output, but only use one value from it
