@@ -158,7 +158,7 @@ hype <- R6::R6Class(
     run_EI_for_time = function(sec, batch_size, covtype="matern5_2",
                                nugget.estim=TRUE, ...) {
       start_time <- proc.time()
-      while(proc.time()[3] - start_time < sec) {
+      while(proc.time()[3] - start_time[3] < sec) {
         self$add_EI(n=batch_size, covtype=covtype, nugget.estim=nugget.estim)
         self$run_all(...)
       }
