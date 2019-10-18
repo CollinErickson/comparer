@@ -239,4 +239,5 @@ if (F) {
   )
   h1$run_all()
   h1$add_EI(n = 1)
+  h1$run_EI_for_time(sec=3)
 }
