@@ -272,7 +272,8 @@ test_that("Test add_variable", {
                     samp <- rnorm(n)
                     data.frame(mean=mean(samp), se=sd(samp)/sqrt(n))}
   )
-  f1$run_all(run_order="random")
+  expect_error(f1$run_all(run_order="random"), NA)
+  expect_error(f1$run_all(run_order="random", to_run=3, warn_repeat = F), NA)
   # Get error if try to use same name as existing
   expect_error(f1$add_variable("nulleff"))
   # Add numeric vector
