@@ -297,6 +297,7 @@ test_that("Test add_level", {
                     data.frame(mean=mean(samp), se=sd(samp)/sqrt(n))}
   )
   f1$run_all()
+  expect_error(f1$add_level("notavar", 2))
   g1 <- f1$add_level("nulleff", 2)
   expect_equal(9, length(g1$completed_runs))
   expect_equal(sum(f1$completed_runs), sum(g1$completed_runs))
