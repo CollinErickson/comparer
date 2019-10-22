@@ -391,3 +391,10 @@ test_that("ffexp with single df input and df multirow output", {
   # Delete at end
   expect_error({rm(f1); gc()}, NA)
 })
+
+test_that("vector output", {
+  f1 <- ffexp$new(data.frame(a=1:2,b=c("b",'c'), c=factor(c(5,6))),
+                  eval_func=function(a,b,cc) {c(a=a, b=b, c=cc)})
+  expect_error(f1$run_all(), NA)
+  f1$outcleandf
+})
