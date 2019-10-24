@@ -53,6 +53,16 @@ test_that("ffexp", {
 })
 
 test_that("ffexp parallel", {
+  # Check that parallel cores can be set, but don't run
+  # because this will be run on Travis
+  expect_error(f1 <- ffexp$new(n=c(100, 1000, 10000),
+                               nulleff=c(0,1),
+                               eval_func=function(n, nulleff) {
+                                 samp <- rnorm(n)
+                                 data.frame(mean=mean(samp), se=sd(samp)/sqrt(n))},
+                               parallel=T, parallel_cores=137,
+                               save_output = F), NA)
+  expect_equal(f1$parallel_cores, 137)
   # Skip tests with parallel=T on Travis, gives error
   testthat::skip_on_travis()
 
