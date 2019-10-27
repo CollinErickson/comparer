@@ -262,7 +262,8 @@ ffexp <- R6::R6Class(
                        write_start_files=save_output,
                        write_error_files=save_output,
                        warn_repeat=TRUE,
-                       is_parallel=FALSE) {
+                       is_parallel=FALSE,
+                       verbose=1) {
       # Set up single row to run
       if (is.null(irow)) { # If irow not given, set to next not run
         if (any(self$completed_runs == FALSE)) {
@@ -280,9 +281,11 @@ ffexp <- R6::R6Class(
       }
 
       # Get ready for single run
-      cat("Running ", irow, ", completed ", sum(self$completed_runs),"/",
-          length(self$completed_runs), " ",
-          format(Sys.time(), "%a %b %d %X %Y"), "\n", sep="")
+      if (verbose >= 1) {
+        cat("Running ", irow, ", completed ", sum(self$completed_runs),"/",
+            length(self$completed_runs), " ",
+            format(Sys.time(), "%a %b %d %X %Y"), "\n", sep="")
+      }
       row_grid <- self$rungrid[irow, , drop=FALSE] #rungrid row for current run
       # if (!is.na(row_grid$seed)) {set.seed(row_grid$seed)}
       # Can't just set row_list <- lapply since a function can't be named
