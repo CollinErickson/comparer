@@ -270,6 +270,8 @@ test_that("ffexp with single row, rungrid2 was giving error", {
 
   expect_equal(f1$rungrid2(rows=c(1,3)), f1$rungrid2()[c(1,3),],
                check.attributes=FALSE) # Weird row names issue
+  expect_equal(f1$rungrid2(rows=c(1,3)), f1$rungrid2(rows=c(T,F,T)),
+               check.attributes=FALSE) # Weird row names issue
   # f1$run_all()
   # Delete at end
   expect_error({rm(f1); gc()}, NA)
