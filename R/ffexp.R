@@ -325,7 +325,9 @@ ffexp <- R6::R6Class(
              })
       # Need to get list of lists out into single list
       # row_list <- as.list(unlist(row_list, recursive = FALSE))
-      print(row_list)
+      if (verbose >= 2) {
+        print(row_list)
+      }
 
       # Get df for output row, must be number of string, no functions
       row_df_list <- lapply(1:ncol(self$nvars),
