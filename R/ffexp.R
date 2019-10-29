@@ -263,7 +263,7 @@ ffexp <- R6::R6Class(
                        write_error_files=save_output,
                        warn_repeat=TRUE,
                        is_parallel=FALSE,
-                       verbose=1) {
+                       verbose=2) {
       # Set up single row to run
       if (is.null(irow)) { # If irow not given, set to next not run
         if (any(self$completed_runs == FALSE)) {
