@@ -218,7 +218,8 @@ ffexp <- R6::R6Class(
           fun=function(ii){
             tout <- self$run_one(ii, is_parallel=TRUE,
                                  write_start_files=write_start_files,
-                                 write_error_files=write_error_files)
+                                 write_error_files=write_error_files,
+                                 verbose=verbose)
             if (parallel_temp_save) {
               saveRDS(object=tout,
                       file=paste0(self$folder_path,
@@ -274,7 +275,8 @@ ffexp <- R6::R6Class(
       } else if (length(irow) > 1) { # If more than one, run each separately
         sapply(irow,
                function(ii){self$run_one(irow=ii, save_output=save_output,
-                                         warn_repeat=warn_repeat)})
+                                         warn_repeat=warn_repeat,
+                                         verbose=verbose)})
         return(invisible(self))
       } else if ((self$completed_runs[irow] == TRUE) && warn_repeat) {
         warning("irow already run, will run again anyways")
