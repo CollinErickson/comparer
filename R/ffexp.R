@@ -88,6 +88,7 @@ ffexp <- R6::R6Class(
     parallel_cores = NULL,
     parallel_cluster = NULL,
     folder_path = NULL,
+    verbose = 2,
     initialize = function(..., eval_func, save_output=FALSE, parallel=FALSE,
                           parallel_cores="detect", folder_path,
                           varlist=NULL) {
@@ -167,6 +168,7 @@ ffexp <- R6::R6Class(
                        write_error_files=save_output,
                        delete_parallel_temp_save_after=FALSE,
                        varlist=self$varlist,
+                       verbose=self$verbose,
                        warn_repeat=TRUE) {
       if (missing(run_order)) { # random for parallel for load balancing
         if (parallel) {run_order <- "random"}
@@ -264,7 +266,7 @@ ffexp <- R6::R6Class(
                        write_error_files=save_output,
                        warn_repeat=TRUE,
                        is_parallel=FALSE,
-                       verbose=2) {
+                       verbose=self$verbose) {
       # Set up single row to run
       if (is.null(irow)) { # If irow not given, set to next not run
         if (any(self$completed_runs == FALSE)) {
