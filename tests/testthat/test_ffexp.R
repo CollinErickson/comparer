@@ -417,3 +417,9 @@ test_that("no output", {
   expect_error(f1$run_all(), NA)
   f1$outcleandf
 })
+test_that("verbose", {
+  f1 <- ffexp$new(data.frame(a=1:2,b=c("b",'c'), c=factor(c(5,6))),
+                  eval_func=function(a,b,cc) {}, verbose=0)
+  expect_equal(f1$verbose, 0)
+  expect_error(f1$run_all(), NA)
+})
