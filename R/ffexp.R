@@ -91,7 +91,7 @@ ffexp <- R6::R6Class(
     verbose = 2,
     initialize = function(..., eval_func, save_output=FALSE, parallel=FALSE,
                           parallel_cores="detect", folder_path,
-                          varlist=NULL) {
+                          varlist=NULL, verbose=2) {
       self$eval_func <- eval_func
       self$save_output <- save_output
       self$folder_path <- if (missing(folder_path)) {
@@ -158,6 +158,7 @@ ffexp <- R6::R6Class(
           self$parallel_cores <- parallel_cores
         }
       }
+      self$verbose <- verbose
     },
     run_all = function(to_run=NULL,
                        redo = FALSE, run_order,
