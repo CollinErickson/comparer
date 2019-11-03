@@ -422,4 +422,11 @@ test_that("verbose", {
                   eval_func=function(a,b,cc) {}, verbose=0)
   expect_equal(f1$verbose, 0)
   expect_error(f1$run_all(), NA)
+  expect_error(c1 <- capture.output(f1$run_all()), NA)
+  expect_equal(length(c1), 0)
+  expect_error(c1 <- capture.output(f1$run_all(verbose=1, redo=T, warn_repeat = F)), NA)
+  expect_equal(length(c1), 2)
+  f1$verbose <- 1
+  expect_error(c1 <- capture.output(f1$run_all(redo=T, warn_repeat = F)), NA)
+  expect_equal(length(c1), 2)
 })
