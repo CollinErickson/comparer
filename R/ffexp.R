@@ -250,7 +250,8 @@ ffexp <- R6::R6Class(
                  tout <- self$run_one(ii, write_start_files=write_start_files,
                                       write_error_files=write_error_files,
                                       warn_repeat=warn_repeat,
-                                      save_output=save_output)
+                                      save_output=save_output,
+                                      verbose=verbose)
                  if (parallel_temp_save) {
                    saveRDS(object=tout,
                            file=paste0(self$folder_path,
