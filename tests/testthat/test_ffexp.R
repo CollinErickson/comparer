@@ -429,4 +429,7 @@ test_that("verbose", {
   f1$verbose <- 1
   expect_error(c1 <- capture.output(f1$run_all(redo=T, warn_repeat = F)), NA)
   expect_equal(length(c1), 2)
+  f1$verbose <- 2
+  expect_error(c1 <- capture.output(f1$run_all(redo=T, warn_repeat = F)), NA)
+  expect_equal(length(c1), 24)
 })
