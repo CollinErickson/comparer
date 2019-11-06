@@ -351,6 +351,44 @@ numerical issues, then it will go to infinity,
 which does not happen with the mean interval score.
 
 
+## Running time-consuming experiments with `ffexp`
+
+The other main function of the package is `ffexp`, an abbreviation for
+full-factorial experiment.
+It will run a function using all possible combinations of input parameters
+given.
+It is useful for running experiments that take a long time to complete.
+
+The first arguments given to `ffexp$new` should give the possible values for
+each input parameter.
+In the example below, `a` can be 1, 2, or 3,
+and `b` can "a", "b", or "c".
+Then `eval_func` should be given that can operate on these parameters.
+For example, using `eval_func = paste` will paste together the value
+of `a` with the value of `b`.
+
+```{r}
+f1 <- ffexp$new(
+  a=1:3,
+  b=c("a","b","c"),
+  eval_func=paste
+)
+```
+
+After creating the `ffexp` object, we can call
+`f1$run_all` to run `eval_func` on every combination of `a` and `b`.
+
+```{R}
+f1$run_all()
+```
+
+Now to see the results in a clean format, look at `f1$outcleandf`.
+
+```{r}
+f1$outcleandf
+```
+
+
 
 
 ## References
