@@ -1,4 +1,6 @@
-# comparer 0.2.0.9000
+# comparer 0.2.1
+
+* Was taken off of CRAN for unknown failures. Putting back up.
 
 # comparer 0.2.0
 

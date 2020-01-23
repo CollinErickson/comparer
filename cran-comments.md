@@ -1,15 +1,15 @@
-I submitted this yesterday and it was rejected by the autocheck system.
-There was one test that doesn't work on Linux systems, so I removed it
-and now it passed on win-builder devel and release and all four
-R-hub checks with no errors, warnings, or notes.
-
-Major changes to the main function mbc(), and added another major function
-`ffexp`.
+I got an email on 1/3/20 that I had to fix errors with
+this package by 1/17/20 or it'd be taken off of CRAN.
+I didn't get to it until after the deadline, so I can't
+even see what the problems were. I'm trying to resubmit
+the package to CRAN and hopefully fix the issue in the
+process.
 
 ## Test environments
-* local Window 7 install, R 3.6.0
-* ubuntu 16.04 (on travis-ci), R 3.6.0
+* local Window 7 install, R 3.6.2
+* ubuntu 16.04 (on travis-ci), R 3.6.2
 * win-builder (devel and release)
+* R-hub (Windows, Ubuntu Linux, Fedora Linux)
 
 ## R CMD check results
 
