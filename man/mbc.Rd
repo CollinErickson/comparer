@@ -4,8 +4,19 @@
 \alias{mbc}
 \title{Model benchmark compare}
 \usage{
-mbc(..., times = 5, input, inputi, evaluator, post, target, targetin,
-  metric = "rmse", paired, kfold)
+mbc(
+  ...,
+  times = 5,
+  input,
+  inputi,
+  evaluator,
+  post,
+  target,
+  targetin,
+  metric = "rmse",
+  paired,
+  kfold
+)
 }
 \arguments{
 \item{...}{Functions to run}
