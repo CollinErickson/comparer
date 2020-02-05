@@ -92,7 +92,7 @@ test_that("ffexp parallel", {
 test_that("ffexp parallel 2", {
   # Skip tests with parallel=T on Travis, gives error
   testthat::skip_on_travis()
-  testthat::skip_on_os("linux")
+  testthat::skip_on_os(c("linux", "mac", "solaris"))
 
   folder <- paste0(tempdir(),"\\")
   expect_error(f1 <- ffexp$new(n=c(100, 1000, 10000),

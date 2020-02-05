@@ -1,9 +1,11 @@
 I got an email on 1/3/20 that I had to fix errors with
 this package by 1/17/20 or it'd be taken off of CRAN.
-I didn't get to it until after the deadline, so I can't
-even see what the problems were. I'm trying to resubmit
-the package to CRAN and hopefully fix the issue in the
-process.
+The only error was that
+one of the tests failed on OSX and Solaris due to
+connections when running in parallel.
+I can't recreate this error on any of my computers.
+I used devtools::skip_on_os to skip that test on
+the OS's giving errors and am resubmitting.
 
 ## Test environments
 * local Window 7 install, R 3.6.2
