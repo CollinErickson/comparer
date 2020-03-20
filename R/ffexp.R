@@ -215,6 +215,8 @@ ffexp <- R6::R6Class(
         cat("About to start run in parallel, run order is:\n    ",
             to_run,
             "\n")
+        # cat("\tCluster is"); print(self$parallel_cluster)
+        # browser()
         parout <- parallel::clusterApplyLB(
           cl=self$parallel_cluster,
           x=to_run,
@@ -440,13 +442,17 @@ ffexp <- R6::R6Class(
                                  start_time, end_time, save_output) {
       # This is used to save results after running an item
 
+      # Save entire output as list
       self$outlist[[irow]] <- output
+
+      # Now try to create clean data frame with outputs
+      # (exclude lists) and include runtime.
       if (is.data.frame(output)) {
         output$runtime <- systime[3]
         newdf0 <- output
         # newdf0$start_time <- start_time
         # newdf0$end_time <- end_time
-      } else if (is.vector(output)) {
+      } else if (is.vector(output) && !is.list(output)) {
         newdf0 <- data.frame(t(output), stringsAsFactors=FALSE)
         newdf0$runtime <- systime[3]
       } else {
