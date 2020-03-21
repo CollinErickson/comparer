@@ -3,9 +3,16 @@ this package by 1/17/20 or it'd be taken off of CRAN.
 The only error was that
 one of the tests failed on OSX and Solaris due to
 connections when running in parallel.
-I can't recreate this error on any of my computers.
-I used devtools::skip_on_os to skip that test on
-the OS's giving errors and am resubmitting.
+After it was taken off of CRAN, I tried to resubmit
+after just skipping the test on non-Windows OS,
+but it wasn't approved since I didn't reply to an email
+in a timely manner.
+
+I debugged the package on Linux and found the error
+(I was using the wrong kind of slashes in a file path).
+I fixed it and have tested on my personal Linux computer,
+my personal Windows computer,
+and the required test systems.
 
 ## Test environments
 * local Window 7 install, R 3.6.2
