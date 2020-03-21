@@ -412,6 +412,18 @@ test_that("vector output", {
   f1$outcleandf
 })
 
+test_that("list output", {
+  c1 <- ffexp$new(
+    # save_output=T,
+    eval_func=function(i) {list(i, i:10, list(i, i^2, i^3), list(data.frame(1:5, 2:6)),
+                                tibble::tibble(11:5))},
+    i=1:3
+  )
+  expect_warning(c1$run_all(), NA)
+  # Shouldn't have columns from list
+  expect_equal(ncol(c1$outcleandf), 5)
+})
+
 test_that("no output", {
   f1 <- ffexp$new(data.frame(a=1:2,b=c("b",'c'), c=factor(c(5,6))),
                   eval_func=function(a,b,cc) {})
