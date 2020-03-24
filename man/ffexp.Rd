@@ -73,3 +73,431 @@ cc$run_all()
 cc <- ffexp$new(a=1:3,b=2, cd=data.frame(c=3:4,d=5:6),
                 eval_func=function(...) {list(...)})
 }
+\section{Public fields}{
+\if{html}{\out{<div class="r6-fields">}}
+\describe{
+\item{\code{outrawdf}}{Raw data frame of output.}
+
+\item{\code{outcleandf}}{Clean output in data frame.}
+
+\item{\code{rungrid}}{matrix specifying which inputs will be run
+for each experiment.}
+
+\item{\code{nvars}}{Number of variables}
+
+\item{\code{allvars}}{All variables}
+
+\item{\code{varlist}}{Character vector of objects to pass to a parallel
+cluster.}
+
+\item{\code{arglist}}{List of values for each argument}
+}
+\if{html}{\out{</div>}}
+}
+\section{Methods}{
+\subsection{Public methods}{
+\itemize{
+\item \href{#method-new}{\code{ffexp$new()}}
+\item \href{#method-run_all}{\code{ffexp$run_all()}}
+\item \href{#method-run_one}{\code{ffexp$run_one()}}
+\item \href{#method-add_result_of_one}{\code{ffexp$add_result_of_one()}}
+\item \href{#method-plot_run_times}{\code{ffexp$plot_run_times()}}
+\item \href{#method-calculate_effects}{\code{ffexp$calculate_effects()}}
+\item \href{#method-save_self}{\code{ffexp$save_self()}}
+\item \href{#method-create_save_folder_if_nonexistent}{\code{ffexp$create_save_folder_if_nonexistent()}}
+\item \href{#method-delete_save_folder_if_empty}{\code{ffexp$delete_save_folder_if_empty()}}
+\item \href{#method-recover_parallel_temp_save}{\code{ffexp$recover_parallel_temp_save()}}
+\item \href{#method-rungrid2}{\code{ffexp$rungrid2()}}
+\item \href{#method-add_variable}{\code{ffexp$add_variable()}}
+\item \href{#method-add_level}{\code{ffexp$add_level()}}
+\item \href{#method-print}{\code{ffexp$print()}}
+\item \href{#method-stop_cluster}{\code{ffexp$stop_cluster()}}
+\item \href{#method-finalize}{\code{ffexp$finalize()}}
+\item \href{#method-clone}{\code{ffexp$clone()}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-new"></a>}}
+\if{latex}{\out{\hypertarget{method-new}{}}}
+\subsection{Method \code{new()}}{
+Create an `ffexp` object.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ffexp$new(
+  ...,
+  eval_func,
+  save_output = FALSE,
+  parallel = FALSE,
+  parallel_cores = "detect",
+  folder_path,
+  varlist = NULL,
+  verbose = 2
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{Input arguments for the experiment}
+
+\item{\code{eval_func}}{The function to be run. It must take
+named arguments matching the names of ...}
+
+\item{\code{save_output}}{Should output be saved to file?}
+
+\item{\code{parallel}}{Should a parallel cluster be used?}
+
+\item{\code{parallel_cores}}{When running in parallel, how many cores should
+be used.}
+
+\item{\code{folder_path}}{Where the data and files should be stored.
+If not given, a folder in the existing directory will be created.}
+
+\item{\code{varlist}}{Character vector of names of objects that need to be
+passed to the parallel environment.}
+
+\item{\code{verbose}}{How much should be printed when running. 0 is none,
+2 is average.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-run_all"></a>}}
+\if{latex}{\out{\hypertarget{method-run_all}{}}}
+\subsection{Method \code{run_all()}}{
+Run an experiment. The user can choose
+to run all rows, or just specified ones, if it should
+be run in parallel, and what files should be saved.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ffexp$run_all(
+  to_run = NULL,
+  redo = FALSE,
+  run_order,
+  save_output = self$save_output,
+  parallel = self$parallel,
+  parallel_temp_save = save_output,
+  write_start_files = save_output,
+  write_error_files = save_output,
+  delete_parallel_temp_save_after = FALSE,
+  varlist = self$varlist,
+  verbose = self$verbose,
+  warn_repeat = TRUE
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{to_run}}{Which rows should be run? If NULL, then all that haven't
+been run yet.}
+
+\item{\code{redo}}{Should already completed rows be run again?}
+
+\item{\code{run_order}}{In what order should the rows by run?
+Options: random, in_order, and reverse.}
+
+\item{\code{save_output}}{Should the output be saved?}
+
+\item{\code{parallel}}{Should it be run in parallel?}
+
+\item{\code{parallel_temp_save}}{Should temp files be written when running
+in parallel? Prevents losing results if it crashes partway through.}
+
+\item{\code{write_start_files}}{Should start files be written?}
+
+\item{\code{write_error_files}}{Should error files be written for rows that
+fail?}
+
+\item{\code{delete_parallel_temp_save_after}}{If using parallel temp save
+files, should they be deleted afterwards?}
+
+\item{\code{varlist}}{A character vector of names of variables to be passed
+the the parallel cluster.}
+
+\item{\code{verbose}}{How much should be printed when running. 0 is none,
+2 is average.}
+
+\item{\code{warn_repeat}}{Should warnings be given when repeating already
+completed rows?}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-run_one"></a>}}
+\if{latex}{\out{\hypertarget{method-run_one}{}}}
+\subsection{Method \code{run_one()}}{
+Run a single row of the experiment.
+You can specify which one to run.
+Generally this should not be used by users, use `run_all`
+instead.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ffexp$run_one(
+  irow = NULL,
+  save_output = self$save_output,
+  write_start_files = save_output,
+  write_error_files = save_output,
+  warn_repeat = TRUE,
+  is_parallel = FALSE,
+  verbose = self$verbose
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{irow}}{Which row should be run?}
+
+\item{\code{save_output}}{Should the output be saved?}
+
+\item{\code{write_start_files}}{Should a file be written when starting
+the experiment?}
+
+\item{\code{write_error_files}}{Should a file be written if there is
+an error?}
+
+\item{\code{warn_repeat}}{Should a warning be given if repeating a row?}
+
+\item{\code{is_parallel}}{Is this being run in parallel?}
+
+\item{\code{verbose}}{How much should be printed when running. 0 is none,
+2 is average.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-add_result_of_one"></a>}}
+\if{latex}{\out{\hypertarget{method-add_result_of_one}{}}}
+\subsection{Method \code{add_result_of_one()}}{
+Add the result of a single experiment to the object.
+This shouldn't be used by users.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ffexp$add_result_of_one(
+  output,
+  systime,
+  irow,
+  row_grid,
+  row_df,
+  start_time,
+  end_time,
+  save_output
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{output}}{The output of the experiment.}
+
+\item{\code{systime}}{The time it took to run}
+
+\item{\code{irow}}{The row of inputs used.}
+
+\item{\code{row_grid}}{The corresponding row in the run grid.}
+
+\item{\code{row_df}}{The corresponding row data frame.}
+
+\item{\code{start_time}}{The start time of the experiment.}
+
+\item{\code{end_time}}{The end time of the experiment.}
+
+\item{\code{save_output}}{Should the output be saved?}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-plot_run_times"></a>}}
+\if{latex}{\out{\hypertarget{method-plot_run_times}{}}}
+\subsection{Method \code{plot_run_times()}}{
+Plot the run times of each trial.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ffexp$plot_run_times()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-calculate_effects"></a>}}
+\if{latex}{\out{\hypertarget{method-calculate_effects}{}}}
+\subsection{Method \code{calculate_effects()}}{
+Calculate the effects of each variable as if this
+was an experiment using a linear model.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ffexp$calculate_effects()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-save_self"></a>}}
+\if{latex}{\out{\hypertarget{method-save_self}{}}}
+\subsection{Method \code{save_self()}}{
+Save this R6 object
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ffexp$save_self()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-create_save_folder_if_nonexistent"></a>}}
+\if{latex}{\out{\hypertarget{method-create_save_folder_if_nonexistent}{}}}
+\subsection{Method \code{create_save_folder_if_nonexistent()}}{
+Create the save folder if it doesn't already exist.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ffexp$create_save_folder_if_nonexistent()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-delete_save_folder_if_empty"></a>}}
+\if{latex}{\out{\hypertarget{method-delete_save_folder_if_empty}{}}}
+\subsection{Method \code{delete_save_folder_if_empty()}}{
+Delete the save folder if it is empty.
+Used to prevent leaving behind empty folders.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ffexp$delete_save_folder_if_empty()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-recover_parallel_temp_save"></a>}}
+\if{latex}{\out{\hypertarget{method-recover_parallel_temp_save}{}}}
+\subsection{Method \code{recover_parallel_temp_save()}}{
+Running this loads the information saved to files
+if `save_parallel_temp_save=TRUE` was used when running.
+Useful when running long jobs in parallel so that you don't
+lose all results if it crashes before finishing.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ffexp$recover_parallel_temp_save(delete_after = TRUE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{delete_after}}{Should the temp files be deleted after they
+are recovered? If TRUE, make sure you save the ffexp object after
+running this function so
+you don't lose the data.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-rungrid2"></a>}}
+\if{latex}{\out{\hypertarget{method-rungrid2}{}}}
+\subsection{Method \code{rungrid2()}}{
+Display the input rows of the experiment.
+rungrid just gives integers, this gives the actual values.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ffexp$rungrid2(rows = 1:nrow(self$rungrid))}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{rows}}{Which rows to display the inputs for? On big
+experiments, specifying the rows can be much faster.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-add_variable"></a>}}
+\if{latex}{\out{\hypertarget{method-add_variable}{}}}
+\subsection{Method \code{add_variable()}}{
+Add a variable to the experiment. You must specify the
+value of the variable for all existing rows, and then also the values
+of the variable which haven't been run yet.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ffexp$add_variable(name, existing_value, new_values, suppressMessage = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{name}}{Name of the variable being added.}
+
+\item{\code{existing_value}}{Which existing argument is a level being added to?}
+
+\item{\code{new_values}}{The values of the new variable which have not been
+run. This should not include `arg_name`, the name of the new variable
+at the existing values.}
+
+\item{\code{suppressMessage}}{Should the message be suppresed? The message
+tells the user a new variable was added and it is being returned in a new
+object. Default FALSE.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-add_level"></a>}}
+\if{latex}{\out{\hypertarget{method-add_level}{}}}
+\subsection{Method \code{add_level()}}{
+Add a level to one of the arguments. This returns a new
+object. The existing object is not changed.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ffexp$add_level(arg_name, new_values, suppressMessage = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{arg_name}}{Which existing argument is a level being added to?}
+
+\item{\code{new_values}}{The value of the new levels to be added to `arg_name`.}
+
+\item{\code{suppressMessage}}{Should the message be suppresed? The message
+tells the user a new level was added and it is being returned in a new
+object. Default FALSE.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-print"></a>}}
+\if{latex}{\out{\hypertarget{method-print}{}}}
+\subsection{Method \code{print()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ffexp$print()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-stop_cluster"></a>}}
+\if{latex}{\out{\hypertarget{method-stop_cluster}{}}}
+\subsection{Method \code{stop_cluster()}}{
+Stop the parallel cluster.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ffexp$stop_cluster()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-finalize"></a>}}
+\if{latex}{\out{\hypertarget{method-finalize}{}}}
+\subsection{Method \code{finalize()}}{
+Cleanup after deleting object.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ffexp$finalize()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-clone}{}}}
+\subsection{Method \code{clone()}}{
+The objects of this class are cloneable with this method.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ffexp$clone(deep = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{deep}}{Whether to make a deep clone.}
+}
+\if{html}{\out{</div>}}
+}
+}
+}

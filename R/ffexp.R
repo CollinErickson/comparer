@@ -66,6 +66,15 @@
 NULL
 
 #' @export
+#' @field outrawdf Raw data frame of output.
+#' @field outcleandf Clean output in data frame.
+#' @field rungrid matrix specifying which inputs will be run
+#' for each experiment.
+#' @field nvars Number of variables
+#' @field allvars All variables
+#' @field varlist Character vector of objects to pass to a parallel
+#' cluster.
+#' @field arglist List of values for each argument
 ffexp <- R6::R6Class(
   classname = "ffexp",
   public = list(
@@ -89,6 +98,20 @@ ffexp <- R6::R6Class(
     parallel_cluster = NULL,
     folder_path = NULL,
     verbose = 2,
+    #' @description Create an `ffexp` object.
+    #' @param ... Input arguments for the experiment
+    #' @param eval_func The function to be run. It must take
+    #' named arguments matching the names of ...
+    #' @param save_output Should output be saved to file?
+    #' @param parallel Should a parallel cluster be used?
+    #' @param parallel_cores When running in parallel, how many cores should
+    #' be used.
+    #' @param folder_path Where the data and files should be stored.
+    #' If not given, a folder in the existing directory will be created.
+    #' @param varlist Character vector of names of objects that need to be
+    #' passed to the parallel environment.
+    #' @param verbose How much should be printed when running. 0 is none,
+    #' 2 is average.
     initialize = function(..., eval_func, save_output=FALSE, parallel=FALSE,
                           parallel_cores="detect", folder_path,
                           varlist=NULL, verbose=2) {
@@ -160,6 +183,29 @@ ffexp <- R6::R6Class(
       }
       self$verbose <- verbose
     },
+    #' @description Run an experiment. The user can choose
+    #' to run all rows, or just specified ones, if it should
+    #' be run in parallel, and what files should be saved.
+    #' @param to_run Which rows should be run? If NULL, then all that haven't
+    #' been run yet.
+    #' @param redo Should already completed rows be run again?
+    #' @param run_order In what order should the rows by run?
+    #' Options: random, in_order, and reverse.
+    #' @param save_output Should the output be saved?
+    #' @param parallel Should it be run in parallel?
+    #' @param parallel_temp_save Should temp files be written when running
+    #' in parallel? Prevents losing results if it crashes partway through.
+    #' @param write_start_files Should start files be written?
+    #' @param write_error_files Should error files be written for rows that
+    #' fail?
+    #' @param delete_parallel_temp_save_after If using parallel temp save
+    #' files, should they be deleted afterwards?
+    #' @param varlist A character vector of names of variables to be passed
+    #' the the parallel cluster.
+    #' @param verbose How much should be printed when running. 0 is none,
+    #' 2 is average.
+    #' @param warn_repeat Should warnings be given when repeating already
+    #' completed rows?
     run_all = function(to_run=NULL,
                        redo = FALSE, run_order,
                        save_output=self$save_output,
@@ -265,6 +311,20 @@ ffexp <- R6::R6Class(
       # self$postprocess_outdf()
       invisible(self)
     },
+    #' @description Run a single row of the experiment.
+    #' You can specify which one to run.
+    #' Generally this should not be used by users, use `run_all`
+    #' instead.
+    #' @param irow Which row should be run?
+    #' @param save_output Should the output be saved?
+    #' @param write_start_files Should a file be written when starting
+    #' the experiment?
+    #' @param write_error_files Should a file be written if there is
+    #' an error?
+    #' @param warn_repeat Should a warning be given if repeating a row?
+    #' @param is_parallel Is this being run in parallel?
+    #' @param verbose How much should be printed when running. 0 is none,
+    #' 2 is average.
     run_one = function(irow=NULL, save_output=self$save_output,
                        write_start_files=save_output,
                        write_error_files=save_output,
@@ -438,6 +498,16 @@ ffexp <- R6::R6Class(
       # Return invisible self
       invisible(self)
     },
+    #' @description Add the result of a single experiment to the object.
+    #' This shouldn't be used by users.
+    #' @param output The output of the experiment.
+    #' @param systime The time it took to run
+    #' @param irow The row of inputs used.
+    #' @param row_grid The corresponding row in the run grid.
+    #' @param row_df The corresponding row data frame.
+    #' @param start_time The start time of the experiment.
+    #' @param end_time The end time of the experiment.
+    #' @param save_output Should the output be saved?
     add_result_of_one = function(output, systime, irow, row_grid, row_df,
                                  start_time, end_time, save_output) {
       # This is used to save results after running an item
@@ -521,6 +591,7 @@ ffexp <- R6::R6Class(
       }
       self$completed_runs[irow] <- TRUE
     },
+    #' @description Plot the run times of each trial.
     plot_run_times = function() {
       ggplot2::ggplot(self$outcleandf) +
         ggplot2::geom_segment(
@@ -530,6 +601,8 @@ ffexp <- R6::R6Class(
         ggplot2::ylab("Run number")
       # invisible(self)
     },
+    #' @description Calculate the effects of each variable as if this
+    #' was an experiment using a linear model.
     calculate_effects = function() {
       nvar <- ncol(self$rungrid)
       sapply(1:nvar,
@@ -571,6 +644,7 @@ ffexp <- R6::R6Class(
              }
       )
     },
+    #' @description Save this R6 object
     save_self = function() {
       file_path <- paste0(self$folder_path,"/object.rds")
       cat("Saving to ", file_path, "\n")
@@ -578,6 +652,7 @@ ffexp <- R6::R6Class(
       saveRDS(object = self, file = file_path)
       invisible(self)
     },
+    #' @description Create the save folder if it doesn't already exist.
     create_save_folder_if_nonexistent = function() {
       # Need to remove tailing slashes when using dir.exists
       fp <- self$folder_path
@@ -589,6 +664,8 @@ ffexp <- R6::R6Class(
       }
       invisible(self)
     },
+    #' @description Delete the save folder if it is empty.
+    #' Used to prevent leaving behind empty folders.
     delete_save_folder_if_empty = function() {
       if (length(list.files(path=self$folder_path,
                             all.files = TRUE, no.. = TRUE)) == 0) {
@@ -598,6 +675,14 @@ ffexp <- R6::R6Class(
       }
       invisible(self)
     },
+    #' @description Running this loads the information saved to files
+    #' if `save_parallel_temp_save=TRUE` was used when running.
+    #' Useful when running long jobs in parallel so that you don't
+    #' lose all results if it crashes before finishing.
+    #' @param delete_after Should the temp files be deleted after they
+    #' are recovered? If TRUE, make sure you save the ffexp object after
+    #' running this function so
+    #' you don't lose the data.
     recover_parallel_temp_save = function(delete_after=TRUE) {
       # Read in and save
       for (ii in 1:nrow(self$rungrid)) {
@@ -615,6 +700,10 @@ ffexp <- R6::R6Class(
       }
       self$delete_save_folder_if_empty()
     },
+    #' @description Display the input rows of the experiment.
+    #' rungrid just gives integers, this gives the actual values.
+    #' @param rows Which rows to display the inputs for? On big
+    #' experiments, specifying the rows can be much faster.
     rungrid2 = function(rows=1:nrow(self$rungrid)) {
       if (all(is.logical(rows))) {
         rows <- which(rows)
@@ -672,6 +761,17 @@ ffexp <- R6::R6Class(
       rownames(rowsdf) <- rows
       rowsdf
     },
+    #' @description Add a variable to the experiment. You must specify the
+    #' value of the variable for all existing rows, and then also the values
+    #' of the variable which haven't been run yet.
+    #' @param name Name of the variable being added.
+    #' @param existing_value Which existing argument is a level being added to?
+    #' @param new_values The values of the new variable which have not been
+    #' run. This should not include `arg_name`, the name of the new variable
+    #' at the existing values.
+    #' @param suppressMessage Should the message be suppresed? The message
+    #' tells the user a new variable was added and it is being returned in a new
+    #' object. Default FALSE.
     add_variable = function(name, existing_value, new_values,
                             suppressMessage=FALSE) {
       # Need to update outlist, completed_runs, number_runs,
@@ -728,6 +828,13 @@ ffexp <- R6::R6Class(
       }
       return(new_exp)
     },
+    #' @description Add a level to one of the arguments. This returns a new
+    #' object. The existing object is not changed.
+    #' @param arg_name Which existing argument is a level being added to?
+    #' @param new_values The value of the new levels to be added to `arg_name`.
+    #' @param suppressMessage Should the message be suppresed? The message
+    #' tells the user a new level was added and it is being returned in a new
+    #' object. Default FALSE.
     add_level = function(arg_name, new_values, suppressMessage=FALSE) {
       # Need to update outlist, completed_runs, number_runs,
       # arglist, nvars, rungrid, outcleandf, outrawdf
@@ -809,6 +916,7 @@ ffexp <- R6::R6Class(
       )
       cat(s, sep="")
     },
+    #' @description  Stop the parallel cluster.
     stop_cluster = function() {
       # cat("Deleting...\n")
       if (!is.null(self$parallel_cluster)) {
@@ -823,6 +931,7 @@ ffexp <- R6::R6Class(
       }
       invisible(self)
     },
+    #' @description Cleanup after deleting object.
     finalize = function() {
       self$stop_cluster()
     }
