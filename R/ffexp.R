@@ -75,6 +75,21 @@ NULL
 #' @field varlist Character vector of objects to pass to a parallel
 #' cluster.
 #' @field arglist List of values for each argument
+#' @field number_runs Total number of runs
+#' @field completed_runs Logical vector of whether each run has been
+#' completed.
+#' @field eval_func The function that is called for each experiment trial.
+#' @field outlist A list of the output from each run.
+#' @field save_output Logical of whether the output should be saved.
+#' @field parallel Logical whether experiment runs should be run in
+#' parallel. Allows for massive speedup.
+#' @field parallel_cores How many cores to use when running in parallel.
+#' Can be an integer, or 'detect' will detect how many cores are
+#' available, or 'detect-1' will do one less than that.
+#' @field parallel_cluster The parallel cluster being used.
+#' @field folder_path The path to the folder where output will be saved.
+#' @field verbose How much should be printed when running. 0 is none,
+#' 2 is average.
 ffexp <- R6::R6Class(
   classname = "ffexp",
   public = list(
@@ -903,6 +918,8 @@ ffexp <- R6::R6Class(
       }
       return(new_exp)
     },
+    #' @description Printing the object shows some
+    #' summary information.
     print = function() {
       s <- paste0(
         c(
