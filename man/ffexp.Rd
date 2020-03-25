@@ -448,7 +448,7 @@ of the variable which haven't been run yet.
 run. This should not include `arg_name`, the name of the new variable
 at the existing values.}
 
-\item{\code{suppressMessage}}{Should the message be suppresed? The message
+\item{\code{suppressMessage}}{Should the message be suppressed? The message
 tells the user a new variable was added and it is being returned in a new
 object. Default FALSE.}
 }
@@ -472,7 +472,7 @@ object. The existing object is not changed.
 
 \item{\code{new_values}}{The value of the new levels to be added to `arg_name`.}
 
-\item{\code{suppressMessage}}{Should the message be suppresed? The message
+\item{\code{suppressMessage}}{Should the message be suppressed? The message
 tells the user a new level was added and it is being returned in a new
 object. Default FALSE.}
 }

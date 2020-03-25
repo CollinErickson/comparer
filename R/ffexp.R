@@ -784,7 +784,7 @@ ffexp <- R6::R6Class(
     #' @param new_values The values of the new variable which have not been
     #' run. This should not include `arg_name`, the name of the new variable
     #' at the existing values.
-    #' @param suppressMessage Should the message be suppresed? The message
+    #' @param suppressMessage Should the message be suppressed? The message
     #' tells the user a new variable was added and it is being returned in a new
     #' object. Default FALSE.
     add_variable = function(name, existing_value, new_values,
@@ -847,7 +847,7 @@ ffexp <- R6::R6Class(
     #' object. The existing object is not changed.
     #' @param arg_name Which existing argument is a level being added to?
     #' @param new_values The value of the new levels to be added to `arg_name`.
-    #' @param suppressMessage Should the message be suppresed? The message
+    #' @param suppressMessage Should the message be suppressed? The message
     #' tells the user a new level was added and it is being returned in a new
     #' object. Default FALSE.
     add_level = function(arg_name, new_values, suppressMessage=FALSE) {
