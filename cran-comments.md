@@ -12,10 +12,16 @@ I debugged the package on Linux and found the error
 (I was using the wrong kind of slashes in a file path).
 I fixed it and have tested on my personal Linux computer,
 my personal Windows computer,
-and the required test systems.
+Travis, win-builder, and R-hub.
+I apologize for the delay in fixing this.
+
+I made a couple of other minor changes, including fixing
+an error with lists, adding documentation, and
+adding tests.
 
 ## Test environments
 * local Window 7 install, R 3.6.2
+* local Ubuntu 18.04, R 3.6.3
 * ubuntu 16.04 (on travis-ci), R 3.6.2
 * win-builder (devel and release)
 * R-hub (Windows, Ubuntu Linux, Fedora Linux)
