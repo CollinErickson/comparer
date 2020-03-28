@@ -8,5 +8,3 @@
 
 * check if folder_path already exists when creating ffexp.
 If yes, maybe don't.
-
-* Check if existing cluster still works
