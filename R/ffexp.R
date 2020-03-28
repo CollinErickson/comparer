@@ -308,20 +308,35 @@ ffexp <- R6::R6Class(
           self$delete_save_folder_if_empty()
         }
       } else { # Not parallel
-        sapply(to_run,
-               function (ii) {
-                 tout <- self$run_one(ii, write_start_files=write_start_files,
-                                      write_error_files=write_error_files,
-                                      warn_repeat=warn_repeat,
-                                      save_output=save_output,
-                                      verbose=verbose)
-                 if (parallel_temp_save) {
-                   saveRDS(object=tout,
-                           file=paste0(self$folder_path,
-                                       "/parallel_temp_output_",ii,".rds"))
-                 }
-                 tout
-               })
+        # if (exists('dbro') && dbro) {browser()}
+        runs_with_error <- integer()
+        for (ii in to_run) {
+          try_one <- try({
+            tout <- self$run_one(ii, write_start_files=write_start_files,
+                                 write_error_files=write_error_files,
+                                 warn_repeat=warn_repeat,
+                                 save_output=save_output,
+                                 verbose=verbose)
+            # tout is only the right thing to save if is_parallel=T
+            # in run_one, this shouldn't work
+            if (parallel_temp_save) {
+              saveRDS(object=tout,
+                      file=paste0(self$folder_path,
+                                  "/parallel_temp_output_",ii,".rds"))
+            }
+            TRUE # Return something from the try block if no error
+          })
+          if (inherits(try_one, 'try-error')) {
+            runs_with_error <- c(runs_with_error, ii)
+          }
+        }
+        if (length(runs_with_error) > 0) {
+          # browser()
+          cat('Errors in run_all with runs:', runs_with_error, '\n')
+          # cat('Error message is:\n')
+          # cat(try_one)
+          stop(try_one)
+        }
       }
       # self$postprocess_outdf()
       invisible(self)
