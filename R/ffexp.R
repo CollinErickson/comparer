@@ -120,7 +120,11 @@ ffexp <- R6::R6Class(
     #' @param save_output Should output be saved to file?
     #' @param parallel Should a parallel cluster be used?
     #' @param parallel_cores When running in parallel, how many cores should
-    #' be used.
+    #' be used. Not actually the number of cores used, actually the number
+    #' of clusters created. Can be more than the computer has available,
+    #' but will hurt performance. Can set to 'detect' to have it detect
+    #' how many cores are available and use that, or 'detect-1' to use
+    #' one fewer than there are.
     #' @param folder_path Where the data and files should be stored.
     #' If not given, a folder in the existing directory will be created.
     #' @param varlist Character vector of names of objects that need to be
@@ -182,19 +186,12 @@ ffexp <- R6::R6Class(
       self$number_runs <- nrow(self$rungrid)
       self$completed_runs <- rep(FALSE, self$number_runs)
       self$parallel <- parallel
-      self$parallel_cores <- parallel_cores
-      if (self$parallel) {
+      # self$parallel_cores <- parallel_cores
+      if (self$parallel || !self$parallel) {
+        # Set this even if not using parallel in case they try to run
+        #  run_all with parallel=T.
         # For now assume using parallel package
-        if (parallel_cores == "detect") {
-          self$parallel_cores <- parallel::detectCores()
-        } else if (parallel_cores == "detect-1") {
-          self$parallel_cores <- parallel::detectCores() - 1
-          if (self$parallel_cores == 0) {
-            "Only 1 core detected, can't do 'detect-1'"
-          }
-        } else {
-          self$parallel_cores <- parallel_cores
-        }
+        self$set_parallel_cores(parallel_cores)
       }
       self$verbose <- verbose
     },
@@ -208,6 +205,12 @@ ffexp <- R6::R6Class(
     #' Options: random, in_order, and reverse.
     #' @param save_output Should the output be saved?
     #' @param parallel Should it be run in parallel?
+    #' @param parallel_cores When running in parallel, how many cores should
+    #' be used. Not actually the number of cores used, actually the number
+    #' of clusters created. Can be more than the computer has available,
+    #' but will hurt performance. Can set to 'detect' to have it detect
+    #' how many cores are available and use that, or 'detect-1' to use
+    #' one fewer than there are.
     #' @param parallel_temp_save Should temp files be written when running
     #' in parallel? Prevents losing results if it crashes partway through.
     #' @param write_start_files Should start files be written?
@@ -225,6 +228,7 @@ ffexp <- R6::R6Class(
                        redo = FALSE, run_order,
                        save_output=self$save_output,
                        parallel=self$parallel,
+                       parallel_cores=self$parallel_cores,
                        parallel_temp_save=save_output,
                        write_start_files=save_output,
                        write_error_files=save_output,
@@ -256,11 +260,21 @@ ffexp <- R6::R6Class(
                          "reverse, or random #567128"))}
 
       if (parallel && length(to_run > 0)) {
+        if (parallel_cores!=self$parallel_cores) {
+          self$set_parallel_cores(parallel_cores)
+        }
         # pc <- parallel::detectCores()
         # cl1 <- parallel::makeCluster(spec=pc, type="SOCK")
         # parallel::parSapply(cl=cl1, to_run,function(ii){self$run_one(ii)})
         if (is.null(self$parallel_cluster)) {
+          if (length(self$parallel_cores)!=1 || #!is.integer(self$parallel_cores) ||
+              self$parallel_cores<1) {
+            stop(paste(c('$parallel_cores is invalid:', self$parallel_cores),
+                       collapse=' '))
+          }
           # Make cluster
+
+          # Save masteroutput file
           self$create_save_folder_if_nonexistent()
           self$parallel_cluster <- parallel::makeCluster(
             spec=self$parallel_cores, type = "SOCK",
@@ -308,10 +322,10 @@ ffexp <- R6::R6Class(
                      paste0(self$folder_path,
                             "/parallel_temp_output_",ii,".rds"))
                  })
-          self$delete_save_folder_if_empty()
+          self$delete_save_folder_if_empty(verbose=0)
         }
       } else { # Not parallel
-        if (exists('dbro') && dbro) {browser()}
+        # if (exists('dbro') && dbro) {browser()}
         runs_with_error <- integer()
         for (ii in to_run) {
           try_one <- try({
@@ -488,12 +502,12 @@ ffexp <- R6::R6Class(
         start_time <- Sys.time()
         systime <- system.time(output <- do.call(self$eval_func, row_list))
         end_time <- Sys.time()
-      })
+      }, silent=verbose<1)
 
       # Delete write start file
       if (write_start_files && file.exists(write_start_file_path)) {
         unlink(write_start_file_path)
-        self$delete_save_folder_if_empty()
+        self$delete_save_folder_if_empty(verbose=0)
       }
 
       # If error while running, write out error file/message
@@ -717,12 +731,14 @@ ffexp <- R6::R6Class(
     },
     #' @description Delete the save folder if it is empty.
     #' Used to prevent leaving behind empty folders.
-    delete_save_folder_if_empty = function() {
+    delete_save_folder_if_empty = function(verbose=self$verbose) {
       if (length(list.files(path=self$folder_path,
                             all.files = TRUE, no.. = TRUE)) == 0) {
         unlink(self$folder_path, recursive = TRUE)
       } else {
-        message("Folder is not empty")
+        if (self$verbose >= 1) {
+          message("Folder is not empty")
+        }
       }
       invisible(self)
     },
@@ -749,7 +765,7 @@ ffexp <- R6::R6Class(
           }
         }
       }
-      self$delete_save_folder_if_empty()
+      self$delete_save_folder_if_empty(verbose=0)
     },
     #' @description Display the input rows of the experiment.
     #' rungrid just gives integers, this gives the actual values.
@@ -971,6 +987,27 @@ ffexp <- R6::R6Class(
         )
       )
       cat(s, sep="")
+    },
+    #' @description Set the number of parallel cores to be used when
+    #' running in parallel. Needed in case user sets "detect"
+    #' @param parallel_cores When running in parallel, how many cores should
+    #' be used. Not actually the number of cores used, actually the number
+    #' of clusters created. Can be more than the computer has available,
+    #' but will hurt performance. Can set to 'detect' to have it detect
+    #' how many cores are available and use that, or 'detect-1' to use
+    #' one fewer than there are.
+    set_parallel_cores = function(parallel_cores) {
+      if (parallel_cores == "detect") {
+        self$parallel_cores <- parallel::detectCores()
+      } else if (parallel_cores == "detect-1") {
+        self$parallel_cores <- parallel::detectCores() - 1
+        if (self$parallel_cores == 0) {
+          "Only 1 core detected, can't do 'detect-1'"
+        }
+      } else {
+        self$parallel_cores <- parallel_cores
+      }
+      invisible(self)
     },
     #' @description  Stop the parallel cluster.
     stop_cluster = function() {

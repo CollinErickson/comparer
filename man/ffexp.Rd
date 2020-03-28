@@ -136,6 +136,7 @@ available, or 'detect-1' will do one less than that.}
 \item \href{#method-add_variable}{\code{ffexp$add_variable()}}
 \item \href{#method-add_level}{\code{ffexp$add_level()}}
 \item \href{#method-print}{\code{ffexp$print()}}
+\item \href{#method-set_parallel_cores}{\code{ffexp$set_parallel_cores()}}
 \item \href{#method-stop_cluster}{\code{ffexp$stop_cluster()}}
 \item \href{#method-finalize}{\code{ffexp$finalize()}}
 \item \href{#method-clone}{\code{ffexp$clone()}}
@@ -172,7 +173,11 @@ named arguments matching the names of ...}
 \item{\code{parallel}}{Should a parallel cluster be used?}
 
 \item{\code{parallel_cores}}{When running in parallel, how many cores should
-be used.}
+be used. Not actually the number of cores used, actually the number
+of clusters created. Can be more than the computer has available,
+but will hurt performance. Can set to 'detect' to have it detect
+how many cores are available and use that, or 'detect-1' to use
+one fewer than there are.}
 
 \item{\code{folder_path}}{Where the data and files should be stored.
 If not given, a folder in the existing directory will be created.}
@@ -200,6 +205,7 @@ be run in parallel, and what files should be saved.
   run_order,
   save_output = self$save_output,
   parallel = self$parallel,
+  parallel_cores = self$parallel_cores,
   parallel_temp_save = save_output,
   write_start_files = save_output,
   write_error_files = save_output,
@@ -224,6 +230,13 @@ Options: random, in_order, and reverse.}
 \item{\code{save_output}}{Should the output be saved?}
 
 \item{\code{parallel}}{Should it be run in parallel?}
+
+\item{\code{parallel_cores}}{When running in parallel, how many cores should
+be used. Not actually the number of cores used, actually the number
+of clusters created. Can be more than the computer has available,
+but will hurt performance. Can set to 'detect' to have it detect
+how many cores are available and use that, or 'detect-1' to use
+one fewer than there are.}
 
 \item{\code{parallel_temp_save}}{Should temp files be written when running
 in parallel? Prevents losing results if it crashes partway through.}
@@ -501,6 +514,29 @@ summary information.
 \if{html}{\out{<div class="r">}}\preformatted{ffexp$print()}\if{html}{\out{</div>}}
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-set_parallel_cores"></a>}}
+\if{latex}{\out{\hypertarget{method-set_parallel_cores}{}}}
+\subsection{Method \code{set_parallel_cores()}}{
+Set the number of parallel cores to be used when
+running in parallel. Needed in case user sets "detect"
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ffexp$set_parallel_cores(parallel_cores)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{parallel_cores}}{When running in parallel, how many cores should
+be used. Not actually the number of cores used, actually the number
+of clusters created. Can be more than the computer has available,
+but will hurt performance. Can set to 'detect' to have it detect
+how many cores are available and use that, or 'detect-1' to use
+one fewer than there are.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-stop_cluster"></a>}}
