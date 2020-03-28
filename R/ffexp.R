@@ -266,7 +266,9 @@ ffexp <- R6::R6Class(
         # pc <- parallel::detectCores()
         # cl1 <- parallel::makeCluster(spec=pc, type="SOCK")
         # parallel::parSapply(cl=cl1, to_run,function(ii){self$run_one(ii)})
-        if (is.null(self$parallel_cluster)) {
+        if (is.null(self$parallel_cluster) ||
+            !("SOCKcluster" %in% class(self$parallel_cluster)) ||
+            inherits(try(print(f1$parallel_cluster[[1]]), silent=T), 'try-error')) {
           if (length(self$parallel_cores)!=1 || #!is.integer(self$parallel_cores) ||
               self$parallel_cores<1) {
             stop(paste(c('$parallel_cores is invalid:', self$parallel_cores),
@@ -731,6 +733,8 @@ ffexp <- R6::R6Class(
     },
     #' @description Delete the save folder if it is empty.
     #' Used to prevent leaving behind empty folders.
+    #' @param verbose How much should be printed when running. 0 is none,
+    #' 2 is average.
     delete_save_folder_if_empty = function(verbose=self$verbose) {
       if (length(list.files(path=self$folder_path,
                             all.files = TRUE, no.. = TRUE)) == 0) {

@@ -405,9 +405,17 @@ Create the save folder if it doesn't already exist.
 Delete the save folder if it is empty.
 Used to prevent leaving behind empty folders.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ffexp$delete_save_folder_if_empty()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ffexp$delete_save_folder_if_empty(verbose = self$verbose)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{verbose}}{How much should be printed when running. 0 is none,
+2 is average.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-recover_parallel_temp_save"></a>}}
