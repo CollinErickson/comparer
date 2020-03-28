@@ -273,9 +273,10 @@ ffexp <- R6::R6Class(
           }
         }
         if (parallel_temp_save) {self$create_save_folder_if_nonexistent()}
-        cat("About to start run in parallel, run order is:\n    ",
-            to_run,
-            "\n")
+        cat("About to start run in parallel (", self$parallel_cores,
+            " cores), run order is:\n    ",
+            paste(to_run, collapse=' '),
+            "\n", sep='')
         # cat("\tCluster is"); print(self$parallel_cluster)
         # browser()
         parout <- parallel::clusterApplyLB(
@@ -325,14 +326,16 @@ ffexp <- R6::R6Class(
                                   "/parallel_temp_output_",ii,".rds"))
             }
             TRUE # Return something from the try block if no error
-          })
+          }, silent=verbose<1)
           if (inherits(try_one, 'try-error')) {
             runs_with_error <- c(runs_with_error, ii)
           }
         }
         if (length(runs_with_error) > 0) {
           # browser()
-          cat('Errors in run_all with runs:', runs_with_error, '\n')
+          if (verbose >= 1) {
+            cat('Errors in run_all with runs:', runs_with_error, '\n')
+          }
           # cat('Error message is:\n')
           # cat(try_one)
           stop(try_one)
@@ -941,7 +944,10 @@ ffexp <- R6::R6Class(
           "ffexp object from the comparer package\n",
           "   ", sum(self$completed_runs), " / ",
           length(self$completed_runs), " completed\n",
-          "   parallel : ", self$parallel, "\n",
+          "   parallel : ", self$parallel,
+          if (self$parallel) {c(' (', self$parallel_cores, ' cores)')}
+          else {''},
+          "\n",
           "   Use $run_all() to run all remaining\n",
           "   Use $run_one() to run a single\n"
         )
