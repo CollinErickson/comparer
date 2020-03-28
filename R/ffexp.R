@@ -273,10 +273,12 @@ ffexp <- R6::R6Class(
           }
         }
         if (parallel_temp_save) {self$create_save_folder_if_nonexistent()}
-        cat("About to start run in parallel (", self$parallel_cores,
-            " cores), run order is:\n    ",
-            paste(to_run, collapse=' '),
-            "\n", sep='')
+        if (verbose>=1) {
+          cat("About to start run in parallel (", self$parallel_cores,
+              " cores), run order is:\n    ",
+              paste(to_run, collapse=' '),
+              "\n", sep='')
+        }
         # cat("\tCluster is"); print(self$parallel_cluster)
         # browser()
         parout <- parallel::clusterApplyLB(
@@ -309,7 +311,7 @@ ffexp <- R6::R6Class(
           self$delete_save_folder_if_empty()
         }
       } else { # Not parallel
-        # if (exists('dbro') && dbro) {browser()}
+        if (exists('dbro') && dbro) {browser()}
         runs_with_error <- integer()
         for (ii in to_run) {
           try_one <- try({
@@ -317,10 +319,12 @@ ffexp <- R6::R6Class(
                                  write_error_files=write_error_files,
                                  warn_repeat=warn_repeat,
                                  save_output=save_output,
-                                 verbose=verbose)
+                                 verbose=verbose,
+                                 return_list_result_of_one=T)
             # tout is only the right thing to save if is_parallel=T
             # in run_one, this shouldn't work
             if (parallel_temp_save) {
+              self$create_save_folder_if_nonexistent()
               saveRDS(object=tout,
                       file=paste0(self$folder_path,
                                   "/parallel_temp_output_",ii,".rds"))
@@ -356,6 +360,8 @@ ffexp <- R6::R6Class(
     #' an error?
     #' @param warn_repeat Should a warning be given if repeating a row?
     #' @param is_parallel Is this being run in parallel?
+    #' @param return_list_result_of_one Should the list of the result of
+    #' this one be return?
     #' @param verbose How much should be printed when running. 0 is none,
     #' 2 is average.
     run_one = function(irow=NULL, save_output=self$save_output,
@@ -363,6 +369,7 @@ ffexp <- R6::R6Class(
                        write_error_files=save_output,
                        warn_repeat=TRUE,
                        is_parallel=FALSE,
+                       return_list_result_of_one=FALSE,
                        verbose=self$verbose) {
       # Set up single row to run
       if (is.null(irow)) { # If irow not given, set to next not run
@@ -513,21 +520,28 @@ ffexp <- R6::R6Class(
         stop(paste0("Error in run_one for irow=",irow,"\n",try.run))
       }
 
-
+      # This needs to be added to object using self$add_result_of_one.
+      # But when running in parallel, this will be returned.
+      list_result_of_one <- list(output=output, systime=systime, irow=irow,
+                                 row_grid=row_grid, row_df=row_df,
+                                 start_time=start_time, end_time=end_time,
+                                 save_output=save_output)
       # If parallel need to return everything to be added to original object
       if (is_parallel) {
-        return(list(output=output, systime=systime, irow=irow,
-                    row_grid=row_grid, row_df=row_df,
-                    start_time=start_time, end_time=end_time,
-                    save_output=save_output))
+        return(list_result_of_one)
       }
       # If not parallel
       # Add results using function
-      self$add_result_of_one(output=output, systime=systime, irow=irow,
-                             row_grid=row_grid, row_df=row_df,
-                             start_time=start_time, end_time=end_time,
-                             save_output=save_output)
+      # self$add_result_of_one(output=output, systime=systime, irow=irow,
+      #                        row_grid=row_grid, row_df=row_df,
+      #                        start_time=start_time, end_time=end_time,
+      #                        save_output=save_output)
+      do.call(self$add_result_of_one, list_result_of_one)
 
+      # If asked, return the list of this result only, not full object.
+      if (return_list_result_of_one) {
+        return(list_result_of_one)
+      }
       # Return invisible self
       invisible(self)
     },
@@ -678,9 +692,13 @@ ffexp <- R6::R6Class(
       )
     },
     #' @description Save this R6 object
-    save_self = function() {
+    #' @param verbose How much should be printed when running. 0 is none,
+    #' 2 is average.
+    save_self = function(verbose=self$verbose) {
       file_path <- paste0(self$folder_path,"/object.rds")
-      cat("Saving to ", file_path, "\n")
+      if (verbose >= 1) {
+        cat("Saving to ", file_path, "\n")
+      }
       self$create_save_folder_if_nonexistent()
       saveRDS(object = self, file = file_path)
       invisible(self)

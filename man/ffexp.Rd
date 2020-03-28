@@ -264,6 +264,7 @@ instead.
   write_error_files = save_output,
   warn_repeat = TRUE,
   is_parallel = FALSE,
+  return_list_result_of_one = FALSE,
   verbose = self$verbose
 )}\if{html}{\out{</div>}}
 }
@@ -284,6 +285,9 @@ an error?}
 \item{\code{warn_repeat}}{Should a warning be given if repeating a row?}
 
 \item{\code{is_parallel}}{Is this being run in parallel?}
+
+\item{\code{return_list_result_of_one}}{Should the list of the result of
+this one be return?}
 
 \item{\code{verbose}}{How much should be printed when running. 0 is none,
 2 is average.}
@@ -359,9 +363,17 @@ was an experiment using a linear model.
 \subsection{Method \code{save_self()}}{
 Save this R6 object
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ffexp$save_self()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ffexp$save_self(verbose = self$verbose)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{verbose}}{How much should be printed when running. 0 is none,
+2 is average.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-create_save_folder_if_nonexistent"></a>}}
