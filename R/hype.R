@@ -5,6 +5,12 @@ par_hype <- R6::R6Class(
   )
 )
 
+#' Parameter with uniform distribution for hyperparameter optimization
+#' @export
+#' @example
+#' p1 <- par_unif$new('x1', 0, 2)
+#' class(p1)
+#' print(p1)
 par_unif <- R6::R6Class(
   classname="par_unif",
   inherit = par_hype,
