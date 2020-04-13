@@ -1,3 +1,9 @@
+#' Parameter for hyperparameter optimization
+#' @export
+#' @example
+#' p1 <- par_hype$new()
+#' class(p1)
+#' print(p1)
 par_hype <- R6::R6Class(
   classname="par_hype",
   public=list(
