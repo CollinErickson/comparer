@@ -36,6 +36,24 @@ if (F) {
   class(p1)
 }
 
+#' Hyperparameter optimization
+#' @export
+#' @example
+#'
+#' # Have df output, but only use one value from it
+#' h1 <- hype$new(
+#'   eval_func = function(a, b) {data.frame(c=a^2+b^2, d=1:2)},
+#'   extract_output_func = function(odf) {odf$c[1]},
+#'   a = par_unif$new('a', -1, 2),
+#'   b = par_unif$new('b', -10, 10),
+#'   n_lhs = 10
+#' )
+#' h1$run_all()
+#' h1$add_EI(n = 1)
+#' system.time(h1$run_EI_for_time(sec=3, batch_size = 1))
+#' system.time(h1$run_EI_for_time(sec=3, batch_size = 3))
+#' h1$plotorder()
+#' h1$plotX()
 hype <- R6::R6Class(
   classname="hype",
   # inherit=ffexp,
