@@ -37,51 +37,104 @@ Hyperparameter optimization
 \if{html}{\out{<a id="method-add_data"></a>}}
 \if{latex}{\out{\hypertarget{method-add_data}{}}}
 \subsection{Method \code{add_data()}}{
+Add data to the experiment results.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{hype$add_data(X, Y)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{X}}{Data frame with names matching the input parameters}
+
+\item{\code{Y}}{Output at rows of X matching the experiment output.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-add_X"></a>}}
 \if{latex}{\out{\hypertarget{method-add_X}{}}}
 \subsection{Method \code{add_X()}}{
+Add new inputs to run. This allows the user to specify
+what they want run next.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{hype$add_X(X)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{X}}{Data frame with names matching the input parameters.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-add_LHS"></a>}}
 \if{latex}{\out{\hypertarget{method-add_LHS}{}}}
 \subsection{Method \code{add_LHS()}}{
+Add new input points using a maximin
+Latin hypercube.
+Latin hypercubes are usually more spacing than randomly picking points.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{hype$add_LHS(n)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{n}}{Number of points to add.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-add_EI"></a>}}
 \if{latex}{\out{\hypertarget{method-add_EI}{}}}
 \subsection{Method \code{add_EI()}}{
+Add new inputs to run using the expected information
+criteria
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{hype$add_EI(n, covtype = "matern5_2", nugget.estim = TRUE)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{n}}{Number of points to add.}
+
+\item{\code{covtype}}{Covariance function to use for the Gaussian process
+model.}
+
+\item{\code{nugget.estim}}{Should a nugget be estimated?}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-run_all"></a>}}
 \if{latex}{\out{\hypertarget{method-run_all}{}}}
 \subsection{Method \code{run_all()}}{
+Run all unevaluated input points.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{hype$run_all(...)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{Passed into `ffexp$run_all`.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-run_EI_for_time"></a>}}
 \if{latex}{\out{\hypertarget{method-run_EI_for_time}{}}}
 \subsection{Method \code{run_EI_for_time()}}{
+Add points using the expected information criteria,
+evaluate them, and repeat until a specified amount of time has passed.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{hype$run_EI_for_time(
   sec,
@@ -92,11 +145,29 @@ Hyperparameter optimization
 )}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{sec}}{Number of seconds to run for. It will go over this time
+limit, finish the current iteration, then stop.}
+
+\item{\code{batch_size}}{Number of points to run at once.}
+
+\item{\code{covtype}}{Covariance function to use for the Gaussian process
+model.}
+
+\item{\code{nugget.estim}}{Should a nugget be estimated?}
+
+\item{\code{...}}{Passed into `ffexp$run_all`.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-plotorder"></a>}}
 \if{latex}{\out{\hypertarget{method-plotorder}{}}}
 \subsection{Method \code{plotorder()}}{
+Plot the output of the points evaluated in order.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{hype$plotorder()}\if{html}{\out{</div>}}
 }
@@ -106,6 +177,7 @@ Hyperparameter optimization
 \if{html}{\out{<a id="method-plotX"></a>}}
 \if{latex}{\out{\hypertarget{method-plotX}{}}}
 \subsection{Method \code{plotX()}}{
+Plot the output as a function of each input.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{hype$plotX()}\if{html}{\out{</div>}}
 }
@@ -115,6 +187,7 @@ Hyperparameter optimization
 \if{html}{\out{<a id="method-print"></a>}}
 \if{latex}{\out{\hypertarget{method-print}{}}}
 \subsection{Method \code{print()}}{
+Print details of the object.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{hype$print(...)}\if{html}{\out{</div>}}
 }

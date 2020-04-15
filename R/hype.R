@@ -108,12 +108,19 @@ hype <- R6::R6Class(
       }
       invisible(self)
     },
+    #' @description Add data to the experiment results.
+    #' @param X Data frame with names matching the input parameters
+    #' @param Y Output at rows of X matching the experiment output.
     add_data = function(X, Y) {
+      stop("Not yet implemented")
       self$ffexp <- updatedffexp
       updatedffexp <- self$ffexp$add_level("Xdf", X, suppressMessage=TRUE)
       stop("need to add Y too")
       invisible(self)
     },
+    #' @description Add new inputs to run. This allows the user to specify
+    #' what they want run next.
+    #' @param X Data frame with names matching the input parameters.
     add_X = function(X) {
       stopifnot(is.data.frame(X))
       stopifnot(all(colnames(X) == colnames(self$X)))
@@ -121,6 +128,10 @@ hype <- R6::R6Class(
       self$ffexp <- updatedffexp
       invisible(self)
     },
+    #' @description Add new input points using a maximin
+    #' Latin hypercube.
+    #' Latin hypercubes are usually more spacing than randomly picking points.
+    #' @param n Number of points to add.
     add_LHS = function(n) {
       Xlhs <- lhs::maximinLHS(n=n, k=length(self$parnames))
       Xlhs <- sweep(sweep(Xlhs,
@@ -131,6 +142,12 @@ hype <- R6::R6Class(
       self$add_X(Xlhs)
       invisible(self)
     },
+    #' @description Add new inputs to run using the expected information
+    #' criteria
+    #' @param n Number of points to add.
+    #' @param covtype Covariance function to use for the Gaussian process
+    #' model.
+    #' @param nugget.estim Should a nugget be estimated?
     add_EI = function(n, covtype="matern5_2", nugget.estim=TRUE) {
       # browser()
       # If unevaluated points, set lowest value.
@@ -168,6 +185,8 @@ hype <- R6::R6Class(
       self$ffexp <- updatedffexp
       invisible(self)
     },
+    #' @description Run all unevaluated input points.
+    #' @param ... Passed into `ffexp$run_all`.
     run_all = function(...) {
       self$ffexp$run_all(...)
       self$X <- self$ffexp$rungrid2()
@@ -185,6 +204,15 @@ hype <- R6::R6Class(
       }
       invisible(self)
     },
+    #' @description Add points using the expected information criteria,
+    #' evaluate them, and repeat until a specified amount of time has passed.
+    #' @param sec Number of seconds to run for. It will go over this time
+    #' limit, finish the current iteration, then stop.
+    #' @param batch_size Number of points to run at once.
+    #' @param covtype Covariance function to use for the Gaussian process
+    #' model.
+    #' @param nugget.estim Should a nugget be estimated?
+    #' @param ... Passed into `ffexp$run_all`.
     run_EI_for_time = function(sec, batch_size, covtype="matern5_2",
                                nugget.estim=TRUE, ...) {
       start_time <- proc.time()
@@ -194,6 +222,7 @@ hype <- R6::R6Class(
       }
       invisible(self)
     },
+    #' @description Plot the output of the points evaluated in order.
     plotorder = function() {
       ggplot2::ggplot(data.frame(index=1:length(self$Z), Z=self$Z,
                                  col=ifelse(self$Z<=min(self$Z),'red','black')),
@@ -203,6 +232,7 @@ hype <- R6::R6Class(
         ggplot2::theme(legend.position = "none")
 
     },
+    #' @description Plot the output as a function of each input.
     plotX = function() {
       tdf <- cbind(self$X, Z=self$Z, Zorder=order(order(self$Z)))
       ggplot2::ggplot(reshape2::melt(tdf, id.vars=c('Z', 'Zorder')),
@@ -211,6 +241,7 @@ hype <- R6::R6Class(
         ggplot2::facet_wrap(. ~ variable, scales='free_x') +
         ggplot2::scale_color_gradientn(colors=c('green', 'purple'))
     },
+    #' @description Print details of the object.
     print = function(...) {
       ts <- paste0(
         "hype object:",
