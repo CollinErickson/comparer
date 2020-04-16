@@ -8,6 +8,14 @@ Hyperparameter optimization
 
 Hyperparameter optimization
 }
+\section{Public fields}{
+\if{html}{\out{<div class="r6-fields">}}
+\describe{
+\item{\code{X}}{Data frame of inputs that have been evaluated or will be evaluated
+next.}
+}
+\if{html}{\out{</div>}}
+}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
@@ -28,10 +36,28 @@ Hyperparameter optimization
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
+Create hype R6 object.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{hype$new(eval_func, ..., X0 = NULL, n_lhs, extract_output_func)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{eval_func}}{The function used to evaluate new points.}
+
+\item{\code{...}}{Hyperparameters to optimize over.}
+
+\item{\code{X0}}{Data frame of initial points to run.}
+
+\item{\code{n_lhs}}{The number that should initially be run using
+a maximin Latin hypercube.}
+
+\item{\code{extract_output_func}}{A function that takes in the output from
+`eval_func` and returns the value we are trying to minimize.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-add_data"></a>}}
@@ -192,6 +218,13 @@ Print details of the object.
 \if{html}{\out{<div class="r">}}\preformatted{hype$print(...)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{not used}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

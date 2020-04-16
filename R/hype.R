@@ -38,6 +38,8 @@ if (F) {
 
 #' Hyperparameter optimization
 #' @export
+#' @field X Data frame of inputs that have been evaluated or will be evaluated
+#' next.
 #' @example
 #'
 #' # Have df output, but only use one value from it
@@ -68,6 +70,14 @@ hype <- R6::R6Class(
     ffexp = NULL,
     eval_func = NULL,
     extract_output_func = NULL,
+    #' @description Create hype R6 object.
+    #' @param eval_func The function used to evaluate new points.
+    #' @param ... Hyperparameters to optimize over.
+    #' @param X0 Data frame of initial points to run.
+    #' @param n_lhs The number that should initially be run using
+    #' a maximin Latin hypercube.
+    #' @param extract_output_func A function that takes in the output from
+    #' `eval_func` and returns the value we are trying to minimize.
     initialize = function(eval_func,
                           ..., # ... is params
                           X0=NULL, n_lhs,
@@ -242,6 +252,7 @@ hype <- R6::R6Class(
         ggplot2::scale_color_gradientn(colors=c('green', 'purple'))
     },
     #' @description Print details of the object.
+    #' @param ... not used
     print = function(...) {
       ts <- paste0(
         "hype object:",
