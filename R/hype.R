@@ -40,6 +40,16 @@ if (F) {
 #' @export
 #' @field X Data frame of inputs that have been evaluated or will be evaluated
 #' next.
+#' @field Z Output at X
+#' @field mod Gaussian process model used to predict what the output will be.
+#' @field parnames Names of the parameters
+#' @field parlower Lower bounds for each parameter
+#' @field parupper Upper bounds for each parameter
+#' @field ffexp An ffexp R6 object used to run the experiment and store
+#' the results.
+#' @field eval_func The function we evaluate.
+#' @field extract_output_func A function that takes in the output from
+#' `eval_func` and returns the value we are trying to minimize.
 #' @example
 #'
 #' # Have df output, but only use one value from it
@@ -63,7 +73,7 @@ hype <- R6::R6Class(
     X=NULL,
     Z=NULL,
     mod=NULL,
-    params=NULL,
+    # params=NULL,
     parnames=NULL,
     parlower=NULL,
     parupper=NULL,

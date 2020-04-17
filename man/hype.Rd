@@ -13,6 +13,24 @@ Hyperparameter optimization
 \describe{
 \item{\code{X}}{Data frame of inputs that have been evaluated or will be evaluated
 next.}
+
+\item{\code{Z}}{Output at X}
+
+\item{\code{mod}}{Gaussian process model used to predict what the output will be.}
+
+\item{\code{parnames}}{Names of the parameters}
+
+\item{\code{parlower}}{Lower bounds for each parameter}
+
+\item{\code{parupper}}{Upper bounds for each parameter}
+
+\item{\code{ffexp}}{An ffexp R6 object used to run the experiment and store
+the results.}
+
+\item{\code{eval_func}}{The function we evaluate.}
+
+\item{\code{extract_output_func}}{A function that takes in the output from
+`eval_func` and returns the value we are trying to minimize.}
 }
 \if{html}{\out{</div>}}
 }
