@@ -1,6 +1,6 @@
 #' Parameter for hyperparameter optimization
 #' @export
-#' @example
+#' @examples
 #' p1 <- par_hype$new()
 #' class(p1)
 #' print(p1)
@@ -13,7 +13,10 @@ par_hype <- R6::R6Class(
 
 #' Parameter with uniform distribution for hyperparameter optimization
 #' @export
-#' @example
+#' @field name Name of the parameter, must match the input to `eval_func`.
+#' @field lower Lower bound of the parameter
+#' @field upper Upper bound of the parameter
+#' @examples
 #' p1 <- par_unif$new('x1', 0, 2)
 #' class(p1)
 #' print(p1)
@@ -24,6 +27,10 @@ par_unif <- R6::R6Class(
     name=NULL,
     lower=NULL,
     upper=NULL,
+    #' @description Create a hyperparameter with uniform distribution
+    #' @param name Name of the parameter, must match the input to `eval_func`.
+    #' @param lower Lower bound of the parameter
+    #' @param upper Upper bound of the parameter
     initialize = function(name, lower, upper) {
       self$name <- name
       self$lower <- lower
@@ -50,7 +57,7 @@ if (F) {
 #' @field eval_func The function we evaluate.
 #' @field extract_output_func A function that takes in the output from
 #' `eval_func` and returns the value we are trying to minimize.
-#' @example
+#' @examples
 #'
 #' # Have df output, but only use one value from it
 #' h1 <- hype$new(

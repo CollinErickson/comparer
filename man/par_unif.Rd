@@ -8,8 +8,24 @@ Parameter with uniform distribution for hyperparameter optimization
 
 Parameter with uniform distribution for hyperparameter optimization
 }
+\examples{
+p1 <- par_unif$new('x1', 0, 2)
+class(p1)
+print(p1)
+}
 \section{Super class}{
 \code{\link[comparer:par_hype]{comparer::par_hype}} -> \code{par_unif}
+}
+\section{Public fields}{
+\if{html}{\out{<div class="r6-fields">}}
+\describe{
+\item{\code{name}}{Name of the parameter, must match the input to `eval_func`.}
+
+\item{\code{lower}}{Lower bound of the parameter}
+
+\item{\code{upper}}{Upper bound of the parameter}
+}
+\if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -28,10 +44,22 @@ Parameter with uniform distribution for hyperparameter optimization
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
+Create a hyperparameter with uniform distribution
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{par_unif$new(name, lower, upper)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{name}}{Name of the parameter, must match the input to `eval_func`.}
+
+\item{\code{lower}}{Lower bound of the parameter}
+
+\item{\code{upper}}{Upper bound of the parameter}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

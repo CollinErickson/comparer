@@ -8,6 +8,11 @@ Parameter for hyperparameter optimization
 
 Parameter for hyperparameter optimization
 }
+\examples{
+p1 <- par_hype$new()
+class(p1)
+print(p1)
+}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
