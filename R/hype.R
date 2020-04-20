@@ -249,9 +249,11 @@ hype <- R6::R6Class(
       }
       invisible(self)
     },
+    #' @description Make a plot to summarize the experiment.
     plot = function() {
       self$plotorder()
     },
+    #' @description Plot pairs of inputs and output
     pairs = function() {
       GGally::ggpairs(cbind(h1$X, Z=h1$Z))
     },

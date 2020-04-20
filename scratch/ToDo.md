@@ -9,4 +9,4 @@
 * check if folder_path already exists when creating ffexp.
 If yes, maybe don't.
 
-* export hype
+* add hype to descr, readme, vignette

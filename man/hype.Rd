@@ -230,6 +230,7 @@ model.}
 \if{html}{\out{<a id="method-plot"></a>}}
 \if{latex}{\out{\hypertarget{method-plot}{}}}
 \subsection{Method \code{plot()}}{
+Make a plot to summarize the experiment.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{hype$plot()}\if{html}{\out{</div>}}
 }
@@ -239,6 +240,7 @@ model.}
 \if{html}{\out{<a id="method-pairs"></a>}}
 \if{latex}{\out{\hypertarget{method-pairs}{}}}
 \subsection{Method \code{pairs()}}{
+Plot pairs of inputs and output
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{hype$pairs()}\if{html}{\out{</div>}}
 }
