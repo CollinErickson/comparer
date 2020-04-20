@@ -61,6 +61,8 @@ the results.}
 \item \href{#method-add_EI}{\code{hype$add_EI()}}
 \item \href{#method-run_all}{\code{hype$run_all()}}
 \item \href{#method-run_EI_for_time}{\code{hype$run_EI_for_time()}}
+\item \href{#method-plot}{\code{hype$plot()}}
+\item \href{#method-pairs}{\code{hype$pairs()}}
 \item \href{#method-plotorder}{\code{hype$plotorder()}}
 \item \href{#method-plotX}{\code{hype$plotX()}}
 \item \href{#method-print}{\code{hype$print()}}
@@ -223,6 +225,24 @@ model.}
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-plot"></a>}}
+\if{latex}{\out{\hypertarget{method-plot}{}}}
+\subsection{Method \code{plot()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{hype$plot()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-pairs"></a>}}
+\if{latex}{\out{\hypertarget{method-pairs}{}}}
+\subsection{Method \code{pairs()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{hype$pairs()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-plotorder"></a>}}

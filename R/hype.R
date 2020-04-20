@@ -249,6 +249,12 @@ hype <- R6::R6Class(
       }
       invisible(self)
     },
+    plot = function() {
+      self$plotorder()
+    },
+    pairs = function() {
+      GGally::ggpairs(cbind(h1$X, Z=h1$Z))
+    },
     #' @description Plot the output of the points evaluated in order.
     plotorder = function() {
       ggplot2::ggplot(data.frame(index=1:length(self$Z), Z=self$Z,
