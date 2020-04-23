@@ -32,6 +32,7 @@ Suggests: plyr,
     tibble,
     lhs,
     DiceKriging,
+    DiceOptim,
     microbenchmark
 RoxygenNote: 7.1.0
 URL: https://github.com/CollinErickson/comparer
