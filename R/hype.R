@@ -76,8 +76,14 @@ if (F) {
 hype <- R6::R6Class(
   classname="hype",
   # inherit=ffexp,
+  active=list(
+    X = function(value) {
+      stopifnot(missing(value))
+      self$ffexp$rungrid2()
+    }
+  ),
   public=list(
-    X=NULL,
+    # X=NULL,
     Z=NULL,
     mod=NULL,
     # params=NULL,
