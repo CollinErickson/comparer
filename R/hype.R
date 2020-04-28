@@ -130,7 +130,10 @@ hype <- R6::R6Class(
         names(Xlhs) <- self$parnames
         X0 <- rbind(X0, Xlhs)
       }
-      if (is.null(X0)) {stop('X0 is null')}
+      if (is.null(X0)) {
+        stop(paste('Give in n_lhs, the number of initial points to evaluate.',
+                   '(X0 is null.)'))
+      }
       if (!is.data.frame(X0)) {browser(); stop("X0 is not a df?")}
       # Use an ffexp object to manage simulations
       self$ffexp <- ffexp$new(eval_func=eval_func,
