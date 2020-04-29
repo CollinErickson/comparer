@@ -28,9 +28,6 @@ h1$plotX()
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{X}}{Data frame of inputs that have been evaluated or will be evaluated
-next.}
-
 \item{\code{Z}}{Output at X}
 
 \item{\code{mod}}{Gaussian process model used to predict what the output will be.}
@@ -48,6 +45,14 @@ the results.}
 
 \item{\code{extract_output_func}}{A function that takes in the output from
 `eval_func` and returns the value we are trying to minimize.}
+}
+\if{html}{\out{</div>}}
+}
+\section{Active bindings}{
+\if{html}{\out{<div class="r6-active-bindings">}}
+\describe{
+\item{\code{X}}{Data frame of inputs that have been evaluated or will be evaluated
+next.}
 }
 \if{html}{\out{</div>}}
 }
