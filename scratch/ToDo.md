@@ -10,3 +10,13 @@
 If yes, maybe don't.
 
 * add hype to descr, readme, vignette
+
+* tests
+
+* log distribution params
+
+* comparer print: if some but not all are done, print estimated time left to run
+
+* comparer run all: if many, don't print the run order, just say random, maybe first and last 5
+
+* ffexp only input is single data.frame, should take name of column, not data frame
