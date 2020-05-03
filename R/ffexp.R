@@ -299,9 +299,16 @@ ffexp <- R6::R6Class(
         }
         if (parallel_temp_save) {self$create_save_folder_if_nonexistent()}
         if (verbose>=1) {
+          if (length(to_run) <= 200) {
+          to_run_print <- paste(to_run, collapse=' ')
+          } else {
+            to_run_print <- paste(c(to_run[1:10], "...", tail(to_run, 10),
+                                    paste0("(", length(to_run), " total)")),
+                                  collapse=' ')
+          }
           cat("About to start run in parallel (", self$parallel_cores,
               " cores), run order is:\n    ",
-              paste(to_run, collapse=' '),
+              to_run_print,
               "\n", sep='')
         }
         # cat("\tCluster is"); print(self$parallel_cluster)
