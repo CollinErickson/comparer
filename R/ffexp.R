@@ -142,6 +142,15 @@ ffexp <- R6::R6Class(
       else {folder_path}
       self$varlist <- varlist
       self$arglist <- list(...)
+      # Getting an error with df with ncol==1, so just avoid that
+      for (i in 1:length(self$arglist)) {
+        if ("data.frame" %in% class(self$arglist[[i]]) && ncol(self$arglist[[i]])==1) {
+          # browser()
+          tmpname <- colnames(self$arglist[[i]]); stopifnot(length(tmpname) == 1);
+          self$arglist[[i]] <- self$arglist[[i]][,1]
+          names(self$arglist)[[i]] <- tmpname
+        }
+      }
       self$nvars <- sapply(self$arglist,
                            function(i) {
                              if (is.data.frame(i)) {
@@ -787,6 +796,7 @@ ffexp <- R6::R6Class(
           row_grid <- self$rungrid[iirow, , drop=FALSE]
           row_list <- lapply(1:ncol(self$nvars),
                              function(i) {
+                               # browser()
                                ar <- self$arglist[[i]]
                                if (is.data.frame(ar)) {
                                  tr <- as.list(ar[row_grid[1,i, drop=TRUE],])
