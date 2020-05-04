@@ -78,7 +78,9 @@ hype <- R6::R6Class(
   # inherit=ffexp,
   active=list(
     X = function(value) {
-      stopifnot(missing(value))
+      if (!missing(value)) {
+        stop("You can't set X in a hype object")
+      }
       self$ffexp$rungrid2()
     }
   ),
@@ -225,7 +227,7 @@ hype <- R6::R6Class(
     #' @param ... Passed into `ffexp$run_all`.
     run_all = function(...) {
       self$ffexp$run_all(...)
-      self$X <- self$ffexp$rungrid2()
+      # self$X <- self$ffexp$rungrid2()
       if (is.null(self$extract_output_func)) {
         self$Z <- self$ffexp$outlist
         if (!all(sapply(self$ffexp$outlist, length) == 1)) {
