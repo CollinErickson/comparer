@@ -76,16 +76,16 @@ if (F) {
 hype <- R6::R6Class(
   classname="hype",
   # inherit=ffexp,
-  active=list(
-    X = function(value) {
-      if (!missing(value)) {
-        stop("You can't set X in a hype object")
-      }
-      self$ffexp$rungrid2()
-    }
-  ),
+  # active=list(
+  #   X = function(value) {
+  #     if (!missing(value)) {
+  #       stop("You can't set X in a hype object")
+  #     }
+  #     self$ffexp$rungrid2()
+  #   }
+  # ),
   public=list(
-    # X=NULL,
+    X=NULL,
     Z=NULL,
     mod=NULL,
     # params=NULL,
@@ -227,7 +227,6 @@ hype <- R6::R6Class(
     #' @param ... Passed into `ffexp$run_all`.
     run_all = function(...) {
       self$ffexp$run_all(...)
-      # self$X <- self$ffexp$rungrid2()
       if (is.null(self$extract_output_func)) {
         self$Z <- self$ffexp$outlist
         if (!all(sapply(self$ffexp$outlist, length) == 1)) {
@@ -240,6 +239,7 @@ hype <- R6::R6Class(
         # browser()
         self$Z <- sapply(self$ffexp$outlist, self$extract_output_func)
       }
+      self$X <- self$ffexp$rungrid2()
       invisible(self)
     },
     #' @description Add points using the expected information criteria,
@@ -280,6 +280,7 @@ hype <- R6::R6Class(
     },
     #' @description Plot the output as a function of each input.
     plotX = function() {
+      stopifnot(nrow(self$X) == length(self$Z))
       tdf <- cbind(self$X, Z=self$Z, Zorder=order(order(self$Z)))
       ggplot2::ggplot(reshape2::melt(tdf, id.vars=c('Z', 'Zorder')),
                       ggplot2::aes(value, Z, color=Zorder)) +
