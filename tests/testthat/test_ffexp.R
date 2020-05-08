@@ -431,6 +431,15 @@ test_that("no output", {
   expect_error(f1$run_all(verbose=0), NA)
   f1$outcleandf
 })
+test_that("input is df with single column, use name of column not df", {
+  f1 <- ffexp$new(x=data.frame(a=1:5,b=c('c'), c=factor(c(5))),
+                  eval_func=function(a,b,cc) {a})
+  expect_equal(colnames(f1$rungrid2()), c('a','b','c'))
+  f1 <- ffexp$new(x=data.frame(a=1:5),
+                  eval_func=function(a) {a})
+  expect_equal(colnames(f1$rungrid2()), c('a'))
+  f1$outcleandf
+})
 test_that("verbose", {
   f1 <- ffexp$new(data.frame(a=1:2,b=c("b",'c'), c=factor(c(5,6))),
                   eval_func=function(a,b,cc) {}, verbose=0)
