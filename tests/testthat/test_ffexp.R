@@ -448,6 +448,10 @@ test_that("verbose", {
   # Output is 22 or 24 lines, depends on system
   expect_true(length(c1) >= 20)
 })
+test_that("print isn't too long", {
+  f1 <- ffexp$new(a=1:10000, eval_func=function(a) {a})
+  f1$run_all(parallel=T, parallel_cores = 1)
+})
 test_that("run_all not parallel keeps going after error", {
   c1 <- ffexp$new(
     eval_func=function(i) {if (i<5) {1/'a'} else {5}},
