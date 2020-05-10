@@ -293,8 +293,11 @@ hype <- R6::R6Class(
     print = function(...) {
       ts <- paste0(
         "hype object:",
-        "\n\td = ", ncol(self$X),
-        "\n\tn = ", nrow(self$X),
+        "\n\td = ", if (is.null(self$X)) {ncol(self$ffexp$rungrid2())} else {ncol(self$X)},
+        "\n\tn = ", if (is.null(self$X)) {nrow(self$ffexp$rungrid2())} else {nrow(self$X)},
+        if (!all(self$ffexp$completed_runs)) {
+          paste0(" (", sum(!self$ffexp$completed_runs)," unevaluated)")
+        } else {''},
         "\n\tTo add data: $add_data(X, Y)",
         "\n\tTo add points using EI: $add_EI",
         "\n\tTo access underlying experiment: $ffexp",
