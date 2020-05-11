@@ -998,7 +998,12 @@ ffexp <- R6::R6Class(
         c(
           "ffexp object from the comparer package\n",
           "   ", sum(self$completed_runs), " / ",
-          length(self$completed_runs), " completed\n",
+          length(self$completed_runs), " completed",
+          if (sum(self$completed_runs) > 0 && sum(!self$completed_runs) > 0) {
+            paste0("  (est. time remaining: ",
+                   round(mean(self$outcleandf$runtime[self$completed_runs]) *
+                     sum(!self$completed_runs), 2), " sec.)\n")
+          } else {'\n'},
           "   parallel : ", self$parallel,
           if (self$parallel) {c(' (', self$parallel_cores, ' cores)')}
           else {''},
