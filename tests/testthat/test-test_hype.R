@@ -15,4 +15,6 @@ test_that("hype works", {
   expect_equal(length(h1$Z), 3)
   expect_error(plotorder <- h1$plotorder(), NA)
   expect_is(plotorder, 'ggplot')
+  expect_error(plotX <- h1$plotX(), NA)
+  expect_is(plotX, 'ggplot')
 })
