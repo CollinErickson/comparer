@@ -15,8 +15,6 @@ If yes, maybe don't.
 
 * log distribution params
 
-* comparer print: if some but not all are done, print estimated time left to run
+* If saved object exists in folder, stop. Add arg to overwrite.
 
-* comparer run all: if many, don't print the run order, just say random, maybe first and last 5
-
-* ffexp only input is single data.frame, should take name of column, not data frame
+* DiceOptim doesn't work on R 4.0
