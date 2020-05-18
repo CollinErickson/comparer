@@ -680,6 +680,13 @@ ffexp <- R6::R6Class(
         ggplot2::ylab("Run number")
       # invisible(self)
     },
+    #' @description Plot pairs of inputs and outputs.
+    #' Helps see correlations and distributions.
+    plot_pairs = function() {
+      nvar <- ncol(self$rungrid)
+      tdf <- self$outcleandf[, 1:(ncol(self$outcleandf) - 3)]
+      GGally::ggpairs(data=tdf)
+    },
     #' @description Calculate the effects of each variable as if this
     #' was an experiment using a linear model.
     calculate_effects = function() {

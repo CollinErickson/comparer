@@ -127,6 +127,7 @@ available, or 'detect-1' will do one less than that.}
 \item \href{#method-run_one}{\code{ffexp$run_one()}}
 \item \href{#method-add_result_of_one}{\code{ffexp$add_result_of_one()}}
 \item \href{#method-plot_run_times}{\code{ffexp$plot_run_times()}}
+\item \href{#method-plot_pairs}{\code{ffexp$plot_pairs()}}
 \item \href{#method-calculate_effects}{\code{ffexp$calculate_effects()}}
 \item \href{#method-save_self}{\code{ffexp$save_self()}}
 \item \href{#method-create_save_folder_if_nonexistent}{\code{ffexp$create_save_folder_if_nonexistent()}}
@@ -356,6 +357,17 @@ This shouldn't be used by users.
 Plot the run times of each trial.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ffexp$plot_run_times()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-plot_pairs"></a>}}
+\if{latex}{\out{\hypertarget{method-plot_pairs}{}}}
+\subsection{Method \code{plot_pairs()}}{
+Plot pairs of inputs and outputs.
+Helps see correlations and distributions.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ffexp$plot_pairs()}\if{html}{\out{</div>}}
 }
 
 }
