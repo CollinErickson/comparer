@@ -30,6 +30,8 @@ test_that("ffexp", {
 
   prt <- f1$plot_run_times()
   expect_is(prt, "gg")
+  pp <- f1$plot_pairs()
+  expect_is(pp, "gg")
   calc.eff <- f1$calculate_effects()
   expect_is(calc.eff, "list")
   expect_true(length(calc.eff) == 2)
