@@ -754,6 +754,14 @@ ffexp <- R6::R6Class(
       }
       invisible(self)
     },
+    change_save_folder = function(new_folder_path) {
+      # Check if that folder exists
+
+      # Copy files over
+
+      # Delete files and old folder if empty
+
+    },
     #' @description Delete the save folder if it is empty.
     #' Used to prevent leaving behind empty folders.
     #' @param verbose How much should be printed when running. 0 is none,
