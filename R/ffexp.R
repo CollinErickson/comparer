@@ -300,7 +300,7 @@ ffexp <- R6::R6Class(
         if (parallel_temp_save) {self$create_save_folder_if_nonexistent()}
         if (verbose>=1) {
           if (length(to_run) <= 200) {
-          to_run_print <- paste(to_run, collapse=' ')
+            to_run_print <- paste(to_run, collapse=' ')
           } else {
             to_run_print <- paste(c(to_run[1:10], "...", tail(to_run, 10),
                                     paste0("(", length(to_run), " total)")),
@@ -754,20 +754,30 @@ ffexp <- R6::R6Class(
       }
       invisible(self)
     },
-    change_save_folder = function(new_folder_path) {
+    change_save_folder = function(new_folder_path, new_folder_name) {
+      stopifnot(missing(new_folder_path) + missing(new_folder_name) == 1)
+      if (missing(new_folder_path)) {
+        new_folder_path <- paste0(getwd(), "//", new_folder_name)
+      }
+      # return()
+      browser()
       # Check if that folder exists
       if (dir.exists(new_folder_path)) {
         stop(paste("Folder already exists"))
       }
-      dir.create(new_folder_path)
       # Copy files over
-      filenames <- 1
-      for (filename in filenames) {
-        file.copy(from=filename, to="")
-        file.remove('')
+      filenames <- list.files(self$folder_path)
+      if (length(filenames) > 0) {
+        dir.create(new_folder_path)
+        for (filename in filenames) {
+          file.copy(from=filename, to="")
+          file.remove('')
+        }
       }
 
       # Delete files and old folder if empty
+      self$delete_save_folder_if_empty()
+      self$folder_path <- new_folder_path
 
       return(invisible(self))
     },
@@ -1026,7 +1036,7 @@ ffexp <- R6::R6Class(
           if (sum(self$completed_runs) > 0 && sum(!self$completed_runs) > 0) {
             paste0("  (est. time remaining: ",
                    round(mean(self$outcleandf$runtime[self$completed_runs]) *
-                     sum(!self$completed_runs), 2), " sec.)\n")
+                           sum(!self$completed_runs), 2), " sec.)\n")
           } else {'\n'},
           "   parallel : ", self$parallel,
           if (self$parallel) {c(' (', self$parallel_cores, ' cores)')}
