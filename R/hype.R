@@ -152,7 +152,7 @@ hype <- R6::R6Class(
     add_data = function(X, Y) {
       stop("Not yet implemented")
       self$ffexp <- updatedffexp
-      nameoflevel <- if (length(self$parnames) > 1) {"Xdf"} else {h1$ffexp$allvars$name[1]}
+      nameoflevel <- if (length(self$parnames) > 1) {"Xdf"} else {self$ffexp$allvars$name[1]}
       updatedffexp <- self$ffexp$add_level(nameoflevel, X, suppressMessage=TRUE)
       stop("need to add Y too")
       invisible(self)
@@ -163,7 +163,7 @@ hype <- R6::R6Class(
     add_X = function(X) {
       stopifnot(is.data.frame(X))
       stopifnot(all(colnames(X) == colnames(self$X)))
-      nameoflevel <- if (length(self$parnames) > 1) {"Xdf"} else {h1$ffexp$allvars$name[1]}
+      nameoflevel <- if (length(self$parnames) > 1) {"Xdf"} else {self$ffexp$allvars$name[1]}
       updatedffexp <- self$ffexp$add_level(nameoflevel, X, suppressMessage=T)
       self$ffexp <- updatedffexp
       invisible(self)
@@ -221,7 +221,7 @@ hype <- R6::R6Class(
                                     upper=self$parupper)
       }
       newX <- EIout$par
-      nameoflevel <- if (length(self$parnames) > 1) {"Xdf"} else {h1$ffexp$allvars$name[1]}
+      nameoflevel <- if (length(self$parnames) > 1) {"Xdf"} else {self$ffexp$allvars$name[1]}
       updatedffexp <- self$ffexp$add_level(nameoflevel, newX, suppressMessage=TRUE)
       self$ffexp <- updatedffexp
       invisible(self)
@@ -269,7 +269,7 @@ hype <- R6::R6Class(
     },
     #' @description Plot pairs of inputs and output
     pairs = function() {
-      GGally::ggpairs(cbind(h1$X, Z=h1$Z))
+      GGally::ggpairs(cbind(self$X, Z=self$Z))
     },
     #' @description Plot the output of the points evaluated in order.
     plotorder = function() {
