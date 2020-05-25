@@ -754,29 +754,35 @@ ffexp <- R6::R6Class(
       }
       invisible(self)
     },
-    change_save_folder = function(new_folder_path, new_folder_name) {
+    rename_save_folder = function(new_folder_path, new_folder_name) {
       stopifnot(missing(new_folder_path) + missing(new_folder_name) == 1)
       if (missing(new_folder_path)) {
         new_folder_path <- paste0(getwd(), "//", new_folder_name)
       }
       # return()
-      browser()
+      # browser()
       # Check if that folder exists
       if (dir.exists(new_folder_path)) {
         stop(paste("Folder already exists"))
       }
-      # Copy files over
-      filenames <- list.files(self$folder_path)
-      if (length(filenames) > 0) {
-        dir.create(new_folder_path)
-        for (filename in filenames) {
-          file.copy(from=filename, to="")
-          file.remove('')
-        }
+      # # Copy files over
+      # filenames <- list.files(self$folder_path)
+      # if (length(filenames) > 0) {
+      #   dir.create(new_folder_path)
+      #   for (filename in filenames) {
+      #     oldfilepath <- paste0(self$folder_path, "//", filename)
+      #     stopifnot(file.copy(from=oldfilepath, to=paste0(new_folder_path, "//", filename)))
+      #     file.remove(oldfilepath)
+      #   }
+      # }
+      # Delete files and old folder if empty
+      # self$delete_save_folder_if_empty()
+
+      # Can rename a folder using file.rename, simpler than above
+      if (dir.exists(self$folder_path)) {
+        file.rename(self$folder_path, new_folder_path)
       }
 
-      # Delete files and old folder if empty
-      self$delete_save_folder_if_empty()
       self$folder_path <- new_folder_path
 
       return(invisible(self))
