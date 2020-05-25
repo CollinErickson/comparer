@@ -20,7 +20,8 @@ test_that("hype works", {
   # Check add
   expect_error(h1$add_EI(1), NA)
   expect_error(h1$add_EI(1), NA)
-  expect_error(h1$run_EI_for_time(1), NA)
+  expect_error(h1$run_all(), NA)
+  expect_error(h1$run_EI_for_time(1, 1), NA)
 
   # Check plots
   expect_error(plotorder <- h1$plotorder(), NA)
