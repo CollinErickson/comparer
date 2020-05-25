@@ -131,6 +131,7 @@ available, or 'detect-1' will do one less than that.}
 \item \href{#method-calculate_effects}{\code{ffexp$calculate_effects()}}
 \item \href{#method-save_self}{\code{ffexp$save_self()}}
 \item \href{#method-create_save_folder_if_nonexistent}{\code{ffexp$create_save_folder_if_nonexistent()}}
+\item \href{#method-rename_save_folder}{\code{ffexp$rename_save_folder()}}
 \item \href{#method-delete_save_folder_if_empty}{\code{ffexp$delete_save_folder_if_empty()}}
 \item \href{#method-recover_parallel_temp_save}{\code{ffexp$recover_parallel_temp_save()}}
 \item \href{#method-rungrid2}{\code{ffexp$rungrid2()}}
@@ -409,6 +410,27 @@ Create the save folder if it doesn't already exist.
 \if{html}{\out{<div class="r">}}\preformatted{ffexp$create_save_folder_if_nonexistent()}\if{html}{\out{</div>}}
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-rename_save_folder"></a>}}
+\if{latex}{\out{\hypertarget{method-rename_save_folder}{}}}
+\subsection{Method \code{rename_save_folder()}}{
+Rename the save folder
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ffexp$rename_save_folder(new_folder_path, new_folder_name)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{new_folder_path}}{New path for the save folder}
+
+\item{\code{new_folder_name}}{If you want the new save folder to be in the
+current directory, you can use this instead of `new_folder_path` and
+just give the folder name.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-delete_save_folder_if_empty"></a>}}

@@ -754,6 +754,11 @@ ffexp <- R6::R6Class(
       }
       invisible(self)
     },
+    #' @description Rename the save folder
+    #' @param new_folder_path New path for the save folder
+    #' @param new_folder_name If you want the new save folder to be in the
+    #' current directory, you can use this instead of `new_folder_path` and
+    #' just give the folder name.
     rename_save_folder = function(new_folder_path, new_folder_name) {
       stopifnot(missing(new_folder_path) + missing(new_folder_name) == 1)
       if (missing(new_folder_path)) {
