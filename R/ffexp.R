@@ -142,15 +142,16 @@ ffexp <- R6::R6Class(
       else {folder_path}
       self$varlist <- varlist
       self$arglist <- list(...)
-      # Getting an error with df with ncol==1, so just avoid that
-      for (i in 1:length(self$arglist)) {
-        if ("data.frame" %in% class(self$arglist[[i]]) && ncol(self$arglist[[i]])==1) {
-          # browser()
-          tmpname <- colnames(self$arglist[[i]]); stopifnot(length(tmpname) == 1);
-          self$arglist[[i]] <- self$arglist[[i]][,1]
-          names(self$arglist)[[i]] <- tmpname
-        }
-      }
+      # FIX1COLDF
+      # # Getting an error with df with ncol==1, so just avoid that
+      # for (i in 1:length(self$arglist)) {
+      #   if ("data.frame" %in% class(self$arglist[[i]]) && ncol(self$arglist[[i]])==1) {
+      #     # browser()
+      #     tmpname <- colnames(self$arglist[[i]]); stopifnot(length(tmpname) == 1);
+      #     self$arglist[[i]] <- self$arglist[[i]][,1]
+      #     names(self$arglist)[[i]] <- tmpname
+      #   }
+      # }
       self$nvars <- sapply(self$arglist,
                            function(i) {
                              if (is.data.frame(i)) {
@@ -431,11 +432,13 @@ ffexp <- R6::R6Class(
       # Can't just set row_list <- lapply since a function can't be named
       #  so to get names there we need to handle functions separately.
       row_list <- list()
+      # browser()
       lapply(1:ncol(self$nvars),
-             function(i) {
+             function(i) {#browser()
                ar <- self$arglist[[i]]
                if (is.data.frame(ar)) {
-                 tr <- as.list(ar[row_grid[1,i, drop=TRUE],])
+                 # FIX1COLDF added drop=FALSE
+                 tr <- as.list(ar[row_grid[1,i, drop=TRUE], , drop=FALSE])
                } else if (is.list(ar)) {
                  # tr <- ar[[row_grid[1,i]]]
                  tr <- lapply(ar, function(x) x[[row_grid[1,i]]])
