@@ -152,7 +152,7 @@ hype <- R6::R6Class(
     add_data = function(X, Y) {
       stop("Not yet implemented")
       self$ffexp <- updatedffexp
-      nameoflevel <- if (length(self$parnames) > 1) {"Xdf"} else {self$ffexp$allvars$name[1]}
+      nameoflevel <- "Xdf" #if (length(self$parnames) > 1) {"Xdf"} else {self$ffexp$allvars$name[1]}
       updatedffexp <- self$ffexp$add_level(nameoflevel, X, suppressMessage=TRUE)
       stop("need to add Y too")
       invisible(self)
@@ -163,7 +163,7 @@ hype <- R6::R6Class(
     add_X = function(X) {
       stopifnot(is.data.frame(X))
       stopifnot(all(colnames(X) == colnames(self$X)))
-      nameoflevel <- if (length(self$parnames) > 1) {"Xdf"} else {self$ffexp$allvars$name[1]}
+      nameoflevel <- "Xdf" #if (length(self$parnames) > 1) {"Xdf"} else {self$ffexp$allvars$name[1]}
       updatedffexp <- self$ffexp$add_level(nameoflevel, X, suppressMessage=T)
       self$ffexp <- updatedffexp
       invisible(self)
@@ -203,6 +203,9 @@ hype <- R6::R6Class(
       if (covtype == "random") {
         covtype <- sample(c("matern5_2", "matern3_2", "exp", "powexp", "gauss"), 1)
       }
+      if (is.null(self$X)) {
+        stop('X is null, you need to run_all first.')
+      }
       self$mod <- DiceKriging::km(formula = ~1,
                                   covtype=covtype,
                                   design = self$X,
@@ -221,7 +224,7 @@ hype <- R6::R6Class(
                                     upper=self$parupper)
       }
       newX <- EIout$par
-      nameoflevel <- if (length(self$parnames) > 1) {"Xdf"} else {self$ffexp$allvars$name[1]}
+      nameoflevel <- "Xdf" #if (length(self$parnames) > 1) {"Xdf"} else {self$ffexp$allvars$name[1]}
       updatedffexp <- self$ffexp$add_level(nameoflevel, newX, suppressMessage=TRUE)
       self$ffexp <- updatedffexp
       invisible(self)
