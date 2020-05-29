@@ -203,6 +203,7 @@ be run in parallel, and what files should be saved.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ffexp$run_all(
   to_run = NULL,
+  random_n = NULL,
   redo = FALSE,
   run_order,
   save_output = self$save_output,
@@ -223,6 +224,9 @@ be run in parallel, and what files should be saved.
 \describe{
 \item{\code{to_run}}{Which rows should be run? If NULL, then all that haven't
 been run yet.}
+
+\item{\code{random_n}}{Randomly selects n trials among those not yet completed
+and runs them.}
 
 \item{\code{redo}}{Should already completed rows be run again?}
 

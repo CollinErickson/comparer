@@ -142,7 +142,6 @@ ffexp <- R6::R6Class(
       else {folder_path}
       self$varlist <- varlist
       self$arglist <- list(...)
-      # FIX1COLDF
       # # Getting an error with df with ncol==1, so just avoid that
       # for (i in 1:length(self$arglist)) {
       #   if ("data.frame" %in% class(self$arglist[[i]]) && ncol(self$arglist[[i]])==1) {
@@ -210,6 +209,8 @@ ffexp <- R6::R6Class(
     #' be run in parallel, and what files should be saved.
     #' @param to_run Which rows should be run? If NULL, then all that haven't
     #' been run yet.
+    #' @param random_n Randomly selects n trials among those not yet completed
+    #' and runs them.
     #' @param redo Should already completed rows be run again?
     #' @param run_order In what order should the rows by run?
     #' Options: random, in_order, and reverse.
@@ -234,7 +235,7 @@ ffexp <- R6::R6Class(
     #' 2 is average.
     #' @param warn_repeat Should warnings be given when repeating already
     #' completed rows?
-    run_all = function(to_run=NULL,
+    run_all = function(to_run=NULL, random_n=NULL,
                        redo = FALSE, run_order,
                        save_output=self$save_output,
                        parallel=self$parallel,
@@ -252,6 +253,14 @@ ffexp <- R6::R6Class(
       }
       if (!is.null(to_run)) {
         # to_run given
+      } else if (!is.null(random_n)) { # Pick a random n from not yet completed
+        stopifnot(length(random_n)==1, random_n>=1)
+        choosefrom <- which(!self$completed_runs)
+        if (length(choosefrom)==1) { # sample is bad with length 1 vector
+          to_run <- choosefrom
+        } else {
+          to_run <- sample(choosefrom, min(length(choosefrom), random_n), replace=F)
+        }
       } else if (!redo) { # Only run ones that haven't been run yet
         to_run <- which(self$completed_runs == FALSE)
       } else {
