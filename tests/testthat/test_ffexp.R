@@ -437,6 +437,7 @@ test_that("input is df with single column, use name of column not df", {
   f1 <- ffexp$new(x=data.frame(a=1:5,b=c('c'), c=factor(c(5))),
                   eval_func=function(a,b,cc) {a})
   expect_equal(colnames(f1$rungrid2()), c('a','b','c'))
+  # FIX1COLDF
   f1 <- ffexp$new(x=data.frame(a=1:5),
                   eval_func=function(a) {a})
   expect_equal(colnames(f1$rungrid2()), c('a'))
@@ -459,10 +460,15 @@ test_that("verbose", {
   # Output is 22 or 24 lines, depends on system
   expect_true(length(c1) >= 20)
 })
-test_that("print isn't too long", {
-  f1 <- ffexp$new(a=1:10000, eval_func=function(a) {a})
-  f1$run_all(parallel=T, parallel_cores = 1)
-})
+# test_that("print isn't too long", {
+#   # Need to run >=201 to get print to be shortened, and must be in parallel,
+#   # too slow and can't run on Travis.
+#   testthat::skip_on_travis()
+#   testthat::skip() # Too slow, not worth it.
+#   f1 <- ffexp$new(a=1:201, eval_func=function(a) {a})
+#   c1 <- capture.output({f1$run_all(parallel=T, parallel_cores = 1)})
+#   expect_true(nchar(paste(c1, collapse=' ')) < 300)
+# })
 test_that("run_all not parallel keeps going after error", {
   c1 <- ffexp$new(
     eval_func=function(i) {if (i<5) {1/'a'} else {5}},
