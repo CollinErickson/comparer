@@ -30,4 +30,10 @@ test_that("hype works", {
   expect_is(plotX, 'ggplot')
   expect_error(plotplot <- plot(h1), NA)
   expect_is(plotplot, 'ggplot')
+
+  # Two inputs
+  expect_error({
+    h2 <- hype$new(eval_func = function(a, b) {a^2 - sin(2*pi*b)}, p1, par_unif$new("b", -1,1), n_lhs=3)
+  }, NA)
+  expect_error(h2$run_all(), NA)
 })

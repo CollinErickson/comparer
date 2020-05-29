@@ -18,3 +18,7 @@ If yes, maybe don't.
 * If saved object exists in folder, stop. Add arg to overwrite.
 
 * DiceOptim doesn't work on R 4.0
+
+* output dat csv doesn't exist
+
+* ffexp run_all for time

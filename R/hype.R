@@ -189,7 +189,6 @@ hype <- R6::R6Class(
     #' model.
     #' @param nugget.estim Should a nugget be estimated?
     add_EI = function(n, covtype="matern5_2", nugget.estim=TRUE) {
-      # browser()
       # If unevaluated points, set lowest value.
       X <- self$ffexp$rungrid2()
       if (nrow(X) == length(self$Z)) { # All have been evaluated
@@ -242,7 +241,6 @@ hype <- R6::R6Class(
         }
         self$Z <- unlist(self$ffexp$outlist)
       } else {
-        # browser()
         self$Z <- sapply(self$ffexp$outlist, self$extract_output_func)
       }
       self$X <- self$ffexp$rungrid2()
