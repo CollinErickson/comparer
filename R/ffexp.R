@@ -854,7 +854,7 @@ ffexp <- R6::R6Class(
                                # browser()
                                ar <- self$arglist[[i]]
                                if (is.data.frame(ar)) {
-                                 tr <- as.list(ar[row_grid[1,i, drop=TRUE],])
+                                 tr <- as.list(ar[row_grid[1,i, drop=TRUE], , drop=FALSE])
                                } else if (is.list(ar)) {
                                  # tr <- ar[[row_grid[1,i]]]
                                  tr <- lapply(ar,
