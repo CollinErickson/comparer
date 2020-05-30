@@ -663,7 +663,16 @@ ffexp <- R6::R6Class(
 
       # Put it in place, but only if dimensions match up
       if (self$number_runs * nrow(newdf1) == nrow(self$outrawdf)) {
+        # Make sure ncol matches
+        if (ncol(self$outrawdf) != ncol(newdf1)) {
+          stop(paste("ncol(self$outrawdf) != ncol(newdf1)",
+                     ncol(self$outrawdf), ncol(newdf1)))
+        }
         self$outrawdf[((irow-1)*nr+1):(irow*nr), ] <- newdf1
+        if (ncol(self$outcleandf) != ncol(newdf_clean)) {
+          stop(paste("ncol(self$outcleandf) != ncol(newdf_clean)",
+                     ncol(self$outcleandf), ncol(newdf_clean)))
+        }
         self$outcleandf[((irow-1)*nr+1):(irow*nr), ] <- newdf_clean
       }
 
