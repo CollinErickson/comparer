@@ -464,7 +464,7 @@ if `save_parallel_temp_save=TRUE` was used when running.
 Useful when running long jobs in parallel so that you don't
 lose all results if it crashes before finishing.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ffexp$recover_parallel_temp_save(delete_after = TRUE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ffexp$recover_parallel_temp_save(delete_after = FALSE, only_reload_new = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -474,6 +474,10 @@ lose all results if it crashes before finishing.
 are recovered? If TRUE, make sure you save the ffexp object after
 running this function so
 you don't lose the data.}
+
+\item{\code{only_reload_new}}{Will only reload output from runs that don't show as
+completed yet. Can make it much faster if there are many saved files, but
+most have already been loaded to this object.}
 }
 \if{html}{\out{</div>}}
 }

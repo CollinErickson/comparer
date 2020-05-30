@@ -531,3 +531,19 @@ test_that('remake cluster if connection doesn\'t work anymore', {
   }
   unlink(f1$folder_path, recursive=T)
 })
+if (F) {
+  # Test recover_parallel_temp_save only_reload_new
+  f1 <- ffexp$new(a=1:4,
+                  eval_func=function(a) {if (a==4) {stop()} else {a^2}},
+                  verbose=0, parallel=T,
+                  parallel_cores=1)
+  f1$run_all(to_run = 1, parallel_temp_save = T)
+  f1$run_all(parallel_temp_save = T)
+  f1
+  # Should only reload 2,3, not 1
+  f1$recover_parallel_temp_save(only_reload_new = T)
+  f1
+  # Should reload 1,2,3
+  f1$recover_parallel_temp_save(only_reload_new = F)
+  f1
+}

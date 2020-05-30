@@ -836,7 +836,10 @@ ffexp <- R6::R6Class(
     #' are recovered? If TRUE, make sure you save the ffexp object after
     #' running this function so
     #' you don't lose the data.
-    recover_parallel_temp_save = function(delete_after=FALSE) {
+    #' @param only_reload_new Will only reload output from runs that don't show as
+    #' completed yet. Can make it much faster if there are many saved files, but
+    #' most have already been loaded to this object.
+    recover_parallel_temp_save = function(delete_after=FALSE, only_reload_new=FALSE) {
       # Read in and save
       # Progress bar
       pb <- progress::progress_bar$new(total=nrow(self$rungrid))
@@ -844,7 +847,7 @@ ffexp <- R6::R6Class(
       for (ii in 1:nrow(self$rungrid)) {
         # Check for file
         file_ii <- paste0(self$folder_path,"/parallel_temp_output_",ii,".rds")
-        if (file.exists(file_ii)) {
+        if (file.exists(file_ii) && !(only_reload_new && self$completed_runs[ii])) {
           # Read in
           oneout <- readRDS(file=file_ii)
           do.call(self$add_result_of_one, oneout)
