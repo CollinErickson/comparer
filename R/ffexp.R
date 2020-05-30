@@ -390,6 +390,38 @@ ffexp <- R6::R6Class(
       # self$postprocess_outdf()
       invisible(self)
     },
+    #' @description Run the experiment for a given time, not for a specified
+    #' number of trials. Runs `batch_size` trials between checking the time
+    #' elapsed, only needs to be more than 1 when running in parallel.
+    #' It will complete the current batch before stopping, it does not quit
+    #' in the middle of the batch when reaching the time limit, so it will
+    #' go over the time limit given.
+    #' @param sec Number of seconds to run for
+    #' @param batch_size Number of trials to run between checking the time
+    #' elapsed.
+    #' @param show_time_in_bar The progress bar can show either the number of
+    #' runs completed or the time elapsed.
+    #' @param save_output Should the output be saved?
+    #' @param parallel Should it be run in parallel?
+    #' @param parallel_cores When running in parallel, how many cores should
+    #' be used. Not actually the number of cores used, actually the number
+    #' of clusters created. Can be more than the computer has available,
+    #' but will hurt performance. Can set to 'detect' to have it detect
+    #' how many cores are available and use that, or 'detect-1' to use
+    #' one fewer than there are.
+    #' @param parallel_temp_save Should temp files be written when running
+    #' in parallel? Prevents losing results if it crashes partway through.
+    #' @param write_start_files Should start files be written?
+    #' @param write_error_files Should error files be written for rows that
+    #' fail?
+    #' @param delete_parallel_temp_save_after If using parallel temp save
+    #' files, should they be deleted afterwards?
+    #' @param varlist A character vector of names of variables to be passed
+    #' the the parallel cluster.
+    #' @param verbose How much should be printed when running. 0 is none,
+    #' 2 is average.
+    #' @param warn_repeat Should warnings be given when repeating already
+    #' completed rows?
     run_for_time = function(sec, batch_size,
                             show_time_in_bar=FALSE,
                             # to_run=NULL, random_n=NULL,

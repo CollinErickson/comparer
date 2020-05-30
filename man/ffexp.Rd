@@ -124,6 +124,7 @@ available, or 'detect-1' will do one less than that.}
 \itemize{
 \item \href{#method-new}{\code{ffexp$new()}}
 \item \href{#method-run_all}{\code{ffexp$run_all()}}
+\item \href{#method-run_for_time}{\code{ffexp$run_for_time()}}
 \item \href{#method-run_one}{\code{ffexp$run_one()}}
 \item \href{#method-add_result_of_one}{\code{ffexp$add_result_of_one()}}
 \item \href{#method-plot_run_times}{\code{ffexp$plot_run_times()}}
@@ -232,6 +233,79 @@ and runs them.}
 
 \item{\code{run_order}}{In what order should the rows by run?
 Options: random, in_order, and reverse.}
+
+\item{\code{save_output}}{Should the output be saved?}
+
+\item{\code{parallel}}{Should it be run in parallel?}
+
+\item{\code{parallel_cores}}{When running in parallel, how many cores should
+be used. Not actually the number of cores used, actually the number
+of clusters created. Can be more than the computer has available,
+but will hurt performance. Can set to 'detect' to have it detect
+how many cores are available and use that, or 'detect-1' to use
+one fewer than there are.}
+
+\item{\code{parallel_temp_save}}{Should temp files be written when running
+in parallel? Prevents losing results if it crashes partway through.}
+
+\item{\code{write_start_files}}{Should start files be written?}
+
+\item{\code{write_error_files}}{Should error files be written for rows that
+fail?}
+
+\item{\code{delete_parallel_temp_save_after}}{If using parallel temp save
+files, should they be deleted afterwards?}
+
+\item{\code{varlist}}{A character vector of names of variables to be passed
+the the parallel cluster.}
+
+\item{\code{verbose}}{How much should be printed when running. 0 is none,
+2 is average.}
+
+\item{\code{warn_repeat}}{Should warnings be given when repeating already
+completed rows?}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-run_for_time"></a>}}
+\if{latex}{\out{\hypertarget{method-run_for_time}{}}}
+\subsection{Method \code{run_for_time()}}{
+Run the experiment for a given time, not for a specified
+number of trials. Runs `batch_size` trials between checking the time
+elapsed, only needs to be more than 1 when running in parallel.
+It will complete the current batch before stopping, it does not quit
+in the middle of the batch when reaching the time limit, so it will
+go over the time limit given.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ffexp$run_for_time(
+  sec,
+  batch_size,
+  show_time_in_bar = FALSE,
+  save_output = self$save_output,
+  parallel = self$parallel,
+  parallel_cores = self$parallel_cores,
+  parallel_temp_save = save_output,
+  write_start_files = save_output,
+  write_error_files = save_output,
+  delete_parallel_temp_save_after = FALSE,
+  varlist = self$varlist,
+  verbose = self$verbose,
+  warn_repeat = TRUE
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{sec}}{Number of seconds to run for}
+
+\item{\code{batch_size}}{Number of trials to run between checking the time
+elapsed.}
+
+\item{\code{show_time_in_bar}}{The progress bar can show either the number of
+runs completed or the time elapsed.}
 
 \item{\code{save_output}}{Should the output be saved?}
 
