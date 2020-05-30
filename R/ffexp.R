@@ -838,6 +838,9 @@ ffexp <- R6::R6Class(
     #' you don't lose the data.
     recover_parallel_temp_save = function(delete_after=TRUE) {
       # Read in and save
+      # Progress bar
+      pb <- progress::progress_bar$new(total=nrow(self$rungrid))
+      pb$tick(0)
       for (ii in 1:nrow(self$rungrid)) {
         # Check for file
         file_ii <- paste0(self$folder_path,"/parallel_temp_output_",ii,".rds")
@@ -850,6 +853,7 @@ ffexp <- R6::R6Class(
             unlink(file_ii)
           }
         }
+        pb$tick()
       }
       self$delete_save_folder_if_empty(verbose=0)
     },
