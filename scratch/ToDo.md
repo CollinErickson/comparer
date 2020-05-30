@@ -21,12 +21,8 @@ If yes, maybe don't.
 
 * output dat csv doesn't exist
 
-* ffexp run_all for time
+* ffexp run_all for time tests, cleanup
 
 * recover temp gives error, print which one
 
-* recover temp, add option to  only add result if not already done
-
 * Delete results of a trial (flip completed, remove from outlist and outdfs)
-
-* Progress bar for recover temp files

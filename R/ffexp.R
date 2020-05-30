@@ -391,6 +391,7 @@ ffexp <- R6::R6Class(
       invisible(self)
     },
     run_for_time = function(sec, batch_size,
+                            show_time_in_bar=FALSE,
                             # to_run=NULL, random_n=NULL,
                             # redo = FALSE, run_order,
                             save_output=self$save_output,
@@ -405,19 +406,31 @@ ffexp <- R6::R6Class(
                             warn_repeat=TRUE) {
       start_time <- Sys.time()
       num_completed_before <- sum(self$completed_runs)
-      pb <- progress::progress_bar$new(
-        format=paste0("  running for time (:spin) [:bar] :elapsed / ", sec, "s"),
-        total=sec)
-      pb$tick(0)
+      # bar can show run time or runs completed
+      # show_time_in_bar <- FALSE
+      if (show_time_in_bar) {
+        pb <- progress::progress_bar$new(
+          format=paste0("  Running for time (:spin) [:bar] :elapsed / ", sec, "s"),
+          total=sec)
+        pb$tick(0)
+      } else {
+        pb <- progress::progress_bar$new(
+          format=paste0("  Running for time :elapsed / ", sec,"s (:spin) [:bar] ",
+                        "Runs completed: :current / ", length(self$completed_runs), ""),
+          total=length(self$completed_runs))
+        pb$tick(sum(self$completed_runs))
+      }
       while(TRUE) {
         if (all(self$completed_runs)) {
           pb$terminate()
-          cat("Completed all runs in", as.numeric(Sys.time() - start_time, units='secs'), "sec", "\n")
+          cat("Completed all runs in",
+              round(as.numeric(Sys.time() - start_time, units='secs'), 1),
+              "seconds", "\n")
           break
         }
         if (as.numeric(Sys.time() - start_time, units='secs') >= sec) {
           pb$terminate()
-          cat("Ran for", as.numeric(Sys.time() - start_time, units='secs'), "sec",
+          cat("Ran for", round(as.numeric(Sys.time() - start_time, units='secs'), 1), "seconds",
               "up to", sum(self$completed_runs),"/", length(self$completed_runs), '\n')
           break
         }
@@ -433,7 +446,11 @@ ffexp <- R6::R6Class(
                      verbose=0,
                      warn_repeat=warn_repeat
         )
-        pb$update(ratio=min(1, as.numeric(Sys.time() - start_time, units='secs') / sec))
+        if (show_time_in_bar) {
+          pb$update(ratio=min(1, as.numeric(Sys.time() - start_time, units='secs') / sec))
+        } else {
+          pb$update(ratio=sum(self$completed_runs) / length(self$completed_runs))
+        }
       }
       invisible(self)
     },
