@@ -547,3 +547,19 @@ if (F) {
   f1$recover_parallel_temp_save(only_reload_new = F)
   f1
 }
+test_that("run for time, not parallel", {
+  f1 <- ffexp$new(a=1:100,
+                  eval_func=function(a) {{a^2}},
+                  parallel=F,
+                  parallel_cores=1)
+  expect_error(f1$run_for_time(1, 2), NA)
+  expect_true(sum(f1$completed_runs) > 0)
+})
+if (F) { # test run_for_time
+  # Use parallel, actually slower
+  f1 <- ffexp$new(a=1:1000,
+                  eval_func=function(a) {{a^2}},
+                  verbose=2, parallel=T,
+                  parallel_cores=3)
+  f1$run_for_time(30, 12)
+}
