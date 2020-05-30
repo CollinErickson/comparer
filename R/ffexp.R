@@ -390,6 +390,53 @@ ffexp <- R6::R6Class(
       # self$postprocess_outdf()
       invisible(self)
     },
+    run_for_time = function(sec, batch_size,
+                            # to_run=NULL, random_n=NULL,
+                            # redo = FALSE, run_order,
+                            save_output=self$save_output,
+                            parallel=self$parallel,
+                            parallel_cores=self$parallel_cores,
+                            parallel_temp_save=save_output,
+                            write_start_files=save_output,
+                            write_error_files=save_output,
+                            delete_parallel_temp_save_after=FALSE,
+                            varlist=self$varlist,
+                            verbose=self$verbose,
+                            warn_repeat=TRUE) {
+      start_time <- Sys.time()
+      num_completed_before <- sum(self$completed_runs)
+      pb <- progress::progress_bar$new(
+        format=paste0("  running for time (:spin) [:bar] :elapsed / ", sec, "s"),
+        total=sec)
+      pb$tick(0)
+      while(TRUE) {
+        if (all(self$completed_runs)) {
+          pb$terminate()
+          cat("Completed all runs in", as.numeric(Sys.time() - start_time, units='secs'), "sec", "\n")
+          break
+        }
+        if (as.numeric(Sys.time() - start_time, units='secs') >= sec) {
+          pb$terminate()
+          cat("Ran for", as.numeric(Sys.time() - start_time, units='secs'), "sec",
+              "up to", sum(self$completed_runs),"/", length(self$completed_runs), '\n')
+          break
+        }
+        self$run_all(random_n = batch_size,
+                     save_output=save_output,
+                     parallel=parallel,
+                     parallel_cores=parallel_cores,
+                     parallel_temp_save=parallel_temp_save,
+                     write_start_files=write_start_files,
+                     write_error_files=write_error_files,
+                     delete_parallel_temp_save_after=delete_parallel_temp_save_after,
+                     varlist=varlist,
+                     verbose=0,
+                     warn_repeat=warn_repeat
+        )
+        pb$update(ratio=min(1, as.numeric(Sys.time() - start_time, units='secs') / sec))
+      }
+      invisible(self)
+    },
     #' @description Run a single row of the experiment.
     #' You can specify which one to run.
     #' Generally this should not be used by users, use `run_all`
@@ -1167,8 +1214,8 @@ if (F) {
   ); cd$run_all(); cd$outcleandf
   # Calculate parallel efficiency
   with(data = cc$outcleandf,
-       sum(runtime) / as.numeric(max(end_time) - min(start_time)),
-       units="secs")
+       sum(runtime) / as.numeric(max(end_time) - min(start_time),
+                                 units="secs"))
   # parallel 'detect-1'
   system.time(ffexp$new(a=1:4, eval_func=function(a){Sys.sleep(1)},
                         parallel = T,
