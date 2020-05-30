@@ -836,7 +836,7 @@ ffexp <- R6::R6Class(
     #' are recovered? If TRUE, make sure you save the ffexp object after
     #' running this function so
     #' you don't lose the data.
-    recover_parallel_temp_save = function(delete_after=TRUE) {
+    recover_parallel_temp_save = function(delete_after=FALSE) {
       # Read in and save
       # Progress bar
       pb <- progress::progress_bar$new(total=nrow(self$rungrid))
