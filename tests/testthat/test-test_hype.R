@@ -36,4 +36,6 @@ test_that("hype works", {
     h2 <- hype$new(eval_func = function(a, b) {a^2 - sin(2*pi*b)}, p1, par_unif$new("b", -1,1), n_lhs=3)
   }, NA)
   expect_error(h2$run_all(), NA)
+  expect_error(h2$add_EI(n=3), NA)
+  expect_error(h2$run_all(), NA)
 })
