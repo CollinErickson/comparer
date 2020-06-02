@@ -129,6 +129,7 @@ available, or 'detect-1' will do one less than that.}
 \item \href{#method-add_result_of_one}{\code{ffexp$add_result_of_one()}}
 \item \href{#method-plot_run_times}{\code{ffexp$plot_run_times()}}
 \item \href{#method-plot_pairs}{\code{ffexp$plot_pairs()}}
+\item \href{#method-plot}{\code{ffexp$plot()}}
 \item \href{#method-calculate_effects}{\code{ffexp$calculate_effects()}}
 \item \href{#method-save_self}{\code{ffexp$save_self()}}
 \item \href{#method-create_save_folder_if_nonexistent}{\code{ffexp$create_save_folder_if_nonexistent()}}
@@ -447,6 +448,16 @@ Plot pairs of inputs and outputs.
 Helps see correlations and distributions.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ffexp$plot_pairs()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-plot"></a>}}
+\if{latex}{\out{\hypertarget{method-plot}{}}}
+\subsection{Method \code{plot()}}{
+Calling `plot` on an `ffexp` object calls `plot_pairs()`
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ffexp$plot()}\if{html}{\out{</div>}}
 }
 
 }

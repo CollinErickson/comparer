@@ -804,6 +804,10 @@ ffexp <- R6::R6Class(
       tdf <- self$outcleandf[, 1:(ncol(self$outcleandf) - 3)]
       GGally::ggpairs(data=tdf)
     },
+    #' @description Calling `plot` on an `ffexp` object calls `plot_pairs()`
+    plot = function() {
+      self$plot_pairs()
+    },
     #' @description Calculate the effects of each variable as if this
     #' was an experiment using a linear model.
     calculate_effects = function() {
