@@ -851,6 +851,51 @@ ffexp <- R6::R6Class(
              }
       )
     },
+    calculate_effects2 = function() {
+      nvar <- ncol(self$rungrid)
+      outputcols <- (nvar+1):(ncol(self$outrawdf)-3)
+      sapply(1:nvar,
+             function(i) {
+               tdf <- plyr::ddply(self$outrawdf[,c(i, outputcols)],
+                                  names(self$rungrid)[i],
+                                  colMeans)
+               # Need df first, then list, then vector
+               if (is.data.frame(self$arglist[[i]])) {
+                 tdf[,1] <- rownames(self$arglist[[i]])[tdf[,1]]
+               } else if (is.list(self$arglist[[i]])) {
+                 tdf[,1] <- names(self$arglist[[i]][[1]])[tdf[,1]]
+               } else if (is.vector(self$arglist[[i]])) {
+                 tdf[,1] <- self$arglist[[i]][tdf[,1]]
+               }
+
+               (coef(lm(paste(colnames(tdf)[2], " ~ ", colnames(tdf)[1]), data=tdf))[2])
+
+               # nlev <- nrow(tdf)
+               # if (nlev > 1) {
+               #   browser()
+               #   for (j in (2:nlev)) {
+               #     for (k in 1:(j-1)) {
+               #       # newdf <- data.frame(diffname=paste0(tdf[j,1],"-",
+               #       #                     tdf[k,1]),
+               #       #                     mean=tdf[j,2]-tdf[k,2],
+               #       #                     se=tdf[j,3]-tdf[k,3],
+               #       #                     runtime=tdf[j,4]-tdf[k,4])
+               #       newdf <- data.frame(tempname=paste0(tdf[j,1],"-",tdf[k,1]))
+               #       colnames(newdf)[1] <- names(self$rungrid)[i]
+               #       newdf <- cbind(newdf,
+               #                      tdf[j,outputcols-nvar+1]-
+               #                        tdf[k,outputcols-nvar+1])
+               #       tdf <- rbind(tdf, newdf)
+               #     }
+               #   }
+               # }
+               # Convert to list here so I can give it a name
+               tl <- list(tdf)
+               names(tl) <- paste0("Mean for levels of ", names(self$rungrid)[i])
+               tl
+             }
+      )
+    },
     #' @description Save this R6 object
     #' @param verbose How much should be printed when running. 0 is none,
     #' 2 is average.
