@@ -868,7 +868,7 @@ ffexp <- R6::R6Class(
                  tdf[,1] <- self$arglist[[i]][tdf[,1]]
                }
 
-               (coef(lm(paste(colnames(tdf)[2], " ~ ", colnames(tdf)[1]), data=tdf))[2])
+               return(coef(lm(paste(colnames(tdf)[2], " ~ ", colnames(tdf)[1]), data=tdf))[2])
 
                # nlev <- nrow(tdf)
                # if (nlev > 1) {
