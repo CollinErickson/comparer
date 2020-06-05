@@ -35,6 +35,9 @@ test_that("ffexp", {
   calc.eff <- f1$calculate_effects()
   expect_is(calc.eff, "list")
   expect_true(length(calc.eff) == 2)
+  calc.eff2 <- f1$calculate_effects2()
+  expect_is(calc.eff2, "vector")
+  expect_true(length(calc.eff) == 2)
 
   # Print
   t1 <- capture.output(f1)
