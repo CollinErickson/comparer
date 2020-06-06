@@ -36,7 +36,7 @@ test_that("ffexp", {
   expect_is(calc.eff, "list")
   expect_true(length(calc.eff) == 2)
   calc.eff2 <- f1$calculate_effects2()
-  expect_is(calc.eff2, "vector")
+  expect_is(calc.eff2, "numeric")
   expect_true(length(calc.eff) == 2)
 
   # Print
