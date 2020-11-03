@@ -308,6 +308,7 @@ test_that("Test add_variable", {
   expect_error({rm(f1, g1); gc()}, NA)
 })
 
+# Add level ----
 test_that("Test add_level", {
   f1 <- ffexp$new(n=c(100, 1000, 10000),
                   nulleff=c(0,1),
@@ -315,12 +316,14 @@ test_that("Test add_level", {
                     samp <- rnorm(n)
                     data.frame(mean=mean(samp), se=sd(samp)/sqrt(n))}
   )
-  f1$run_all(verbose=0)
+  f1$run_all(to_run = c(1,4), verbose=0)
+  # f1$run_all(verbose=0)
   expect_error(f1$add_level("notavar", 2))
   g1 <- f1$add_level("nulleff", 2)
   expect_equal(9, length(g1$completed_runs))
   expect_equal(sum(f1$completed_runs), sum(g1$completed_runs))
   expect_equal(length(g1$completed_runs), 3 + length(f1$completed_runs))
+  expect_equal(nrow(g1$outcleandf), 9)
 
   # Add two new levels
   g1$run_all(verbose=0)
@@ -331,7 +334,7 @@ test_that("Test add_level", {
   expect_equal(length(h1$completed_runs), 9 + length(f1$completed_runs))
 
   # Delete at end
-  expect_error({rm(f1, g1); gc()}, NA)
+  expect_error({rm(f1, g1, h1); gc()}, NA)
 })
 
 test_that("Test add_level with data frame", {

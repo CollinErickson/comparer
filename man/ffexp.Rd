@@ -131,6 +131,7 @@ available, or 'detect-1' will do one less than that.}
 \item \href{#method-plot_pairs}{\code{ffexp$plot_pairs()}}
 \item \href{#method-plot}{\code{ffexp$plot()}}
 \item \href{#method-calculate_effects}{\code{ffexp$calculate_effects()}}
+\item \href{#method-calculate_effects2}{\code{ffexp$calculate_effects2()}}
 \item \href{#method-save_self}{\code{ffexp$save_self()}}
 \item \href{#method-create_save_folder_if_nonexistent}{\code{ffexp$create_save_folder_if_nonexistent()}}
 \item \href{#method-rename_save_folder}{\code{ffexp$rename_save_folder()}}
@@ -469,6 +470,17 @@ Calculate the effects of each variable as if this
 was an experiment using a linear model.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ffexp$calculate_effects()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-calculate_effects2"></a>}}
+\if{latex}{\out{\hypertarget{method-calculate_effects2}{}}}
+\subsection{Method \code{calculate_effects2()}}{
+Calculate the effects of each variable as if this
+was an experiment using a linear model.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ffexp$calculate_effects2()}\if{html}{\out{</div>}}
 }
 
 }

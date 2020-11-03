@@ -26,3 +26,19 @@ If yes, maybe don't.
 * recover temp gives error, print which one
 
 * Delete results of a trial (flip completed, remove from outlist and outdfs)
+
+* Rename ffexp?
+
+* Run fractional experiments?
+
+* ffexp plot effects?
+
+* calculate effects that calculates slopes instead of for each level.
+
+* add_level fix outcleandf
+
+* print something after run_all
+
+* run_all print running then clear with \r
+
+* list outputs, get some for outcleandf

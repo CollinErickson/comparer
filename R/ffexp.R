@@ -194,6 +194,7 @@ ffexp <- R6::R6Class(
 
       self$number_runs <- nrow(self$rungrid)
       self$completed_runs <- rep(FALSE, self$number_runs)
+      self$outlist <- rep(list(NULL), self$number_runs)
       self$parallel <- parallel
       # self$parallel_cores <- parallel_cores
       if (self$parallel || !self$parallel) {
@@ -851,6 +852,8 @@ ffexp <- R6::R6Class(
              }
       )
     },
+    #' @description Calculate the effects of each variable as if this
+    #' was an experiment using a linear model.
     calculate_effects2 = function() {
       nvar <- ncol(self$rungrid)
       outputcols <- (nvar+1):(ncol(self$outrawdf)-3)
@@ -1186,8 +1189,18 @@ ffexp <- R6::R6Class(
       # Or could use rungrid and replace new_values with biggest number
       # existing_indexes <- which(
       #   new_exp$rungrid[,arg_name] < max(new_exp$rungrid[,arg_name]))
+      # Loop over runs that were already part of experiment, completed or not.
+      # Copy over data, leaving space for new runs.
       existing_indexes <- which(
         new_exp$rungrid[,arg_name] %in% existing_level_indexes)
+      # browser()
+      # Need to add rows to outcleandf, and copy over existing outcleandf
+      nrowsperindex <- nrow(self$outcleandf) / self$number_runs
+      new_exp$outcleandf <- new_exp$outcleandf[nrow(new_exp$outcleandf) +
+                                                 1:(new_exp$number_runs*nrowsperindex), ]
+      rownames(new_exp$outcleandf) <- 1:nrow(new_exp$outcleandf)
+      new_exp$outrawdf <- new_exp$outrawdf[nrow(new_exp$outrawdf) + 1:(new_exp$number_runs*nrowsperindex), ]
+      rownames(new_exp$outrawdf) <- 1:nrow(new_exp$outrawdf)
       for(old_index in existing_indexes) {
         old_rg_row <- self$rungrid[old_index,]
         new_index <- which(apply(new_exp$rungrid,1,
@@ -1197,15 +1210,22 @@ ffexp <- R6::R6Class(
         # new_index <- 1
         new_exp$completed_runs[new_index] <- self$completed_runs[old_index]
         new_exp$outlist[[new_index]] <- self$outlist[[old_index]]
+        new_exp$outcleandf[1:nrowsperindex + nrowsperindex*(new_index-1), ] <-
+          self$outcleandf[1:nrowsperindex + nrowsperindex*(old_index-1), ]
+        new_exp$outrawdf[1:nrowsperindex + nrowsperindex*(new_index-1), ] <-
+          self$outrawdf[1:nrowsperindex + nrowsperindex*(old_index-1), ]
       }; rm(old_rg_row, new_index, old_index)
+      # Loop over new runs, prepare them.
       for (new_index in setdiff(1:new_exp$number_runs, existing_indexes)) {
         stopifnot(!new_exp$completed_runs[new_index])
         # Needed in order to run add_level twice in a row without having run it
         new_exp$outlist[[new_index]] <- list(NULL)
       }
+      # browser("outcleandf")
+      # new_exp$outcleandf
       # Notify user that it wasn't changed in place
       if (!suppressMessage) {
-        message("Returning new object with added variable")
+        message("Returning new object with added variable, object was not changed in place.")
       }
       return(new_exp)
     },
