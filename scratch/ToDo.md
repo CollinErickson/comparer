@@ -35,10 +35,7 @@ If yes, maybe don't.
 
 * calculate effects that calculates slopes instead of for each level.
 
-* add_level fix outcleandf
-
-* print something after run_all
-
-* run_all print running then clear with \r
-
 * list outputs, get some for outcleandf
+
+* superbatches: If run_all with 100, give option to run in groups of 10.
+  would allow for progress print out and saving object

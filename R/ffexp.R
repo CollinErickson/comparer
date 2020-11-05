@@ -310,7 +310,7 @@ ffexp <- R6::R6Class(
         }
         if (parallel_temp_save) {self$create_save_folder_if_nonexistent()}
         if (verbose>=1) {
-          if (length(to_run) <= 200) {
+          if (length(to_run) <= 60) {
             to_run_print <- paste(to_run, collapse=' ')
           } else {
             to_run_print <- paste(c(to_run[1:10], "...", tail(to_run, 10),
@@ -318,9 +318,12 @@ ffexp <- R6::R6Class(
                                   collapse=' ')
           }
           cat("About to start run in parallel (", self$parallel_cores,
-              " cores), run order is:\n    ",
+              " cores) at ",
+              as.character(Sys.time()),
+              ", run order is:\n    ",
               to_run_print,
               "\n", sep='')
+          cat("Running...")
         }
         # cat("\tCluster is"); print(self$parallel_cluster)
         # browser()
@@ -339,6 +342,9 @@ ffexp <- R6::R6Class(
             }
             tout
           })
+        if (verbose >= 1) {
+          cat("\r... finished at", as.character(Sys.time()), "\n")
+        }
         lapply(parout,
                function(oneout) {do.call(self$add_result_of_one, oneout)})
         parallel::stopCluster(self$parallel_cluster)
@@ -658,7 +664,11 @@ ffexp <- R6::R6Class(
           cat("Error was:\n\n", file=write_error_file_path)
           cat(try.run[1], "\n", file=write_error_file_path)
         }
-        stop(paste0("Error in run_one for irow=",irow,"\n",try.run))
+        # print(self$rungrid2(irow))
+        stop(paste0("Error in run_one for irow=",irow,"\n",
+                    try.run,
+                    "To check inputs, call: $rungrid2(rows=", irow, ")\n"
+                    ))
       }
 
       # This needs to be added to object using self$add_result_of_one.
