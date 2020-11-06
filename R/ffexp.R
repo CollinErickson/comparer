@@ -493,6 +493,47 @@ ffexp <- R6::R6Class(
       }
       invisible(self)
     },
+    run_superbatch = function(nsb, #to_run=NULL, random_n=NULL,
+                              redo = FALSE, run_order,
+                              save_output=self$save_output,
+                              parallel=self$parallel,
+                              parallel_cores=self$parallel_cores,
+                              parallel_temp_save=save_output,
+                              write_start_files=save_output,
+                              write_error_files=save_output,
+                              delete_parallel_temp_save_after=FALSE,
+                              varlist=self$varlist,
+                              verbose=self$verbose,
+                              warn_repeat=TRUE) {
+      # browser()
+      to_run <- which(!self$completed_runs)
+      if (length(to_run) == 0) {return(invisible(self))}
+      to_run <- to_run[sample(1:length(to_run))]
+      stopifnot(length(nsb) == 1, is.numeric(nsb), nsb > 0)
+      nbatch <- ceiling(length(to_run) / nsb)
+      stopifnot(nbatch > 0)
+      pb <- progress::progress_bar$new(total=nbatch)
+      pb$tick(0)
+      cat("Starting to run", length(to_run), "trials in batches of size", nsb, "\n")
+      for (i in 1:nbatch) {
+        to_run_i <- to_run[((i-1)*nsb + 1):min(nsb*i, length(to_run))]
+        self$run_all(to_run=to_run_i, #random_n=NULL,
+                     redo = redo, #run_order,
+                     save_output=save_output,
+                     parallel=parallel,
+                     parallel_cores=parallel_cores,
+                     parallel_temp_save=parallel_temp_save,
+                     write_start_files=write_start_files,
+                     write_error_files=write_error_files,
+                     delete_parallel_temp_save_after=delete_parallel_temp_save_after,
+                     varlist=varlist,
+                     verbose=0,
+                     warn_repeat=warn_repeat)
+        pb$tick()
+      }
+      cat("Finished running superbatches", "\n")
+      invisible(self)
+    },
     #' @description Run a single row of the experiment.
     #' You can specify which one to run.
     #' Generally this should not be used by users, use `run_all`
@@ -668,7 +709,7 @@ ffexp <- R6::R6Class(
         stop(paste0("Error in run_one for irow=",irow,"\n",
                     try.run,
                     "To check inputs, call: $rungrid2(rows=", irow, ")\n"
-                    ))
+        ))
       }
 
       # This needs to be added to object using self$add_result_of_one.
