@@ -234,6 +234,8 @@ ffexp <- R6::R6Class(
     #' the the parallel cluster.
     #' @param verbose How much should be printed when running. 0 is none,
     #' 2 is average.
+    #' @param outfile Where should master output file be saved when running
+    #' in parallel?
     #' @param warn_repeat Should warnings be given when repeating already
     #' completed rows?
     run_all = function(to_run=NULL, random_n=NULL,
@@ -247,6 +249,7 @@ ffexp <- R6::R6Class(
                        delete_parallel_temp_save_after=FALSE,
                        varlist=self$varlist,
                        verbose=self$verbose,
+                       outfile,
                        warn_repeat=TRUE) {
       if (missing(run_order)) { # random for parallel for load balancing
         if (parallel) {run_order <- "random"}
@@ -296,12 +299,16 @@ ffexp <- R6::R6Class(
           }
           # Make cluster
 
-          # Save masteroutput file
-          self$create_save_folder_if_nonexistent()
+          # Save masteroutput file. Allow use to set, on one computer it hangs
+          #  when given, so user must give in ""
+          if (missing(outfile)) {
+            outfile <- paste0(self$folder_path,
+                              "/parallel_MASTEROUTPUT.txt")
+            self$create_save_folder_if_nonexistent()
+          }
           self$parallel_cluster <- parallel::makeCluster(
             spec=self$parallel_cores, type = "SOCK",
-            outfile=paste0(self$folder_path,
-                           "/parallel_MASTEROUTPUT.txt"))
+            outfile=outfile)
           # Export any variables
           if (!is.null(varlist)) {
             parallel::clusterExport(cl=self$parallel_cluster,

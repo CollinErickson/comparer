@@ -125,6 +125,7 @@ available, or 'detect-1' will do one less than that.}
 \item \href{#method-new}{\code{ffexp$new()}}
 \item \href{#method-run_all}{\code{ffexp$run_all()}}
 \item \href{#method-run_for_time}{\code{ffexp$run_for_time()}}
+\item \href{#method-run_superbatch}{\code{ffexp$run_superbatch()}}
 \item \href{#method-run_one}{\code{ffexp$run_one()}}
 \item \href{#method-add_result_of_one}{\code{ffexp$add_result_of_one()}}
 \item \href{#method-plot_run_times}{\code{ffexp$plot_run_times()}}
@@ -218,6 +219,7 @@ be run in parallel, and what files should be saved.
   delete_parallel_temp_save_after = FALSE,
   varlist = self$varlist,
   verbose = self$verbose,
+  outfile,
   warn_repeat = TRUE
 )}\if{html}{\out{</div>}}
 }
@@ -263,6 +265,9 @@ the the parallel cluster.}
 
 \item{\code{verbose}}{How much should be printed when running. 0 is none,
 2 is average.}
+
+\item{\code{outfile}}{Where should master output file be saved when running
+in parallel?}
 
 \item{\code{warn_repeat}}{Should warnings be given when repeating already
 completed rows?}
@@ -342,6 +347,29 @@ completed rows?}
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-run_superbatch"></a>}}
+\if{latex}{\out{\hypertarget{method-run_superbatch}{}}}
+\subsection{Method \code{run_superbatch()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ffexp$run_superbatch(
+  nsb,
+  redo = FALSE,
+  run_order,
+  save_output = self$save_output,
+  parallel = self$parallel,
+  parallel_cores = self$parallel_cores,
+  parallel_temp_save = save_output,
+  write_start_files = save_output,
+  write_error_files = save_output,
+  delete_parallel_temp_save_after = FALSE,
+  varlist = self$varlist,
+  verbose = self$verbose,
+  warn_repeat = TRUE
+)}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-run_one"></a>}}
