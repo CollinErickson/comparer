@@ -352,6 +352,8 @@ completed rows?}
 \if{html}{\out{<a id="method-run_superbatch"></a>}}
 \if{latex}{\out{\hypertarget{method-run_superbatch}{}}}
 \subsection{Method \code{run_superbatch()}}{
+Run batches. Allows for better progress visualization
+and saving when running in parallel
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ffexp$run_superbatch(
   nsb,
@@ -370,6 +372,52 @@ completed rows?}
 )}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{nsb}}{Number of super batches}
+
+\item{\code{redo}}{Should already completed rows be run again?}
+
+\item{\code{run_order}}{In what order should the rows by run?
+Options: random, in_order, and reverse.}
+
+\item{\code{save_output}}{Should the output be saved?}
+
+\item{\code{parallel}}{Should it be run in parallel?}
+
+\item{\code{parallel_cores}}{When running in parallel, how many cores should
+be used. Not actually the number of cores used, actually the number
+of clusters created. Can be more than the computer has available,
+but will hurt performance. Can set to 'detect' to have it detect
+how many cores are available and use that, or 'detect-1' to use
+one fewer than there are.}
+
+\item{\code{parallel_temp_save}}{Should temp files be written when running
+in parallel? Prevents losing results if it crashes partway through.}
+
+\item{\code{write_start_files}}{Should start files be written?}
+
+\item{\code{write_error_files}}{Should error files be written for rows that
+fail?}
+
+\item{\code{delete_parallel_temp_save_after}}{If using parallel temp save
+files, should they be deleted afterwards?}
+
+\item{\code{varlist}}{A character vector of names of variables to be passed
+the the parallel cluster.}
+
+\item{\code{verbose}}{How much should be printed when running. 0 is none,
+2 is average.}
+
+\item{\code{warn_repeat}}{Should warnings be given when repeating already
+completed rows?}
+
+\item{\code{outfile}}{Where should master output file be saved when running
+in parallel?}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-run_one"></a>}}

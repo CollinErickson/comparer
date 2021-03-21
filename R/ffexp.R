@@ -500,6 +500,40 @@ ffexp <- R6::R6Class(
       }
       invisible(self)
     },
+    #' @description Run batches. Allows for better progress visualization
+    #' and saving when running in parallel
+    #' @param nsb Number of super batches
+    #'
+    # @param to_run Which rows should be run? If NULL, then all that haven't
+    # been run yet.
+    # @param random_n Randomly selects n trials among those not yet completed
+    # and runs them.
+    #' @param redo Should already completed rows be run again?
+    #' @param run_order In what order should the rows by run?
+    #' Options: random, in_order, and reverse.
+    #' @param save_output Should the output be saved?
+    #' @param parallel Should it be run in parallel?
+    #' @param parallel_cores When running in parallel, how many cores should
+    #' be used. Not actually the number of cores used, actually the number
+    #' of clusters created. Can be more than the computer has available,
+    #' but will hurt performance. Can set to 'detect' to have it detect
+    #' how many cores are available and use that, or 'detect-1' to use
+    #' one fewer than there are.
+    #' @param parallel_temp_save Should temp files be written when running
+    #' in parallel? Prevents losing results if it crashes partway through.
+    #' @param write_start_files Should start files be written?
+    #' @param write_error_files Should error files be written for rows that
+    #' fail?
+    #' @param delete_parallel_temp_save_after If using parallel temp save
+    #' files, should they be deleted afterwards?
+    #' @param varlist A character vector of names of variables to be passed
+    #' the the parallel cluster.
+    #' @param verbose How much should be printed when running. 0 is none,
+    #' 2 is average.
+    #' @param outfile Where should master output file be saved when running
+    #' in parallel?
+    #' @param warn_repeat Should warnings be given when repeating already
+    #' completed rows?
     run_superbatch = function(nsb, #to_run=NULL, random_n=NULL,
                               redo = FALSE, run_order,
                               save_output=self$save_output,
