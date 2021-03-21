@@ -1,7 +1,7 @@
 Package: comparer
 Type: Package
 Title: Compare Output and Run Time
-Version: 0.2.1.9000
+Version: 0.2.2
 Authors@R: c(
   person("Collin", "Erickson", , "collinberickson@gmail.com", c("aut", "cre"))
   )
@@ -10,7 +10,7 @@ Description: Quickly run experiments to compare the run time and output of
     and will calculate statistics comparing the resulting outputs.
     It can be used to compare model fits to the same data or
     see which function runs faster.
-    The function ffexp() runs a function using all possible combinations
+    The R6 class ffexp$new() runs a function using all possible combinations
     of selected inputs. This is useful for comparing the effect of
     different parameter values. It can also run in parallel and
     automatically save intermediate results, which is very useful
