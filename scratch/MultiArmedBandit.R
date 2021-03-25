@@ -17,10 +17,13 @@ function(inputs, eval_func, method="epsgreedy") {
       self$inputs <- inputs
       self$ninputs <- length(inputs)
       self$method <- method
-      print(inputs); print(n0)
+      # print(inputs); print(n0)
       self$inputs2 <- data.frame(input=inputs, K=n0)
       self$exp <- comparer::ffexp$new(input=self$inputs2, eval_func=eval_func)
       self$minimize <- minimize
+    },
+    run = function(verbose=0) {
+      self$exp$run_all(verbose=verbose)
     },
     add1 = function() {
       minmult <- if (self$minimize) {-1} else {1}
@@ -69,20 +72,49 @@ function(inputs, eval_func, method="epsgreedy") {
       expnew <- self$exp$add_level("input", list(input=nextind, K=nextK), suppressMessage = T)
       self$exp <- expnew
       # Run the new one
-      self$exp$run_all(verbose=0)
+      # self$exp$run_all(verbose=0)
+      self$run(verbose=0)
+    },
+    plot = function(flip=F) {
+      df <- self$exp$outcleandf
+      # browser()
+      dfsum <- df %>% group_by(input) %>%
+        summarize(N=n(), mn=mean(t.output.), std=sd(t.output.),
+                  LCB=mn-2*std, UCB=mn+2*std,
+                  LCBmn=mn-2*std/sqrt(N), UCBmn=mn+2*std/sqrt(N))
+      p <- ggplot2::ggplot(df, ggplot2::aes(input, t.output.)) +
+        ggplot2::geom_rect(data=dfsum %>% filter(!is.na(std)),
+                           aes(xmin=input-.05,xmax=input+.05, ymin=LCB, ymax=UCB, y=NULL), fill="gray77") +
+        ggplot2::geom_rect(data=dfsum %>% filter(!is.na(std)),
+                           aes(xmin=input-.05,xmax=input+.05, ymin=LCBmn, ymax=UCBmn, y=NULL), fill="gray67") +
+        ggplot2::geom_point(data=dfsum, aes(input, mn), color='green', size=3) +
+        ggplot2::geom_point()
+      if (flip) {p <- p + coord_flip()}
+      p
+    },
+    print = function() {
+      s <- c("Multi-armed bandit experiment from the comparer package")
+      s <- c(s, paste0("    # of arms: ", self$ninputs))
+      s <- c(s, paste0("    # of trials completed: ", nrow(self$exp$outcleandf)))
+      s <- c(s, "    Use $add1() to add a trial and run it")
+      s <- c(s, "    Use $plot() to view results")
+      s <- paste(s, collapse="\n")
+      cat(s, "\n")
     }
   )
 )
 
 e1 <- ..MAB_R6$new(1:5, n0=1, eval_func=function(input, ...) {rnorm(1, input, 2)}, minimize=F, method="TS")
 e1$exp
-e1$exp$run_all()
+e1$run() #exp$run_all()
 e1$exp$outcleandf
-library(dplyr)
+library(dplyr); library(ggplot2)
 e1$add1()
 e1$exp
 for (i in 1:10) {
   e1$add1()
   # print(e1$exp$outcleandf)
-  plot(e1$exp$outcleandf$input, e1$exp$outcleandf$t.output.)
+  # plot(e1$exp$outcleandf$input, e1$exp$outcleandf$t.output.)
+  e1$plot() %>% print
 }
+print(e1)
