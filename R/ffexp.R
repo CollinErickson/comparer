@@ -691,7 +691,16 @@ ffexp <- R6::R6Class(
                               tr
                             })
       # Need to get list of lists out into single list
-      row_df <- as.list(unlist(row_df_list, recursive = FALSE))
+      # browser()
+      # This didn't work because it would convert numeric to char
+      # row_df <- as.list(unlist(row_df_list, recursive = FALSE))
+      # Instead do this. Hopefully it works. Didn't work.
+      # row_df <- lapply(row_df_list, function(x){x[[1]]})
+      # names(row_df) <- sapply(row_df_list, function(x){names(x)})
+      # Maybe just this?
+      # browser()
+      row_df <- do.call(c,
+                        lapply(row_df_list, function(lst) {if (is.list(lst)) {lst} else {as.list(lst)}}))
 
       # Write start file so user can see which ones are currently
       #  running and when they started.
