@@ -25,7 +25,7 @@ If yes, maybe don't.
 
 * Delete results of a trial (flip completed, remove from outlist and outdfs)
 
-* Rename ffexp?
+* Rename ffexp? 
 
 * Create non-R6 function for ffexp. FFexp, Experiment, CompExp?
 
@@ -39,3 +39,10 @@ If yes, maybe don't.
 
 * superbatches: If run_all with 100, give option to run in groups of 10.
   would allow for progress print out and saving object
+
+* Multi-armed bandit. addn, run parallel, easy access function, df/list input, log scale.
+   Check that all have been run. Binary.
+
+* Unnamed output is called t.output., rename?
+
+* ffexp print when already run all, show other options
