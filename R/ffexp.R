@@ -812,6 +812,13 @@ ffexp <- R6::R6Class(
         # newdf0$start_time <- start_time
         # newdf0$end_time <- end_time
       } else if (is.vector(output) && !is.list(output)) {
+        # Change name so it's not named t.output.
+        if (is.null(names(output))) {
+          names(output) <- paste0("V", 1:length(output))
+        }
+        # if (any(names(output) == "")) { # E.g., c(3, b=4)
+        #   # By default they get named V1, V2, etc, so it's fine.
+        # }
         newdf0 <- data.frame(t(output), stringsAsFactors=FALSE)
         newdf0$runtime <- systime[3]
       } else {

@@ -1,6 +1,6 @@
-function(inputs, eval_func, method="epsgreedy") {
-  inputs
-}
+# function(inputs, eval_func, method="epsgreedy") {
+#   inputs
+# }
 
 ..MAB_R6 <- R6::R6Class(
   classname="MAB",
@@ -29,7 +29,7 @@ function(inputs, eval_func, method="epsgreedy") {
       minmult <- if (self$minimize) {-1} else {1}
       ocdf <- self$exp$outcleandf
       countdf <- ocdf %>% group_by(input) %>%
-        summarize(N=n(),mn=mean(t.output.), std=sd(t.output.),
+        summarize(N=n(),mn=mean(V1), std=sd(V1),
                   UCB=mn+2*std, LCB=mn-2*std)
       if (min(countdf$N) < 2) {
         nextind <- countdf %>% arrange(N) %>% .$input %>% .[[1]]
@@ -79,10 +79,10 @@ function(inputs, eval_func, method="epsgreedy") {
       df <- self$exp$outcleandf
       # browser()
       dfsum <- df %>% group_by(input) %>%
-        summarize(N=n(), mn=mean(t.output.), std=sd(t.output.),
+        summarize(N=n(), mn=mean(V1), std=sd(V1),
                   LCB=mn-2*std, UCB=mn+2*std,
                   LCBmn=mn-2*std/sqrt(N), UCBmn=mn+2*std/sqrt(N))
-      p <- ggplot2::ggplot(df, ggplot2::aes(input, t.output.)) +
+      p <- ggplot2::ggplot(df, ggplot2::aes(input, V1)) +
         ggplot2::geom_rect(data=dfsum %>% filter(!is.na(std)),
                            aes(xmin=input-.05,xmax=input+.05, ymin=LCB, ymax=UCB, y=NULL), fill="gray77") +
         ggplot2::geom_rect(data=dfsum %>% filter(!is.na(std)),
@@ -114,7 +114,7 @@ e1$exp
 for (i in 1:10) {
   e1$add1()
   # print(e1$exp$outcleandf)
-  # plot(e1$exp$outcleandf$input, e1$exp$outcleandf$t.output.)
+  # plot(e1$exp$outcleandf$input, e1$exp$outcleandf$V1)
   e1$plot() %>% print
 }
 print(e1)
