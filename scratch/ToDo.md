@@ -45,8 +45,6 @@ If yes, maybe don't.
 
 * ffexp print when already run all, show other options
 
-* paraller masteroutput to "" by default to make it easier. Usually don't want it anyways
+* parallel masteroutput to "" by default to make it easier. Usually don't want it anyways
 
 * ffexp replace system.time with Sys.time for better accuracy
-
-* ffexp fix data.frame with single column input

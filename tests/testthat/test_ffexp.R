@@ -414,11 +414,20 @@ test_that("ffexp with single df input and df multirow output", {
   expect_error({rm(f1); gc()}, NA)
 })
 
+test_that("length one vector output unnamed, df single col input", {
+  f1 <- ffexp$new(data.frame(a=1:2),
+                  eval_func=function(a) {a^2})
+  expect_error(f1$run_all(verbose=0), NA)
+  f1$outcleandf
+  expect_equal(names(f1$outcleandf)[1:2], c("a", "V1"))
+})
+
 test_that("vector output", {
   f1 <- ffexp$new(data.frame(a=1:2,b=c("b",'c'), c=factor(c(5,6))),
                   eval_func=function(a,b,cc) {c(a=a, b=b, c=cc)})
   expect_error(f1$run_all(verbose=0), NA)
   f1$outcleandf
+  expect_equal(names(f1$outcleandf)[1:6], c("a", "b", "c", "a", "b", "c"))
 })
 
 test_that("list output", {

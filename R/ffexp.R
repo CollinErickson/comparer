@@ -166,7 +166,7 @@ ffexp <- R6::R6Class(
                               lapply(1:length(self$arglist),
                                      function(j) {
                                        i <- self$arglist[[j]]
-                                       if (is.data.frame(i)) {
+                                       if (is.data.frame(i)) {#browser()
                                          data.frame(name =colnames(i),
                                                     class=unlist(lapply(i, class)),
                                                     num  =nrow(i))
@@ -668,10 +668,10 @@ ffexp <- R6::R6Class(
 
       # Get df for output row, must be number of string, no functions
       row_df_list <- lapply(1:ncol(self$nvars),
-                            function(i) {
+                            function(i) {#browser()
                               ar <- self$arglist[[i]]
                               if (is.data.frame(ar)) {
-                                tr <- as.list(ar[row_grid[1,i, drop=TRUE],])
+                                tr <- as.list(ar[row_grid[1,i, drop=TRUE], , drop=FALSE])
                               } else if (is.list(ar)) {
                                 # tr <- ar[[row_grid[1,i]]]
                                 tr <- lapply(ar, function(x) x[[row_grid[1,i]]])
@@ -800,7 +800,8 @@ ffexp <- R6::R6Class(
     add_result_of_one = function(output, systime, irow, row_grid, row_df,
                                  start_time, end_time, save_output) {
       # This is used to save results after running an item
-
+      # browser()
+      # stopifnot(is.data.frame(row_df))
       # Save entire output as list
       self$outlist[[irow]] <- output
 
