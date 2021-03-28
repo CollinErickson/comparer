@@ -1,4 +1,6 @@
-# comparer 0.2.1.9000
+# comparer 0.2.2
+
+Minor fixes for ffexp to improve reliability.
 
 # comparer 0.2.1
 
