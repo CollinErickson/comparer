@@ -28,7 +28,6 @@ Suggests:
     ggplot2,
     GGally,
     parallel,
-    snow,
     rmarkdown,
     reshape,
     tibble,
