@@ -17,7 +17,6 @@ Description: Quickly run experiments to compare the run time and output of
     for long computations.
 License: GPL-3
 Encoding: UTF-8
-LazyData: true
 Imports: R6
 Suggests: 
     plyr,
@@ -28,6 +27,7 @@ Suggests:
     ggplot2,
     GGally,
     parallel,
+    snow,
     rmarkdown,
     reshape,
     tibble,

@@ -724,7 +724,7 @@ ffexp <- R6::R6Class(
       # Run and time it
       try.run <- try({
         start_time <- Sys.time()
-        systime <- system.time(output <- do.call(self$eval_func, row_list))
+        systime <- system.time(output <- do.call(self$eval_func, row_list), gcFirst = FALSE)
         end_time <- Sys.time()
       }, silent=verbose<1)
 

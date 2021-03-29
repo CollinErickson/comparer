@@ -9,42 +9,58 @@
     ninputs=NULL,
     inputs2=NULL,
     method=NULL,
-    exp=NULL,
+    eps=NULL, # Prob to select a random input
+    exp=NULL, # FFexp experiment object
     minimize=NULL,
-    initialize = function(inputs, n0=1, eval_func, method="epsgreedy", minimize=TRUE) {
+    parallel=NULL,
+    parallel_cores=NULL,
+    initialize = function(inputs, n0=1, eval_func, method="UCB", eps=.1, minimize=TRUE,
+                          parallel=FALSE,
+                          parallel_cores="detect") {
       cat('initializing mab\n')
       # inputs is vector
       self$inputs <- inputs
       self$ninputs <- length(inputs)
       self$method <- method
+      self$eps <- eps
       # print(inputs); print(n0)
       stopifnot(is.numeric(n0), length(n0) == 1)
       self$inputs2 <- expand.grid(input=inputs, K=1:n0)
       self$exp <- comparer::ffexp$new(input=self$inputs2, eval_func=eval_func)
       self$minimize <- minimize
+      self$parallel <- parallel
+      self$parallel_cores <- parallel_cores
     },
-    run = function(verbose=0, ...) {
-      self$exp$run_all(verbose=verbose, ...)
+    run = function(verbose=0, parallel=self$parallel, parallel_cores=self$parallel_cores, ...) {
+      self$exp$run_all(verbose=verbose, parallel=parallel, parallel_cores=parallel_cores, ...)
     },
-    add1 = function(run=TRUE) {
+    add1 = function(run=TRUE, method=self$method, eps=self$eps, Nmin=2) {
+      stopifnot(length(eps)==1, eps>=0, eps<=1, length(Nmin)==1, Nmin>=1,
+                length(method)==1, length(run)==1, is.logical(run))
+      method <- tolower(method)
       minmult <- if (self$minimize) {-1} else {1}
       ocdf <- self$exp$outcleandf
-      countdf <- ocdf %>% group_by(input) %>%
+      # Count of all allocated
+      # browser()
+      countdf_all <- self$exp$rungrid2() %>% group_by(input) %>% tally(name="Ntotal")
+      # Countdf can include some trials not evaluated yet.
+      countdf_completed <- ocdf %>% group_by(input) %>% filter(!is.na(input)) %>%
         summarize(N=n(),mn=mean(V1, na.rm=T), std=sd(V1, na.rm=T),
                   UCB=mn+2*std, LCB=mn-2*std)
-      if (min(countdf$N) < 2) {
+      countdf <- full_join(countdf_all, countdf_completed, "input")
+      if (min(countdf$Ntotal) < Nmin) {
         nextind <- countdf %>% arrange(N) %>% .$input %>% .[[1]]
         nextK <- min(countdf$N) + 1
-      } else if (self$method=="epsgreedy") {
-        if (runif(1) < .2) {#browser()
+      } else if (runif(1) < eps || method=="random") {
+        # if () {
           nextind <- sample(1:self$ninputs, 1)
           nextK <- (ocdf %>% filter(input==nextind) %>% nrow) + 1
-        } else {
-          nextdf <- countdf %>% arrange(-minmult*mn)
-          nextind <- nextdf$input[1]
-          nextK <- nextdf$N[1] + 1
-        }
-      } else if (self$method=="CB") {
+        # }
+      } else if (method=="greedy") {
+        nextdf <- countdf %>% arrange(-minmult*mn)
+        nextind <- nextdf$input[1]
+        nextK <- nextdf$N[1] + 1
+      } else if (method %in% c("cb", "ucb", "lcb")) {
         if (self$minimize) {
           nextdf <- countdf %>% arrange(LCB)
         } else {
@@ -52,7 +68,7 @@
         }
         nextind <- nextdf$input[1]
         nextK <- nextdf$N[1] + 1
-      } else if (self$method=="TS") {browser()
+      } else if (method=="ts") {#browser()
         countdf <- countdf %>% mutate(samp=mn+std*rt(n=n(), df=N-1))
         if (self$minimize) {
           nextdf <- countdf %>% arrange(samp)
@@ -61,12 +77,12 @@
         }
         nextind <- nextdf$input[1]
         nextK <- nextdf$N[1] + 1
-      } else if (self$method=="fewest") {
+      } else if (method=="fewest") {
         nextdf <- countdf %>% arrange(N)
         nextind <- nextdf$input[1]
         nextK <- nextdf$N[1] + 1
       } else {
-        stop(paste0("Bad method given (", self$method,"), pick one of epsgreedy, CB, TS, or fewest"))
+        stop(paste0("Bad method given (", method,"), pick one of epsgreedy, CB, TS, or fewest"))
       }
       # cat('next ind is', nextind, 'nextK', nextK, '\n')
       if (is.na(nextind)) {browser()}
@@ -76,16 +92,17 @@
       # Run the new one
       # self$exp$run_all(verbose=0)
       if (run) {
-        self$run(verbose=0)
+        self$run(verbose=0, parallel=FALSE)
       }
     },
-    addn = function(n, run=TRUE, parallel) {
-      stopifnot(is.integer(n), length(n)==1)
+    addn = function(n, run=TRUE, method=self$method, eps=self$eps, Nmin=2,
+                    parallel=self$parallel && n>1, parallel_cores=self$parallel_cores) {
+      stopifnot(as.integer(n) == n, length(n)==1)
       for (i in 1:n) {
-        self$add1(run=FALSE)
+        self$add1(run=FALSE, method=method, eps=eps, Nmin=Nmin)
       }
       if (run) {
-        self$run(verbose=0)
+        self$run(verbose=0, parallel=parallel, parallel_cores=parallel_cores)
       }
     },
     plot = function(flip=F) {
@@ -107,8 +124,11 @@
     },
     print = function() {
       s <- c("Multi-armed bandit experiment from the comparer package")
-      s <- c(s, paste0("    # of arms: ", self$ninputs))
-      s <- c(s, paste0("    # of trials completed: ", nrow(self$exp$outcleandf)))
+      s <- c(s, paste0("    # of arms: ", self$ninputs, ',    using method: ', self$method))
+      s <- c(s, paste0("    # of trials completed: ", sum(self$exp$completed_runs), "/", length(self$exp$completed_runs)))
+      if (sum(!self$exp$completed_runs) > 0) {
+        s <- c(s, paste0("    Use $run() to evaluate all remaining trials"))
+      }
       s <- c(s, "    Use $add1() to add a trial and run it")
       s <- c(s, "    Use $plot() to view results")
       s <- paste(s, collapse="\n")
@@ -138,6 +158,7 @@ if (F) {
 if (F) {
 
   e1 <- ..MAB_R6$new(1:5, n0=2, eval_func=function(input, ...) {print(input);rnorm(1, input, 2)}, minimize=F, method="TS")
+  e1
   e1$exp$rungrid2()
   e1$run()
   e1$plot()
@@ -146,6 +167,25 @@ if (F) {
   e1$add1(run=F)
   e1
   e1$run()
+  e1$plot()
+}
 
+if (F) {
+
+  e1 <- ..MAB_R6$new(1:5, n0=2, eval_func=function(input, ...) {rnorm(1, input, (6-input)^2)}, minimize=F, method="TS")
+  e1
+  e1$exp$rungrid2()
+  system.time(e1$run())
+  e1$plot()
+  e1$add1(run=F)
+  e1$add1(run=F)
+  e1$add1(run=F, eps=1)
+  e1
+  e1$run()
+  e1$plot()
+  e1$exp$plot_run_times()
+  e1$addn(10L, parallel=T)
+  e1$plot()
+  e1$exp$plot_run_times()
 }
 

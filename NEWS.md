@@ -1,6 +1,8 @@
 # comparer 0.2.2
 
-Minor fixes for ffexp to improve reliability.
+* Minor fixes for ffexp to improve reliability.
+
+* Major speedup for fast trials when not run in parallel.
 
 # comparer 0.2.1
 

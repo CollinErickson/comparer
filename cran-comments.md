@@ -26,8 +26,23 @@ Uses the superseded package: 'snow'
 
 The first isn't an issue.
 For 'snow', I tried removing it from Suggests since I never actually
-call it, I only use 'parallel', but then it gives an error.
-Thus I am leaving 'snow' in Suggests.
+call it (I only use the package 'parallel'), but then it gives an error.
+Apparently parallel::makeCluster using type="SOCK" calls snow::makeSOCKcluster,
+requiring 'snow' to be in Suggests.
+Thus I do not think this is an issue and I am leaving 'snow' in Suggests.
+
+On winbuilder, there is one NOTE:
+"
+* checking CRAN incoming feasibility ... NOTE
+Maintainer: 'Collin Erickson <collinberickson@gmail.com>'
+
+Possibly mis-spelled words in DESCRIPTION:
+  ffexp (13:18)
+
+Uses the superseded package: 'snow'
+"
+
+This is the same as on R-hub and I don't think it's a problem.
 
 ## Reverse dependencies
 
