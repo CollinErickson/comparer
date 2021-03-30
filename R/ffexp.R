@@ -1341,24 +1341,31 @@ ffexp <- R6::R6Class(
     #' @description Printing the object shows some
     #' summary information.
     print = function() {
-      s <- paste0(
-        c(
-          "ffexp object from the comparer package\n",
-          "   ", sum(self$completed_runs), " / ",
-          length(self$completed_runs), " completed",
-          if (sum(self$completed_runs) > 0 && sum(!self$completed_runs) > 0) {
-            paste0("  (est. time remaining: ",
-                   round(mean(self$outcleandf$runtime[self$completed_runs]) *
-                           sum(!self$completed_runs), 2), " sec.)\n")
-          } else {'\n'},
-          "   parallel : ", self$parallel,
-          if (self$parallel) {c(' (', self$parallel_cores, ' cores)')}
-          else {''},
-          "\n",
-          "   Use $run_all() to run all remaining\n",
-          "   Use $run_one() to run a single\n"
-        )
+      s <- c(
+        "ffexp object from the comparer package\n",
+        "   ", sum(self$completed_runs), " / ",
+        length(self$completed_runs), " completed",
+        if (sum(self$completed_runs) > 0 && sum(!self$completed_runs) > 0) {
+          paste0("  (est. time remaining: ",
+                 round(mean(self$outcleandf$runtime[self$completed_runs]) *
+                         sum(!self$completed_runs), 2), " sec.)\n")
+        } else {'\n'},
+        "   parallel : ", self$parallel,
+        if (self$parallel) {c(' (', self$parallel_cores, ' cores)')}
+        else {''},
+        "\n"
       )
+      # If still trials left, tell how they can be run
+      if (sum(!self$completed_runs) > 0) {
+        s <- c(s,
+               "   Use $run_all() to run all remaining\n",
+               "   Use $run_one() to run a single\n"
+        )
+      } else {
+        s <- c(s,
+               "   Use $outcleandf to get all output data\n"
+        )
+      }
       cat(s, sep="")
     },
     #' @description Set the number of parallel cores to be used when

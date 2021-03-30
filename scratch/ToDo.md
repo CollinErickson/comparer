@@ -43,10 +43,6 @@ If yes, maybe don't.
 * Multi-armed bandit. run batches, easy access function, df/list input, log scale.
    Check that all have been run. Binary.
 
-* ffexp print when already run all, show other options
-
 * parallel masteroutput to "" by default to make it easier. Usually don't want it anyways
-
-* ffexp replace system.time with Sys.time for better accuracy
 
 * superbatch has nsb wrong. Give either n batches or n trials per batch.
