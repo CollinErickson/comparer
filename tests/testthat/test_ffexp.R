@@ -42,7 +42,8 @@ test_that("ffexp", {
   # Print
   t1 <- capture.output(f1)
   expect_is(t1, "character")
-  expect_length(t1, 5)
+  # 5 lines beforre finished, 4 after finished
+  expect_length(t1, 4)
 
   # rungrid2
   t2 <- f1$rungrid2()

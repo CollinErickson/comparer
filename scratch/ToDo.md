@@ -46,3 +46,5 @@ If yes, maybe don't.
 * parallel masteroutput to "" by default to make it easier. Usually don't want it anyways
 
 * superbatch has nsb wrong. Give either n batches or n trials per batch.
+
+* hype: if no params given in, give message telling what to do
