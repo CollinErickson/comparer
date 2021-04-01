@@ -53,8 +53,8 @@
         nextK <- min(countdf$N) + 1
       } else if (runif(1) < eps || method=="random") {
         # if () {
-          nextind <- sample(1:self$ninputs, 1)
-          nextK <- (ocdf %>% filter(input==nextind) %>% nrow) + 1
+        nextind <- sample(1:self$ninputs, 1)
+        nextK <- (ocdf %>% filter(input==nextind) %>% nrow) + 1
         # }
       } else if (method=="greedy") {
         nextdf <- countdf %>% arrange(-minmult*mn)
@@ -173,6 +173,31 @@ if (F) {
 if (F) {
 
   e1 <- ..MAB_R6$new(1:5, n0=2, eval_func=function(input, ...) {rnorm(1, input, (6-input)^2)}, minimize=F, method="TS")
+  e1
+  e1$exp$rungrid2()
+  system.time(e1$run())
+  e1$plot()
+  e1$add1(run=F)
+  e1$add1(run=F)
+  e1$add1(run=F, eps=1)
+  e1
+  e1$run()
+  e1$plot()
+  e1$exp$plot_run_times()
+  e1$addn(10L, parallel=T)
+  e1$plot()
+  e1$exp$plot_run_times()
+}
+
+
+
+if (F) {
+  # Character input
+  e1 <- ..MAB_R6$new(c("a","b","c"), n0=2,
+                     eval_func=function(input, ...) {
+                       input2 <- which(c("a","b","c") == input);
+                       rnorm(1, input2, (6-input2)^2)},
+                     minimize=F, method="TS")
   e1
   e1$exp$rungrid2()
   system.time(e1$run())
