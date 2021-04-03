@@ -7,10 +7,12 @@
   public=list(
     inputs=NULL,
     ninputs=NULL,
-    inputs2=NULL,
+    # inputs2=NULL,
+    inputdf=NULL,
     method=NULL,
     eps=NULL, # Prob to select a random input
     exp=NULL, # FFexp experiment object
+    eval_func=NULL,
     minimize=NULL,
     parallel=NULL,
     parallel_cores=NULL,
@@ -25,8 +27,11 @@
       self$eps <- eps
       # print(inputs); print(n0)
       stopifnot(is.numeric(n0), length(n0) == 1)
-      self$inputs2 <- expand.grid(input=inputs, K=1:n0)
-      self$exp <- comparer::ffexp$new(input=self$inputs2, eval_func=eval_func)
+      inputs2 <- expand.grid(input=inputs, K=1:n0)
+      self$eval_func <- eval_func
+      eval_func2 <- function(input, K) {do.call(self$eval_func, list(self$inputs[input]))}
+      # self$exp <- comparer::ffexp$new(input=inputs2, eval_func=eval_func)
+      self$exp <- comparer::ffexp$new(input=expand.grid(input=1:self$ninputs, K=1:n0), eval_func=eval_func2)
       self$minimize <- minimize
       self$parallel <- parallel
       self$parallel_cores <- parallel_cores
@@ -87,6 +92,7 @@
       # cat('next ind is', nextind, 'nextK', nextK, '\n')
       if (is.na(nextind)) {browser()}
       # Add new level to experiment, returns new object
+      # browser()
       expnew <- self$exp$add_level("input", list(input=nextind, K=nextK), suppressMessage = T)
       self$exp <- expnew
       # Run the new one
@@ -112,13 +118,28 @@
         summarize(N=n(), mn=mean(V1), std=sd(V1),
                   LCB=mn-2*std, UCB=mn+2*std,
                   LCBmn=mn-2*std/sqrt(N), UCBmn=mn+2*std/sqrt(N))
-      p <- ggplot2::ggplot(df, ggplot2::aes(input, V1)) +
+      # browser()
+      # df$inputx <- factor(df$input) %>% as.numeric
+      df$inputorig <- factor(self$inputs[df$input], self$inputs)
+      dfsum$inputorig <- factor(self$inputs[dfsum$input], self$inputs)
+      # p <- ggplot2::ggplot(df, ggplot2::aes(inputorig, V1)) +
+      #   ggplot2::geom_rect(data=dfsum %>% filter(!is.na(std)),
+      #                      aes(xmin=input-.05,xmax=input+.05, ymin=LCB, ymax=UCB, y=NULL), fill="gray77") +
+      #   ggplot2::geom_rect(data=dfsum %>% filter(!is.na(std)),
+      #                      aes(xmin=input-.05,xmax=input+.05, ymin=LCBmn, ymax=UCBmn, y=NULL), fill="gray67") +
+      #   ggplot2::geom_point(data=dfsum, aes(input, mn), color='green', size=3) +
+      #   ggplot2::geom_point()
+      dfsum2 <- dfsum %>% filter(!is.na(std))
+      p <- ggplot2::ggplot(df, ggplot2::aes(inputorig, V1)) +
         ggplot2::geom_rect(data=dfsum %>% filter(!is.na(std)),
-                           aes(xmin=input-.05,xmax=input+.05, ymin=LCB, ymax=UCB, y=NULL), fill="gray77") +
+                           aes(xmin=input-.05,xmax=input+.05, ymin=LCB, ymax=UCB, y=NULL),
+                           xmin=dfsum$input-.05,xmax=dfsum$input+.05, fill="gray77") +
         ggplot2::geom_rect(data=dfsum %>% filter(!is.na(std)),
-                           aes(xmin=input-.05,xmax=input+.05, ymin=LCBmn, ymax=UCBmn, y=NULL), fill="gray67") +
+                           aes(ymin=LCBmn, ymax=UCBmn, y=NULL),
+                           xmin=dfsum$input-.05,xmax=dfsum$input+.05, fill="gray67") +
         ggplot2::geom_point(data=dfsum, aes(input, mn), color='green', size=3) +
-        ggplot2::geom_point()
+        ggplot2::geom_point() +
+        ylab(paste0("Output (",if (self$minimize) {"min"} else {"max"},")"))
       if (flip) {p <- p + coord_flip()}
       p
     },
@@ -192,11 +213,11 @@ if (F) {
 
 
 if (F) {
-  # Character input
+  # Character input ----
   e1 <- ..MAB_R6$new(c("a","b","c"), n0=2,
                      eval_func=function(input, ...) {
                        input2 <- which(c("a","b","c") == input);
-                       rnorm(1, input2, (6-input2)^2)},
+                       rnorm(1, input2^2, (4-input2)^2)},
                      minimize=F, method="TS")
   e1
   e1$exp$rungrid2()
