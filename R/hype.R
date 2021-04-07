@@ -43,6 +43,7 @@ if (F) {
   class(p1)
 }
 
+# hype ----
 #' Hyperparameter optimization
 #' @export
 #' @field X Data frame of inputs that have been evaluated or will be evaluated
@@ -74,7 +75,7 @@ if (F) {
 #' #system.time(h1$run_EI_for_time(sec=3, batch_size = 3))
 #' h1$plotorder()
 #' h1$plotX()
-hype <- R6::R6Class(
+hype <- R6::R6Class( # hype ----
   classname="hype",
   # inherit=ffexp,
   # active=list(
@@ -111,6 +112,9 @@ hype <- R6::R6Class(
     ) {
       self$eval_func <- eval_func
       dots <- list(...)
+      if (length(dots) == 0) {
+        stop("No hyperparameters given. Give a par_unif$new to hype$new.")
+      }
       parlist <- data.frame()
       self$parnames <- c()
       self$parlower <- c()
@@ -124,6 +128,7 @@ hype <- R6::R6Class(
         self$parlower <- c(self$parlower, pari$lower)
         self$parupper <- c(self$parupper, pari$upper)
       }
+      browser()
       if (!missing(n_lhs)) {
         Xlhs <- lhs::maximinLHS(n=n_lhs, k=length(self$parnames))
         Xlhs <- sweep(sweep(Xlhs,
@@ -360,4 +365,11 @@ if (F) {
   system.time(h1$run_EI_for_time(sec=3, batch_size = 3))
   h1$plotorder()
   h1$plotX()
+}
+if (F) {
+  h1 <- hype$new(
+    eval_func = function(a, b) {data.frame(c=a^2+b^2, d=1:2)},
+    extract_output_func = function(odf) {odf$c[1]},
+    n_lhs = 10
+  )
 }
