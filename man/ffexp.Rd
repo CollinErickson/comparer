@@ -116,6 +116,10 @@ available, or 'detect-1' will do one less than that.}
 
 \item{\code{verbose}}{How much should be printed when running. 0 is none,
 2 is average.}
+
+\item{\code{extract_output_to_df}}{A function to extract the raw output into
+a data frame. E.g., if the output is a list, but you want a single
+item to show up in the output data frame.}
 }
 \if{html}{\out{</div>}}
 }
@@ -162,7 +166,8 @@ Create an `ffexp` object.
   parallel_cores = "detect",
   folder_path,
   varlist = NULL,
-  verbose = 2
+  verbose = 2,
+  extract_output_to_df = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -193,6 +198,10 @@ passed to the parallel environment.}
 
 \item{\code{verbose}}{How much should be printed when running. 0 is none,
 2 is average.}
+
+\item{\code{extract_output_to_df}}{A function to extract the raw output into
+a data frame. E.g., if the output is a list, but you want a single
+item to show up in the output data frame.}
 }
 \if{html}{\out{</div>}}
 }

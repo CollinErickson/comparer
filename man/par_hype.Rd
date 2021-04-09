@@ -13,6 +13,13 @@ p1 <- par_hype$new()
 class(p1)
 print(p1)
 }
+\section{Public fields}{
+\if{html}{\out{<div class="r6-fields">}}
+\describe{
+\item{\code{partrans}}{The transformation type.}
+}
+\if{html}{\out{</div>}}
+}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{

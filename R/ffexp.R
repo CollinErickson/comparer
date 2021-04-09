@@ -90,6 +90,9 @@ NULL
 #' @field folder_path The path to the folder where output will be saved.
 #' @field verbose How much should be printed when running. 0 is none,
 #' 2 is average.
+#' @field extract_output_to_df A function to extract the raw output into
+#' a data frame. E.g., if the output is a list, but you want a single
+#' item to show up in the output data frame.
 ffexp <- R6::R6Class(
   classname = "ffexp",
   public = list(
@@ -112,6 +115,7 @@ ffexp <- R6::R6Class(
     parallel_cores = NULL,
     parallel_cluster = NULL,
     folder_path = NULL,
+    extract_output_to_df = NULL,
     verbose = 2,
     #' @description Create an `ffexp` object.
     #' @param ... Input arguments for the experiment
@@ -131,9 +135,15 @@ ffexp <- R6::R6Class(
     #' passed to the parallel environment.
     #' @param verbose How much should be printed when running. 0 is none,
     #' 2 is average.
+    #' @param extract_output_to_df A function to extract the raw output into
+    #' a data frame. E.g., if the output is a list, but you want a single
+    #' item to show up in the output data frame.
     initialize = function(..., eval_func, save_output=FALSE, parallel=FALSE,
                           parallel_cores="detect", folder_path,
-                          varlist=NULL, verbose=2) {
+                          varlist=NULL, verbose=2,
+                          extract_output_to_df=NULL
+                          ) {
+      # browser()
       self$eval_func <- eval_func
       self$save_output <- save_output
       self$folder_path <- if (missing(folder_path)) {
@@ -142,6 +152,7 @@ ffexp <- R6::R6Class(
       else {folder_path}
       self$varlist <- varlist
       self$arglist <- list(...)
+      self$extract_output_to_df <- extract_output_to_df
       # # Getting an error with df with ncol==1, so just avoid that
       # for (i in 1:length(self$arglist)) {
       #   if ("data.frame" %in% class(self$arglist[[i]]) && ncol(self$arglist[[i]])==1) {
@@ -822,11 +833,26 @@ ffexp <- R6::R6Class(
         # }
         newdf0 <- data.frame(t(output), stringsAsFactors=FALSE)
         newdf0$runtime <- systime[3]
-      } else {
-        newdf0 <- data.frame(runtime=systime[3])
-        # newdf0 <- data.frame()
-        # newdf0$start_time <- start_time
-        # newdf0$end_time <- end_time
+      } else { # Lists or other objects
+        if (!is.null(self$extract_output_to_df)) {
+          # browser()
+          out_as_df <- self$extract_output_to_df(output)
+          if (is.vector(out_as_df)) {
+            out_as_df <- as.data.frame(out_as_df)
+          }
+          if (is.data.frame(out_as_df)) {
+            newdf0 <- out_as_df
+            newdf0$runtime <- systime[3]
+          } else { # Only keep run time
+            newdf0 <- data.frame(runtime=systime[3])
+          }
+
+        } else {
+          newdf0 <- data.frame(runtime=systime[3])
+          # newdf0 <- data.frame()
+          # newdf0$start_time <- start_time
+          # newdf0$end_time <- end_time
+        }
       }
       # newdf0$runtime <- systime[3]
       newdf0$start_time <- start_time

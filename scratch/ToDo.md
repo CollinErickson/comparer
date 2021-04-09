@@ -35,14 +35,18 @@ If yes, maybe don't.
 
 * calculate effects that calculates slopes instead of for each level.
 
+* Fix calculate effects 2
+
 * list outputs, get some for outcleandf
 
 * superbatches: If run_all with 100, give option to run in groups of 10.
   would allow for progress print out and saving object
 
 * Multi-armed bandit. run batches, easy access function, df/list input, log scale.
-   Check that all have been run. Binary.
+   Check that all have been run. Binary. Pass through args.
 
 * parallel masteroutput to "" by default to make it easier. Usually don't want it anyways
 
 * superbatch has nsb wrong. Give either n batches or n trials per batch.
+
+* ffexp: if parallel error, error message say to use varlist?

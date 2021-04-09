@@ -42,6 +42,8 @@ next.}
 
 \item{\code{parupper}}{Upper bounds for each parameter}
 
+\item{\code{partrans}}{Transformation for each parameter}
+
 \item{\code{ffexp}}{An ffexp R6 object used to run the experiment and store
 the results.}
 
