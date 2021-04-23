@@ -963,7 +963,7 @@ ffexp <- R6::R6Class(
                  tdf[,1] <- self$arglist[[i]][tdf[,1]]
                }
                nlev <- nrow(tdf)
-               if (nlev > 1) {
+               if (nlev > 1 && nlev <= 5) {
                  for (j in (2:nlev)) {
                    for (k in 1:(j-1)) {
                      # newdf <- data.frame(diffname=paste0(tdf[j,1],"-",

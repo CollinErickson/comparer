@@ -47,3 +47,9 @@ f1 <- ffexp$new(eval_func=function(x, b){list(x^2, x^3)}, x=1:3, b=letters[1:2],
 f1$extract_output_to_df
 f1$run_all()
 f1$outcleandf
+
+
+f1 <- ffexp$new(eval_func=function(x){(x-5)^2}, x=1:6)
+f1$run_all()
+f1$outcleandf
+f1$calculate_effects()
