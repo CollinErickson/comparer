@@ -296,14 +296,47 @@ hype <- R6::R6Class( # hype ----
 
                        },
                        #' @description Plot the output as a function of each input.
-                       plotX = function() {
+                       plotX = function(addlines=TRUE, covtype="matern5_2", nugget.estim=TRUE) {
                          stopifnot(nrow(self$X) == length(self$Z))
                          tdf <- cbind(self$X, Z=self$Z, Zorder=order(order(self$Z)))
-                         ggplot2::ggplot(reshape2::melt(tdf, id.vars=c('Z', 'Zorder')),
-                                         ggplot2::aes(value, Z, color=Zorder)) +
-                           ggplot2::geom_point() +
+                         if (addlines) {
+                           min_ind <- which.min(h1$Z)[1]
+                           min_X <- self$X[min_ind,,drop=TRUE]
+                           preddf <- NULL
+                           npts <- 30
+                           # browser()
+                           mod <- DiceKriging::km(formula = ~1,
+                                                  covtype=covtype,
+                                                  design = self$X,
+                                                  response = self$Z,
+                                                  nugget.estim=nugget.estim,
+                                                  control=list(trace=FALSE))
+                           for (i in 1:ncol(self$X)) {
+                             predX <- matrix(rep(unlist(min_X), npts), ncol=ncol(self$X), byrow=T)
+                             # predZ <- mod
+                             predX[, i] <- seq(self$parlower[i], self$parupper[i],l=npts)
+                             predXdf <- as.data.frame(predX)
+                             names(predXdf) <- names(self$X)
+                             predout <- DiceKriging::predict.km(mod, predXdf, type="SK", light.return = T)
+                             predout$mean
+                             df_i <- data.frame(value=predX[, i], mean=predout$mean,
+                                                lower95=predout$lower95, upper95=predout$upper95,
+                                                index=i, variable=colnames(self$X)[i])
+                             preddf <- rbind(preddf, df_i)
+                           }
+                         }
+                         p <- ggplot2::ggplot(reshape2::melt(tdf, id.vars=c('Z', 'Zorder')),
+                                         ggplot2::aes(value, Z, color=Zorder))
+                         if (addlines) {
+                           p <- p +
+                             ggplot2::geom_line(data=preddf, ggplot2::aes(value,    mean,color=NULL), alpha=.1) +
+                             ggplot2::geom_line(data=preddf, ggplot2::aes(value, lower95,color=NULL), alpha=.1) +
+                             ggplot2::geom_line(data=preddf, ggplot2::aes(value, upper95,color=NULL), alpha=.1)
+                         }
+                         p <- p + ggplot2::geom_point() +
                            ggplot2::facet_wrap(. ~ variable, scales='free_x') +
                            ggplot2::scale_color_gradientn(colors=c('green', 'purple'))
+                         p
                        },
                        #' @description Print details of the object.
                        #' @param ... not used
