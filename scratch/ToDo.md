@@ -68,8 +68,6 @@ If yes, maybe don't.
 
 * Give DK GP info. Plot? Show which inputs are important.
 
-* On plotX, plot curve changing X of best point, holding rest constant
-
 ## MAB: multi-armed bandit
 
 * run batches, easy access function, df/list input, log scale.

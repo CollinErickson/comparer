@@ -339,6 +339,31 @@ hype <- R6::R6Class(
         ggplot2::scale_color_gradientn(colors=c('green', 'purple'))
       p
     },
+    plotinteractions = function(covtype="matern5_2", nugget.estim=TRUE) {
+      # browser()
+
+      mod <- DiceKriging::km(formula = ~1,
+                             covtype=covtype,
+                             design = self$X,
+                             response = self$Z,
+                             nugget.estim=nugget.estim,
+                             control=list(trace=FALSE))
+      predict(mod, self$X, type='sk', light.compute=T, se.compute=F)
+      min_ind <- which.min(h1$Z)[1]
+      min_X <- self$X[min_ind,,drop=TRUE]
+      min_Xvec <- unlist(min_X)
+      predfunc <- function(X) {#browser()
+        Xdf <- as.data.frame(X)
+        colnames(Xdf) <- colnames(self$X)
+        pred <- DiceKriging::predict.km(mod, Xdf, type="sk", light.return = T, se.compute = F)
+        pred$mean
+      }
+      # browser()
+      ContourFunctions::cf_highdim(predfunc, D=ncol(self$X), baseline=min_Xvec, batchmax = Inf,
+                                   pts=matrix(min_Xvec, nrow=1), #pts=as.matrix(self$X),
+                                   var_names = colnames(self$X),
+                                   low = self$parlower, high=self$parupper)
+    },
     #' @description Print details of the object.
     #' @param ... not used
     print = function(...) {
