@@ -68,6 +68,7 @@ the results.}
 \item \href{#method-pairs}{\code{hype$pairs()}}
 \item \href{#method-plotorder}{\code{hype$plotorder()}}
 \item \href{#method-plotX}{\code{hype$plotX()}}
+\item \href{#method-plotinteractions}{\code{hype$plotinteractions()}}
 \item \href{#method-print}{\code{hype$print()}}
 \item \href{#method-clone}{\code{hype$clone()}}
 }
@@ -265,7 +266,16 @@ Plot the output of the points evaluated in order.
 \subsection{Method \code{plotX()}}{
 Plot the output as a function of each input.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{hype$plotX()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{hype$plotX(addlines = TRUE, covtype = "matern5_2", nugget.estim = TRUE)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-plotinteractions"></a>}}
+\if{latex}{\out{\hypertarget{method-plotinteractions}{}}}
+\subsection{Method \code{plotinteractions()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{hype$plotinteractions(covtype = "matern5_2", nugget.estim = TRUE)}\if{html}{\out{</div>}}
 }
 
 }

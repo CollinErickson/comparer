@@ -226,10 +226,11 @@ hype <- R6::R6Class(
                                   nugget.estim=nugget.estim,
                                   control=list(trace=FALSE))
       if (n==1) {
-        EIout <- DiceOptim::max_EI(model=self$mod,
+        # Suppress "Stopped because hard maximum generation limit was hit"
+        EIout <- suppressWarnings(DiceOptim::max_EI(model=self$mod,
                                    lower=self$parlower,
                                    upper=self$parupper,
-                                   control=list(print.level=0))
+                                   control=list(print.level=0)))
       } else {
         EIout <- DiceOptim::max_qEI(model=self$mod,
                                     npoints=n,
@@ -301,7 +302,7 @@ hype <- R6::R6Class(
       stopifnot(nrow(self$X) == length(self$Z))
       tdf <- cbind(self$X, Z=self$Z, Zorder=order(order(self$Z)))
       if (addlines) {
-        min_ind <- which.min(h1$Z)[1]
+        min_ind <- which.min(self$Z)[1]
         min_X <- self$X[min_ind,,drop=TRUE]
         preddf <- NULL
         npts <- 30
@@ -349,7 +350,7 @@ hype <- R6::R6Class(
                              nugget.estim=nugget.estim,
                              control=list(trace=FALSE))
       predict(mod, self$X, type='sk', light.compute=T, se.compute=F)
-      min_ind <- which.min(h1$Z)[1]
+      min_ind <- which.min(self$Z)[1]
       min_X <- self$X[min_ind,,drop=TRUE]
       min_Xvec <- unlist(min_X)
       predfunc <- function(X) {#browser()

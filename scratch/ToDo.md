@@ -56,7 +56,7 @@ If yes, maybe don't.
 
 * log distribution params
 
-* Plot interactions
+* Plot interactions: change for 2D, not highdim
 
 * Give best inputs, either already run, or optimized
 
