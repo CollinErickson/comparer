@@ -56,8 +56,6 @@ If yes, maybe don't.
 
 * log distribution params
 
-* Plot interactions: change for 2D, not highdim
-
 * Give best inputs, either already run, or optimized
 
 * Store proportion of time spent with DK vs running experiment
@@ -67,6 +65,8 @@ If yes, maybe don't.
 * Factor levels
 
 * Give DK GP info. Plot? Show which inputs are important.
+
+* Save mod as active so it's only fit in one spot.
 
 ## MAB: multi-armed bandit
 

@@ -228,9 +228,9 @@ hype <- R6::R6Class(
       if (n==1) {
         # Suppress "Stopped because hard maximum generation limit was hit"
         EIout <- suppressWarnings(DiceOptim::max_EI(model=self$mod,
-                                   lower=self$parlower,
-                                   upper=self$parupper,
-                                   control=list(print.level=0)))
+                                                    lower=self$parlower,
+                                                    upper=self$parupper,
+                                                    control=list(print.level=0)))
       } else {
         EIout <- DiceOptim::max_qEI(model=self$mod,
                                     npoints=n,
@@ -299,7 +299,10 @@ hype <- R6::R6Class(
     },
     #' @description Plot the output as a function of each input.
     plotX = function(addlines=TRUE, covtype="matern5_2", nugget.estim=TRUE) {
-      stopifnot(nrow(self$X) == length(self$Z))
+      if (is.null(self$X) || is.null(self$Z)) {
+        stop("Nothing has been evaluated yet. Call $run_all() first.")
+      }
+      stopifnot(!is.null(self$X), !is.null(self$Z), nrow(self$X) == length(self$Z))
       tdf <- cbind(self$X, Z=self$Z, Zorder=order(order(self$Z)))
       if (addlines) {
         min_ind <- which.min(self$Z)[1]
@@ -342,6 +345,12 @@ hype <- R6::R6Class(
     },
     plotinteractions = function(covtype="matern5_2", nugget.estim=TRUE) {
       # browser()
+      if (is.null(self$X) || is.null(self$Z)) {
+        stop("Nothing has been evaluated yet. Call $run_all() first. Use $plotX instead.")
+      }
+      if (ncol(self$X) == 1) {
+        stop("Can't plot interactions with single input.")
+      }
 
       mod <- DiceKriging::km(formula = ~1,
                              covtype=covtype,
@@ -360,10 +369,17 @@ hype <- R6::R6Class(
         pred$mean
       }
       # browser()
-      ContourFunctions::cf_highdim(predfunc, D=ncol(self$X), baseline=min_Xvec, batchmax = Inf,
-                                   pts=matrix(min_Xvec, nrow=1), #pts=as.matrix(self$X),
-                                   var_names = colnames(self$X),
-                                   low = self$parlower, high=self$parupper)
+      if (ncol(self$X) < 2.5) {
+        ContourFunctions::cf_func(predfunc, batchmax = Inf, bar=T,
+                                  xlim = c(self$parlower[1], self$parupper[1]),
+                                  ylim = c(self$parlower[2], self$parupper[2]),
+                                  pts=self$X, gg=TRUE) #+ ggplot2::xlab("xxxx")
+      } else {
+        ContourFunctions::cf_highdim(predfunc, D=ncol(self$X), baseline=min_Xvec, batchmax = Inf,
+                                     pts=matrix(min_Xvec, nrow=1), #pts=as.matrix(self$X),
+                                     var_names = colnames(self$X),
+                                     low = self$parlower, high=self$parupper)
+      }
     },
     #' @description Print details of the object.
     #' @param ... not used
