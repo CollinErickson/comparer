@@ -66,7 +66,7 @@ h1$add_LHS(13)
 # debugonce(h1$ffexp$run_all)
 h1$run_all(parallel=F)
 h1$plotX()
-
+# h1$add_EI(n=6)
 
 
 # 2 inputs, both matter, interaction

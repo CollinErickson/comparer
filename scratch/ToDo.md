@@ -70,6 +70,8 @@ If yes, maybe don't.
 
 * qEI is slow, print what it's doing?
 
+* Avoid outliers. Allow output on log scale.
+
 ## MAB: multi-armed bandit
 
 * run batches, easy access function, df/list input, log scale.

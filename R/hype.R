@@ -232,8 +232,10 @@ hype <- R6::R6Class(
                                                     upper=self$parupper,
                                                     control=list(print.level=0)))
       } else {
+        browser()
         EIout <- DiceOptim::max_qEI(model=self$mod,
                                     npoints=n,
+                                    crit="CL", # exact was very slow for more than a couple
                                     lower=self$parlower,
                                     upper=self$parupper)
       }
