@@ -42,7 +42,7 @@ If yes, maybe don't.
 
 * Fix calculate effects 2
 
-* New varlist in run all, not just init
+* run_all, not parallel, a lot, don't print, use progress?
 
 ## hype
 
@@ -65,6 +65,10 @@ If yes, maybe don't.
 * Save mod as active so it's only fit in one spot.
 
 * Maximize option?
+
+* set parallel in init, give in varlist
+
+* qEI is slow, print what it's doing?
 
 ## MAB: multi-armed bandit
 

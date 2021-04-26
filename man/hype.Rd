@@ -191,7 +191,9 @@ Run all unevaluated input points.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{Passed into `ffexp$run_all`.}
+\item{\code{...}}{Passed into `ffexp$run_all`. Can set 'parallel=TRUE'
+to evaluate multiple points simultaneously as long as all needed
+variables have been passed to 'varlist'}
 }
 \if{html}{\out{</div>}}
 }

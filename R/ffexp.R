@@ -944,6 +944,9 @@ ffexp <- R6::R6Class(
     #' @description Calculate the effects of each variable as if this
     #' was an experiment using a linear model.
     calculate_effects = function() {
+      if (nrow(self$outrawdf) == 0) {
+        stop("Must run the experiment before evaluating, use $run_all()")
+      }
       nvar <- ncol(self$rungrid)
       sapply(1:nvar,
              function(i) {
@@ -987,6 +990,9 @@ ffexp <- R6::R6Class(
     #' @description Calculate the effects of each variable as if this
     #' was an experiment using a linear model.
     calculate_effects2 = function() {
+      if (nrow(self$outrawdf) == 0) {
+        stop("Must run the experiment before evaluating, use $run_all()")
+      }
       nvar <- ncol(self$rungrid)
       outputcols <- (nvar+1):(ncol(self$outrawdf)-3)
       sapply(1:nvar,
@@ -1143,7 +1149,8 @@ ffexp <- R6::R6Class(
             }
           }
           # Check hash value
-          if (self$hashvalue != oneout$hashvalue) {
+          if (!is.null(self$hashvalue) && !is.null(oneout$hashvalue) &&
+              self$hashvalue != oneout$hashvalue) {
             if (!hashvalue_warning_given) {
               warning(paste0("Hash value of what is being reloaded doesn't match",
                              " inputs of current object. Did you change the inputs?",
@@ -1381,6 +1388,19 @@ ffexp <- R6::R6Class(
         message("Returning new object with added variable, object was not changed in place.")
       }
       return(new_exp)
+    },
+    #' @description Remove results of completed trials. They will be rerun
+    #' next time $run_all() is called.
+    #' @param to_remove Indexes of trials to remove
+    remove_results = function(to_remove) {
+      if (missing(to_remove)) {
+        stop("Must give in to_remove to $remove_results()")
+      }
+      self$completed_runs[to_remove] <- FALSE
+      # outlist: don't set to NULL since it moves others up
+      # outrawdf:
+      # outcleandf:
+      invisible(self)
     },
     #' @description Printing the object shows some
     #' summary information.

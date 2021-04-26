@@ -50,14 +50,20 @@ f1$outcleandf
 
 
 f1 <- ffexp$new(eval_func=function(x){(x-5)^2}, x=1:6)
-f1$run_all()
+f1$run_all(to_run = 1)
 f1$outcleandf
 f1$calculate_effects()
+f1$calculate_effects2()
 
 
-f1 <- ffexp$new(eval_func=function(x){x^2}, a=1:2, x=(1:300), save_output = T,
+f1 <- ffexp$new(eval_func=function(a,x){x^2}, a=1:2, x=(1:300), save_output = T,
                 folder_path = "testrecoverff")
 f1$run_all(parallel_temp_save = T)
 f1 <- ffexp$new(eval_func=function(x){x^2}, a=1:2, x=rev(1:300), save_output = T,
                 folder_path = "testrecoverff")
 f1$recover_parallel_temp_save(delete_after = F)
+
+
+f1 <- ffexp$new(eval_func=function(x){(x-5)^2}, x=1:5)
+f1$run_all()
+f1$remove_results(3)

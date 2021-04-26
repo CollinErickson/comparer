@@ -145,6 +145,7 @@ item to show up in the output data frame.}
 \item \href{#method-rungrid2}{\code{ffexp$rungrid2()}}
 \item \href{#method-add_variable}{\code{ffexp$add_variable()}}
 \item \href{#method-add_level}{\code{ffexp$add_level()}}
+\item \href{#method-remove_results}{\code{ffexp$remove_results()}}
 \item \href{#method-print}{\code{ffexp$print()}}
 \item \href{#method-set_parallel_cores}{\code{ffexp$set_parallel_cores()}}
 \item \href{#method-stop_cluster}{\code{ffexp$stop_cluster()}}
@@ -490,7 +491,8 @@ This shouldn't be used by users.
   row_df,
   start_time,
   end_time,
-  save_output
+  save_output,
+  hashvalue
 )}\if{html}{\out{</div>}}
 }
 
@@ -732,6 +734,24 @@ object. The existing object is not changed.
 \item{\code{suppressMessage}}{Should the message be suppressed? The message
 tells the user a new level was added and it is being returned in a new
 object. Default FALSE.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-remove_results"></a>}}
+\if{latex}{\out{\hypertarget{method-remove_results}{}}}
+\subsection{Method \code{remove_results()}}{
+Remove results of completed trials. They will be rerun
+next time $run_all() is called.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ffexp$remove_results(to_remove)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{to_remove}}{Indexes of trials to remove}
 }
 \if{html}{\out{</div>}}
 }
