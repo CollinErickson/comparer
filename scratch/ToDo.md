@@ -15,8 +15,6 @@ If yes, maybe don't.
 
 * ffexp run_all for time tests, cleanup
 
-* output dat csv doesn't exist
-
 * recover temp gives error, print which one
 
 * Delete results of a trial (flip completed, remove from outlist and outdfs)
@@ -44,9 +42,7 @@ If yes, maybe don't.
 
 * Fix calculate effects 2
 
-* When recovering, ensure row_grid/row_df matches
-
-* When recovering, better progress printout
+* New varlist in run all, not just init
 
 ## hype
 
@@ -62,11 +58,13 @@ If yes, maybe don't.
 
 * Run_all in parallel, does it work?
 
-* Factor levels
+* Factor levels. Start with binary?
 
 * Give DK GP info. Plot? Show which inputs are important.
 
 * Save mod as active so it's only fit in one spot.
+
+* Maximize option?
 
 ## MAB: multi-armed bandit
 

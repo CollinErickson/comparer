@@ -63,7 +63,8 @@ h1 <- hype$new(eval_func = function(a, b,d,e,f) {3*a^2 + cos(b) + .3*d + rnorm(l
 h1$run_all()
 h1$plotX()
 h1$add_LHS(13)
-h1$run_all()
+# debugonce(h1$ffexp$run_all)
+h1$run_all(parallel=F)
 h1$plotX()
 
 

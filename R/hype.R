@@ -244,7 +244,9 @@ hype <- R6::R6Class(
       invisible(self)
     },
     #' @description Run all unevaluated input points.
-    #' @param ... Passed into `ffexp$run_all`.
+    #' @param ... Passed into `ffexp$run_all`. Can set 'parallel=TRUE'
+    #' to evaluate multiple points simultaneously as long as all needed
+    #' variables have been passed to 'varlist'
     run_all = function(...) {
       self$ffexp$run_all(...)
       if (is.null(self$extract_output_func)) {
