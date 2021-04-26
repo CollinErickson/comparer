@@ -136,7 +136,6 @@ hype <- R6::R6Class(
         self$parupper <- c(self$parupper, pari$upper)
         self$partrans <- c(self$partrans, pari$partrans)
       }
-      # browser()
       if (!missing(n_lhs)) {
         Xlhs <- lhs::maximinLHS(n=n_lhs, k=length(self$parnames))
         Xlhs <- sweep(sweep(Xlhs,
@@ -150,7 +149,7 @@ hype <- R6::R6Class(
         stop(paste('Give in n_lhs, the number of initial points to evaluate.',
                    '(X0 is null.)'))
       }
-      if (!is.data.frame(X0)) {browser(); stop("X0 is not a df?")}
+      if (!is.data.frame(X0)) {stop("X0 is not a df?")}
       # Use an ffexp object to manage simulations
       self$ffexp <- ffexp$new(eval_func=eval_func,
                               Xdf=X0
@@ -232,7 +231,7 @@ hype <- R6::R6Class(
                                                     upper=self$parupper,
                                                     control=list(print.level=0)))
       } else {
-        browser()
+        # Select multiple points to be evaluated, useful when running in parallel
         EIout <- DiceOptim::max_qEI(model=self$mod,
                                     npoints=n,
                                     crit="CL", # exact was very slow for more than a couple
@@ -313,7 +312,6 @@ hype <- R6::R6Class(
         min_X <- self$X[min_ind,,drop=TRUE]
         preddf <- NULL
         npts <- 30
-        # browser()
         mod <- DiceKriging::km(formula = ~1,
                                covtype=covtype,
                                design = self$X,
@@ -348,7 +346,6 @@ hype <- R6::R6Class(
       p
     },
     plotinteractions = function(covtype="matern5_2", nugget.estim=TRUE) {
-      # browser()
       if (is.null(self$X) || is.null(self$Z)) {
         stop("Nothing has been evaluated yet. Call $run_all() first. Use $plotX instead.")
       }
@@ -366,13 +363,12 @@ hype <- R6::R6Class(
       min_ind <- which.min(self$Z)[1]
       min_X <- self$X[min_ind,,drop=TRUE]
       min_Xvec <- unlist(min_X)
-      predfunc <- function(X) {#browser()
+      predfunc <- function(X) {
         Xdf <- as.data.frame(X)
         colnames(Xdf) <- colnames(self$X)
         pred <- DiceKriging::predict.km(mod, Xdf, type="sk", light.return = T, se.compute = F)
         pred$mean
       }
-      # browser()
       if (ncol(self$X) < 2.5) {
         ContourFunctions::cf_func(predfunc, batchmax = Inf, bar=T,
                                   xlim = c(self$parlower[1], self$parupper[1]),

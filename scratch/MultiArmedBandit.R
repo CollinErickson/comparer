@@ -46,7 +46,6 @@
       minmult <- if (self$minimize) {-1} else {1}
       ocdf <- self$exp$outcleandf
       # Count of all allocated
-      # browser()
       countdf_all <- self$exp$rungrid2() %>% group_by(input) %>% tally(name="Ntotal")
       # Countdf can include some trials not evaluated yet.
       countdf_completed <- ocdf %>% group_by(input) %>% filter(!is.na(input)) %>%
@@ -73,7 +72,7 @@
         }
         nextind <- nextdf$input[1]
         nextK <- nextdf$N[1] + 1
-      } else if (method=="ts") {#browser()
+      } else if (method=="ts") {
         countdf <- countdf %>% mutate(samp=mn+std*rt(n=n(), df=N-1))
         if (self$minimize) {
           nextdf <- countdf %>% arrange(samp)
@@ -90,9 +89,8 @@
         stop(paste0("Bad method given (", method,"), pick one of epsgreedy, CB, TS, or fewest"))
       }
       # cat('next ind is', nextind, 'nextK', nextK, '\n')
-      if (is.na(nextind)) {browser()}
+      if (is.na(nextind)) {stop("Next ind is NA")}
       # Add new level to experiment, returns new object
-      # browser()
       expnew <- self$exp$add_level("input", list(input=nextind, K=nextK), suppressMessage = T)
       self$exp <- expnew
       # Run the new one
@@ -113,12 +111,10 @@
     },
     plot = function(flip=F) {
       df <- self$exp$outcleandf
-      # browser()
       dfsum <- df %>% group_by(input) %>%
         summarize(N=n(), mn=mean(V1), std=sd(V1),
                   LCB=mn-2*std, UCB=mn+2*std,
                   LCBmn=mn-2*std/sqrt(N), UCBmn=mn+2*std/sqrt(N))
-      # browser()
       # df$inputx <- factor(df$input) %>% as.numeric
       df$inputorig <- factor(self$inputs[df$input], self$inputs)
       dfsum$inputorig <- factor(self$inputs[dfsum$input], self$inputs)
