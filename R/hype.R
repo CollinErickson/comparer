@@ -29,6 +29,9 @@ par_unif <- R6::R6Class(
     name=NULL,
     lower=NULL,
     upper=NULL,
+    fromraw=identity,
+    toraw= identity,
+    ggtrans="identity", # ggplot trans to give to scale_x_continuous
     #' @description Create a hyperparameter with uniform distribution
     #' @param name Name of the parameter, must match the input to `eval_func`.
     #' @param lower Lower bound of the parameter
@@ -97,9 +100,12 @@ hype <- R6::R6Class(
     mod=NULL,
     # params=NULL,
     parnames=NULL,
-    parlower=NULL,
-    parupper=NULL,
+    parlowerraw=NULL,
+    parupperraw=NULL,
+    parlowertrans=NULL,
+    paruppertrans=NULL,
     partrans=NULL,
+    parlist=NULL,
     ffexp = NULL,
     eval_func = NULL,
     extract_output_func = NULL,
@@ -121,10 +127,12 @@ hype <- R6::R6Class(
       if (length(dots) == 0) {
         stop("No hyperparameters given. Give a par_unif$new to hype$new.")
       }
-      parlist <- data.frame()
+      parlist <- list()
       self$parnames <- c()
-      self$parlower <- c()
-      self$parupper <- c()
+      self$parlowerraw <- c()
+      self$parupperraw <- c()
+      self$parlowertrans <- c()
+      self$paruppertrans <- c()
       self$partrans <- c()
       for (pari in dots) {
         if (!("par_hype" %in% class(pari))) {
@@ -132,27 +140,44 @@ hype <- R6::R6Class(
         }
         parlist <- c(parlist, pari)
         self$parnames <- c(self$parnames, pari$name)
-        self$parlower <- c(self$parlower, pari$lower)
-        self$parupper <- c(self$parupper, pari$upper)
+        self$parlowerraw <- c(self$parlowerraw, pari$lower)
+        self$parupperraw <- c(self$parupperraw, pari$upper)
+        # browser()
+        self$parlowertrans <- c(self$parlowertrans, pari$fromraw(pari$lower))
+        self$paruppertrans <- c(self$paruppertrans, pari$fromraw(pari$upper))
         self$partrans <- c(self$partrans, pari$partrans)
       }
-      if (!missing(n_lhs)) {
-        Xlhs <- lhs::maximinLHS(n=n_lhs, k=length(self$parnames))
-        Xlhs <- sweep(sweep(Xlhs,
-                            2, self$parupper - self$parlower, "*"
-        ), 2, self$parlower, "+")
-        Xlhs <- as.data.frame(Xlhs)
-        names(Xlhs) <- self$parnames
-        X0 <- rbind(X0, Xlhs)
+      self$parlist <- parlist
+      # browser()
+      if (!is.null(X0)) {
+        stop("X0 not working yet, need to check with raw/trans")
       }
-      if (is.null(X0)) {
+      X0trans <- NULL
+      if (!missing(n_lhs)) {
+        Xlhstrans <- lhs::maximinLHS(n=n_lhs, k=length(self$parnames))
+        # browser()
+        Xlhstrans <- sweep(sweep(Xlhstrans,
+                            2, self$paruppertrans - self$parlowertrans, "*"
+        ), 2, self$parlowertrans, "+")
+        Xlhstrans <- as.data.frame(Xlhstrans)
+        names(Xlhstrans) <- self$parnames
+        X0trans <- rbind(X0trans, Xlhstrans)
+      }
+      if (is.null(X0trans)) {
         stop(paste('Give in n_lhs, the number of initial points to evaluate.',
                    '(X0 is null.)'))
       }
-      if (!is.data.frame(X0)) {stop("X0 is not a df?")}
+      if (!is.data.frame(X0trans)) {stop("X0 is not a df?")}
+      # Convert transformed back to raw
+      # X0raw <- X0trans
+      # browser()
+      X0raw <- self$convert_trans_to_raw(X0trans)
+      # for (i in 1:ncol(X0trans)) {
+      #   X0raw[, i] <- parlist[[i]]$toraw(X0trans[, i])
+      # }
       # Use an ffexp object to manage simulations
       self$ffexp <- ffexp$new(eval_func=eval_func,
-                              Xdf=X0
+                              Xdftrans=X0raw
       )
       if (!missing(extract_output_func)) {
         self$extract_output_func <- extract_output_func
@@ -186,14 +211,47 @@ hype <- R6::R6Class(
     #' Latin hypercubes are usually more spacing than randomly picking points.
     #' @param n Number of points to add.
     add_LHS = function(n) {
-      Xlhs <- lhs::maximinLHS(n=n, k=length(self$parnames))
-      Xlhs <- sweep(sweep(Xlhs,
-                          2, self$parupper - self$parlower, "*"
-      ), 2, self$parlower, "+")
-      Xlhs <- as.data.frame(Xlhs)
-      names(Xlhs) <- self$parnames
-      self$add_X(Xlhs)
+      Xlhstrans <- lhs::maximinLHS(n=n, k=length(self$parnames))
+      Xlhstrans <- sweep(sweep(Xlhstrans,
+                          2, self$paruppertrans - self$parlowertrans, "*"
+      ), 2, self$parlowertrans, "+")
+      Xlhstrans <- as.data.frame(Xlhstrans)
+      names(Xlhstrans) <- self$parnames
+      # Convert trans to raw
+      browser()
+      Xlhsraw <- self$convert_trans_to_raw(Xlhstrans)
+      self$add_X(Xlhsraw)
       invisible(self)
+    },
+    convert_trans_to_raw = function(Xtrans) {
+      convert_back <- FALSE
+      if (is.vector(Xtrans)) {
+        convert_back <- TRUE
+        Xtrans <- matrix(Xtrans, nrow=1)
+      }
+      Xraw <- Xtrans
+      for (i in 1:ncol(Xtrans)) {
+        Xraw[, i] <- self$parlist[[i]]$toraw(Xtrans[, i])
+      }
+      if (convert_back) {
+        Xraw <- Xraw[1, , drop=TRUE]
+      }
+      Xraw
+    },
+    convert_raw_to_trans = function(Xraw) {
+      convert_back <- FALSE
+      if (is.vector(Xraw)) {
+        convert_back <- TRUE
+        Xraw <- matrix(Xraw, nrow=1)
+      }
+      Xtrans <- Xraw
+      for (i in 1:ncol(Xtrans)) {
+        Xtrans[, i] <- self$parlist[[i]]$fromraw(Xraw[, i])
+      }
+      if (convert_back) {
+        Xtrans <- Xtrans[1, , drop=TRUE]
+      }
+      Xtrans
     },
     #' @description Add new inputs to run using the expected information
     #' criteria
@@ -202,12 +260,16 @@ hype <- R6::R6Class(
     #' model.
     #' @param nugget.estim Should a nugget be estimated?
     add_EI = function(n, covtype="matern5_2", nugget.estim=TRUE) {
+      if (is.null(self$X)) {
+        stop('X is null, you need to run_all first.')
+      }
       # If unevaluated points, set lowest value.
-      X <- self$ffexp$rungrid2()
-      if (nrow(X) == length(self$Z)) { # All have been evaluated
+      Xraw <- self$ffexp$rungrid2()
+      Xtrans <- self$convert_raw_to_trans(Xraw)
+      if (nrow(Xtrans) == length(self$Z)) { # All have been evaluated
         Z <- self$Z
       } else { # Unevaluated points exist, set to constant liar
-        Z <- c(self$Z, rep(min(self$Z), nrow(X) - length(self$Z)))
+        Z <- c(self$Z, rep(min(self$Z), nrow(Xtrans) - length(self$Z)))
         message("Unevaluated points already exist, using constant liar")
       }
 
@@ -215,32 +277,31 @@ hype <- R6::R6Class(
       if (covtype == "random") {
         covtype <- sample(c("matern5_2", "matern3_2", "exp", "powexp", "gauss"), 1)
       }
-      if (is.null(self$X)) {
-        stop('X is null, you need to run_all first.')
-      }
+      # browser()
       self$mod <- DiceKriging::km(formula = ~1,
                                   covtype=covtype,
-                                  design = self$X,
-                                  response = self$Z,
+                                  design = Xtrans,
+                                  response = Z,
                                   nugget.estim=nugget.estim,
                                   control=list(trace=FALSE))
       if (n==1) {
         # Suppress "Stopped because hard maximum generation limit was hit"
         EIout <- suppressWarnings(DiceOptim::max_EI(model=self$mod,
-                                                    lower=self$parlower,
-                                                    upper=self$parupper,
+                                                    lower=self$parlowertrans,
+                                                    upper=self$paruppertrans,
                                                     control=list(print.level=0)))
       } else {
         # Select multiple points to be evaluated, useful when running in parallel
         EIout <- DiceOptim::max_qEI(model=self$mod,
                                     npoints=n,
                                     crit="CL", # exact was very slow for more than a couple
-                                    lower=self$parlower,
-                                    upper=self$parupper)
+                                    lower=self$parlowertrans,
+                                    upper=self$paruppertrans)
       }
-      newX <- EIout$par
-      nameoflevel <- "Xdf" #if (length(self$parnames) > 1) {"Xdf"} else {self$ffexp$allvars$name[1]}
-      updatedffexp <- self$ffexp$add_level(nameoflevel, newX, suppressMessage=TRUE)
+      newXtrans <- EIout$par
+      newXraw <- self$convert_trans_to_raw(newXtrans)
+      nameoflevel <- "Xdftrans" #if (length(self$parnames) > 1) {"Xdf"} else {self$ffexp$allvars$name[1]}
+      updatedffexp <- self$ffexp$add_level(nameoflevel, newXraw, suppressMessage=TRUE)
       self$ffexp <- updatedffexp
       invisible(self)
     },
@@ -262,6 +323,7 @@ hype <- R6::R6Class(
         self$Z <- sapply(self$ffexp$outlist, self$extract_output_func)
       }
       self$X <- self$ffexp$rungrid2()
+      # self$Xtrans <- s
       invisible(self)
     },
     #' @description Add points using the expected information criteria,
@@ -288,6 +350,7 @@ hype <- R6::R6Class(
     },
     #' @description Plot pairs of inputs and output
     pairs = function() {
+      stop("Fix pairs for Xtrans")
       GGally::ggpairs(cbind(self$X, Z=self$Z))
     },
     #' @description Plot the output of the points evaluated in order.
@@ -311,31 +374,38 @@ hype <- R6::R6Class(
       }
       stopifnot(!is.null(self$X), !is.null(self$Z), nrow(self$X) == length(self$Z))
       tdf <- cbind(self$X, Z=self$Z, Rank=order(order(self$Z)))
+      Xtrans <- self$convert_raw_to_trans(self$X)
       if (addlines) {
         min_ind <- which.min(self$Z)[1]
-        min_X <- self$X[min_ind,,drop=TRUE]
+        min_Xraw <- self$X[min_ind,,drop=TRUE]
+        min_Xtrans <- Xtrans[min_ind,,drop=TRUE]
         preddf <- NULL
         npts <- 30
         mod <- DiceKriging::km(formula = ~1,
                                covtype=covtype,
-                               design = self$X,
+                               design = Xtrans,
                                response = self$Z,
                                nugget.estim=nugget.estim,
                                control=list(trace=FALSE))
+        # browser()
         for (i in 1:ncol(self$X)) {
-          predX <- matrix(rep(unlist(min_X), npts), ncol=ncol(self$X), byrow=T)
+          # Predict at points that are the same for all other components
+          predXtrans <- matrix(rep(unlist(min_Xtrans), npts), ncol=ncol(self$X), byrow=T)
           # predZ <- mod
-          predX[, i] <- seq(self$parlower[i], self$parupper[i],l=npts)
-          predXdf <- as.data.frame(predX)
-          names(predXdf) <- names(self$X)
-          predout <- DiceKriging::predict.km(mod, predXdf, type="SK", light.return = T)
+          predXtrans[, i] <- seq(self$parlowertrans[i], self$paruppertrans[i],l=npts)
+          predXtransdf <- as.data.frame(predXtrans)
+          names(predXtransdf) <- names(self$X)
+          predout <- DiceKriging::predict.km(mod, predXtransdf, type="SK", light.return = T)
           predout$mean
-          df_i <- data.frame(value=predX[, i], mean=predout$mean,
+          df_i <- data.frame(valuetrans=predXtrans[, i],
+                             valueraw=self$parlist[[i]]$toraw((predXtrans[, i])),
+                             mean=predout$mean,
                              lower95=predout$lower95, upper95=predout$upper95,
                              index=i, variable=colnames(self$X)[i])
           preddf <- rbind(preddf, df_i)
         }
       }
+      browser()
       p <- ggplot2::ggplot(reshape2::melt(tdf, id.vars=c('Z', 'Rank')),
                            ggplot2::aes(value, Z, color=Rank))
       if (addlines) {
