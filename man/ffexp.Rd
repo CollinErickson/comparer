@@ -120,6 +120,8 @@ available, or 'detect-1' will do one less than that.}
 \item{\code{extract_output_to_df}}{A function to extract the raw output into
 a data frame. E.g., if the output is a list, but you want a single
 item to show up in the output data frame.}
+
+\item{\code{hashvalue}}{A value used to make sure inputs match when reloading.}
 }
 \if{html}{\out{</div>}}
 }
@@ -514,6 +516,8 @@ This shouldn't be used by users.
 \item{\code{end_time}}{The end time of the experiment.}
 
 \item{\code{save_output}}{Should the output be saved?}
+
+\item{\code{hashvalue}}{Not used.}
 }
 \if{html}{\out{</div>}}
 }

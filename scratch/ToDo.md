@@ -51,6 +51,8 @@ If yes, maybe don't.
 * tests
 
 * log distribution params
+Messes up plot, use
+ggpubr::ggarrange(p,p,p,p + scale_x_log10(), common.legend=T, legend="right")
 
 * Give best inputs, either already run, or optimized
 
@@ -66,7 +68,7 @@ If yes, maybe don't.
 
 * Maximize option?
 
-* set parallel in init, give in varlist
+* set parallel in init, give in varlist, save_folder
 
 * qEI is slow, print what it's doing?
 

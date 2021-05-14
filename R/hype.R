@@ -301,12 +301,16 @@ hype <- R6::R6Class(
 
     },
     #' @description Plot the output as a function of each input.
+    #' @param addlines Should prediction mean and 95\% interval be plotted?
+    #' @param covtype Covariance function to use for the Gaussian process
+    #' model.
+    #' @param nugget.estim Should a nugget be estimated?
     plotX = function(addlines=TRUE, covtype="matern5_2", nugget.estim=TRUE) {
       if (is.null(self$X) || is.null(self$Z)) {
         stop("Nothing has been evaluated yet. Call $run_all() first.")
       }
       stopifnot(!is.null(self$X), !is.null(self$Z), nrow(self$X) == length(self$Z))
-      tdf <- cbind(self$X, Z=self$Z, Zorder=order(order(self$Z)))
+      tdf <- cbind(self$X, Z=self$Z, Rank=order(order(self$Z)))
       if (addlines) {
         min_ind <- which.min(self$Z)[1]
         min_X <- self$X[min_ind,,drop=TRUE]
@@ -332,8 +336,8 @@ hype <- R6::R6Class(
           preddf <- rbind(preddf, df_i)
         }
       }
-      p <- ggplot2::ggplot(reshape2::melt(tdf, id.vars=c('Z', 'Zorder')),
-                           ggplot2::aes(value, Z, color=Zorder))
+      p <- ggplot2::ggplot(reshape2::melt(tdf, id.vars=c('Z', 'Rank')),
+                           ggplot2::aes(value, Z, color=Rank))
       if (addlines) {
         p <- p +
           ggplot2::geom_line(data=preddf, ggplot2::aes(value,    mean,color=NULL), alpha=.1) +
@@ -345,6 +349,11 @@ hype <- R6::R6Class(
         ggplot2::scale_color_gradientn(colors=c('green', 'purple'))
       p
     },
+    #' @description Plot the 2D plots from inputs to the output.
+    #' All other variables are held at their values for the best input.
+    #' @param covtype Covariance function to use for the Gaussian process
+    #' model.
+    #' @param nugget.estim Should a nugget be estimated?
     plotinteractions = function(covtype="matern5_2", nugget.estim=TRUE) {
       if (is.null(self$X) || is.null(self$Z)) {
         stop("Nothing has been evaluated yet. Call $run_all() first. Use $plotX instead.")

@@ -271,15 +271,39 @@ Plot the output as a function of each input.
 \if{html}{\out{<div class="r">}}\preformatted{hype$plotX(addlines = TRUE, covtype = "matern5_2", nugget.estim = TRUE)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{addlines}}{Should prediction mean and 95\% interval be plotted?}
+
+\item{\code{covtype}}{Covariance function to use for the Gaussian process
+model.}
+
+\item{\code{nugget.estim}}{Should a nugget be estimated?}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-plotinteractions"></a>}}
 \if{latex}{\out{\hypertarget{method-plotinteractions}{}}}
 \subsection{Method \code{plotinteractions()}}{
+Plot the 2D plots from inputs to the output.
+All other variables are held at their values for the best input.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{hype$plotinteractions(covtype = "matern5_2", nugget.estim = TRUE)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{covtype}}{Covariance function to use for the Gaussian process
+model.}
+
+\item{\code{nugget.estim}}{Should a nugget be estimated?}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-print"></a>}}

@@ -93,6 +93,7 @@ NULL
 #' @field extract_output_to_df A function to extract the raw output into
 #' a data frame. E.g., if the output is a list, but you want a single
 #' item to show up in the output data frame.
+#' @field hashvalue A value used to make sure inputs match when reloading.
 ffexp <- R6::R6Class(
   classname = "ffexp",
   public = list(
@@ -806,6 +807,7 @@ ffexp <- R6::R6Class(
     #' @param start_time The start time of the experiment.
     #' @param end_time The end time of the experiment.
     #' @param save_output Should the output be saved?
+    #' @param hashvalue Not used.
     add_result_of_one = function(output, systime, irow, row_grid, row_df,
                                  start_time, end_time, save_output, hashvalue) {
       # This is used to save results after running an item
