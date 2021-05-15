@@ -475,10 +475,13 @@ hype <- R6::R6Class(
                              response = self$Z,
                              nugget.estim=nugget.estim,
                              control=list(trace=FALSE))
-      predict(mod, self$X, type='sk', light.compute=T, se.compute=F)
+      # predict(mod, self$X, type='sk', light.compute=T, se.compute=F)
       min_ind <- which.min(self$Z)[1]
       min_X <- self$X[min_ind,,drop=TRUE]
       min_Xvec <- unlist(min_X)
+      Xtrans <- self$convert_raw_to_trans(self$X)
+      min_Xtrans <- Xtrans[min_ind,,drop=TRUE]
+      min_Xvectrans <- unlist(min_Xtrans)
       predfunc <- function(X) {
         Xdf <- as.data.frame(X)
         colnames(Xdf) <- colnames(self$X)
@@ -487,14 +490,15 @@ hype <- R6::R6Class(
       }
       if (ncol(self$X) < 2.5) {
         ContourFunctions::cf_func(predfunc, batchmax = Inf, bar=T,
-                                  xlim = c(self$parlower[1], self$parupper[1]),
-                                  ylim = c(self$parlower[2], self$parupper[2]),
+                                  xlim = c(self$parlowertrans[1], self$paruppertrans[1]),
+                                  ylim = c(self$parlowertrans[2], self$paruppertrans[2]),
                                   pts=self$X, gg=TRUE) #+ ggplot2::xlab("xxxx")
       } else {
-        ContourFunctions::cf_highdim(predfunc, D=ncol(self$X), baseline=min_Xvec, batchmax = Inf,
-                                     pts=matrix(min_Xvec, nrow=1), #pts=as.matrix(self$X),
+        ContourFunctions::cf_highdim(predfunc, D=ncol(self$X), baseline=min_Xvectrans,
+                                     batchmax = Inf,
+                                     pts=matrix(min_Xvectrans, nrow=1), #pts=as.matrix(self$X),
                                      var_names = colnames(self$X),
-                                     low = self$parlower, high=self$parupper)
+                                     low = self$parlowertrans, high=self$paruppertrans)
       }
     },
     #' @description Print details of the object.
