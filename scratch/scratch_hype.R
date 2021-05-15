@@ -110,3 +110,32 @@ h1$plotX()
 h1$run_all()
 h1$plotX()
 h1$plotinteractions()
+
+# 2 params, 2nd is Log parameter
+
+# 2 inputs, second is null
+h1 <- hype$new(eval_func = function(a, b) {a^2},
+               par_unif$new("a", -1, 1),
+               par_log10$new("b", 1e-8, 1e-2), n_lhs=6)
+h1$run_all()
+# h1$plotX2()
+h1$add_LHS(13)
+h1$run_all()
+h1$plotX()
+h1$plotinteractions()
+
+# 5 inputs, 2 are log
+h1 <- hype$new(eval_func = function(a, b, d,e,f) {-a^2*b^2*log(d)*sqrt(f)},
+               par_unif$new("a", -1, 1),
+               par_unif$new("b", -3, 4),
+               par_log10$new("d", 1e-8, 1e-2),
+               par_unif$new("e", -1, 1),
+               par_log10$new("f", 1, 1000),
+               n_lhs=6)
+# h1$plotX()
+h1$run_all()
+h1$add_LHS(50)
+h1$plotX()
+h1$run_all()
+h1$plotX()
+h1$plotinteractions()

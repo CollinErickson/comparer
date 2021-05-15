@@ -201,7 +201,7 @@ hype <- R6::R6Class(
     add_X = function(X) {
       stopifnot(is.data.frame(X))
       stopifnot(all(colnames(X) == colnames(self$X)))
-      nameoflevel <- "Xdf" #if (length(self$parnames) > 1) {"Xdf"} else {self$ffexp$allvars$name[1]}
+      nameoflevel <- "Xdftrans" #if (length(self$parnames) > 1) {"Xdf"} else {self$ffexp$allvars$name[1]}
       updatedffexp <- self$ffexp$add_level(nameoflevel, X, suppressMessage=T)
       self$ffexp <- updatedffexp
       invisible(self)
@@ -218,7 +218,7 @@ hype <- R6::R6Class(
       Xlhstrans <- as.data.frame(Xlhstrans)
       names(Xlhstrans) <- self$parnames
       # Convert trans to raw
-      browser()
+      # browser()
       Xlhsraw <- self$convert_trans_to_raw(Xlhstrans)
       self$add_X(Xlhsraw)
       invisible(self)
@@ -405,19 +405,55 @@ hype <- R6::R6Class(
           preddf <- rbind(preddf, df_i)
         }
       }
-      browser()
-      p <- ggplot2::ggplot(reshape2::melt(tdf, id.vars=c('Z', 'Rank')),
-                           ggplot2::aes(value, Z, color=Rank))
-      if (addlines) {
-        p <- p +
-          ggplot2::geom_line(data=preddf, ggplot2::aes(value,    mean,color=NULL), alpha=.1) +
-          ggplot2::geom_line(data=preddf, ggplot2::aes(value, lower95,color=NULL), alpha=.1) +
-          ggplot2::geom_line(data=preddf, ggplot2::aes(value, upper95,color=NULL), alpha=.1)
+      # browser()
+      # p <- ggplot2::ggplot(reshape2::melt(tdf, id.vars=c('Z', 'Rank')),
+      #                      ggplot2::aes(value, Z, color=Rank))
+      # if (addlines) {
+      #   p <- p +
+      #     ggplot2::geom_line(data=preddf, ggplot2::aes(value,    mean,color=NULL), alpha=.1) +
+      #     ggplot2::geom_line(data=preddf, ggplot2::aes(value, lower95,color=NULL), alpha=.1) +
+      #     ggplot2::geom_line(data=preddf, ggplot2::aes(value, upper95,color=NULL), alpha=.1)
+      # }
+      # p <- p + ggplot2::geom_point() +
+      #   ggplot2::facet_wrap(. ~ variable, scales='free_x') +
+      #   ggplot2::scale_color_gradientn(colors=c('green', 'purple'))
+      # p
+
+      # New with transformations on x axis
+
+      ggs <- list()
+      for (i in 1:ncol(Xtrans)) {
+        dfi <- data.frame(value=self$X[, i], Z=self$Z, Rank=order(order(self$Z)))
+        # ggi <- ggplot2::ggplot(reshape2::melt(tdf, id.vars=c('Z', 'Rank')),
+        #                        ggplot2::aes(value, Z, color=Rank))
+        ggi <- ggplot2::ggplot(dfi,
+                               ggplot2::aes(value, Z, color=Rank))
+        # Add prediction lines
+        # ggi <- ggi + preddf[preddf$index==i, ]
+        if (addlines) {
+          preddfi <-  preddf[preddf$index==i, ]
+          ggi <- ggi +
+            ggplot2::geom_line(data=preddfi, ggplot2::aes(valueraw,    mean,color=NULL), alpha=.1) +
+            ggplot2::geom_line(data=preddfi, ggplot2::aes(valueraw, lower95,color=NULL), alpha=.1) +
+            ggplot2::geom_line(data=preddfi, ggplot2::aes(valueraw, upper95,color=NULL), alpha=.1)
+        }
+        # Add points
+        ggi <- ggi + ggplot2::geom_point() +
+          #ggplot2::facet_wrap(. ~ variable, scales='free_x') +
+          ggplot2::scale_color_gradientn(colors=c('green', 'purple'))
+        ggi <- ggi + ggplot2::scale_x_continuous(trans=self$parlist[[i]]$ggtrans)
+        ggi <- ggi + xlab(self$parnames[i])
+        if (i > 1) {
+          ggi <- ggi + ylab(NULL)
+        }
+        ggs[[i]] <- ggi
       }
-      p <- p + ggplot2::geom_point() +
-        ggplot2::facet_wrap(. ~ variable, scales='free_x') +
-        ggplot2::scale_color_gradientn(colors=c('green', 'purple'))
-      p
+      # ggpubr::ggarrange(ggs[[1]], ggs[[2]], common.legend=T, legend="right")
+
+      ggs$common.legend <- T
+      ggs$legend <- "right"
+      do.call(ggpubr::ggarrange, ggs) + ylab("Outer ylab")
+
     },
     #' @description Plot the 2D plots from inputs to the output.
     #' All other variables are held at their values for the best input.
@@ -432,9 +468,10 @@ hype <- R6::R6Class(
         stop("Can't plot interactions with single input.")
       }
 
+      Xtrans <- self$convert_raw_to_trans(self$X)
       mod <- DiceKriging::km(formula = ~1,
                              covtype=covtype,
-                             design = self$X,
+                             design = Xtrans,
                              response = self$Z,
                              nugget.estim=nugget.estim,
                              control=list(trace=FALSE))

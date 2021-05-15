@@ -7,7 +7,7 @@ par_log10 <- R6::R6Class(
     name=NULL,
     lower=NULL,
     upper=NULL,
-    partrans="log",
+    # partrans="log",
     fromraw=function(x) {log(x, 10)},
     toraw= function(x) {10 ^ x},
     ggtrans="log10", # ggplot trans to give to scale_x_continuous
