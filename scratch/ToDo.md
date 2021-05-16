@@ -74,6 +74,8 @@ ggpubr::ggarrange(p,p,p,p + scale_x_log10(), common.legend=T, legend="right")
 
 * Avoid outliers. Allow output on log scale.
 
+* Don't print out all from ffexp, do progress
+
 ## MAB: multi-armed bandit
 
 * run batches, easy access function, df/list input, log scale.

@@ -1,4 +1,6 @@
 
+#' Hyperparameter on log10 scale
+#' @export
 # par_log ----
 par_log10 <- R6::R6Class(
   classname="par_log10",
@@ -19,6 +21,7 @@ par_log10 <- R6::R6Class(
       self$name <- name
       self$lower <- lower #log(lower, 10)
       self$upper <- upper #log(upper, 10)
+      stopifnot(lower>0, upper>lower)
     }
   )
 )

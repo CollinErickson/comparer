@@ -17,6 +17,9 @@ par_hype <- R6::R6Class(
 #' @field name Name of the parameter, must match the input to `eval_func`.
 #' @field lower Lower bound of the parameter
 #' @field upper Upper bound of the parameter
+#' @field fromraw Function
+#' @field toraw Function
+#' @field ggtrans Trans
 #' @examples
 #' p1 <- par_unif$new('x1', 0, 2)
 #' class(p1)
@@ -29,9 +32,12 @@ par_unif <- R6::R6Class(
     name=NULL,
     lower=NULL,
     upper=NULL,
-    fromraw=identity,
-    toraw= identity,
+    fromraw=function(x) {x}, #identity,
+    toraw= function(x) {x}, #identity,
     ggtrans="identity", # ggplot trans to give to scale_x_continuous
+    # fromraw=NULL,
+    # toraw= NULL,
+    # ggtrans=NULL, # ggplot trans to give to scale_x_continuous
     #' @description Create a hyperparameter with uniform distribution
     #' @param name Name of the parameter, must match the input to `eval_func`.
     #' @param lower Lower bound of the parameter
@@ -40,6 +46,10 @@ par_unif <- R6::R6Class(
       self$name <- name
       self$lower <- lower
       self$upper <- upper
+      # These can't be defined above, gave error, has to be in init
+      # self$fromraw <- identity
+      # self$toraw <- identity
+      # self$ggtrans <- "identity" # ggplot trans to give to scale_x_continuous
     }
   )
 )
@@ -57,8 +67,11 @@ if (F) {
 #' @field Z Output at X
 #' @field mod Gaussian process model used to predict what the output will be.
 #' @field parnames Names of the parameters
-#' @field parlower Lower bounds for each parameter
-#' @field parupper Upper bounds for each parameter
+#' @field parlowerraw Lower bounds for each parameter on raw scale
+#' @field parupperraw Upper bounds for each parameter on raw scale
+#' @field parlowertrans Lower bounds for each parameter on transformed scale
+#' @field paruppertrans Upper bounds for each parameter on transformed scale
+#' @field parlist List of all parameters
 #' @field partrans Transformation for each parameter
 #' @field ffexp An ffexp R6 object used to run the experiment and store
 #' the results.
@@ -223,6 +236,8 @@ hype <- R6::R6Class(
       self$add_X(Xlhsraw)
       invisible(self)
     },
+    #' @description Convert parameters from transformed scale to raw scale.
+    #' @param Xtrans Parameters on the transformed scale
     convert_trans_to_raw = function(Xtrans) {
       convert_back <- FALSE
       if (is.vector(Xtrans)) {
@@ -238,6 +253,8 @@ hype <- R6::R6Class(
       }
       Xraw
     },
+    #' @description Convert parameters from raw scale to transformed scale.
+    #' @param Xraw Parameters on the raw scale
     convert_raw_to_trans = function(Xraw) {
       convert_back <- FALSE
       if (is.vector(Xraw)) {
@@ -292,11 +309,12 @@ hype <- R6::R6Class(
                                                     control=list(print.level=0)))
       } else {
         # Select multiple points to be evaluated, useful when running in parallel
-        EIout <- DiceOptim::max_qEI(model=self$mod,
+        # Suppress "Stopped because hard maximum generation limit was hit."
+        EIout <- suppressWarnings(DiceOptim::max_qEI(model=self$mod,
                                     npoints=n,
                                     crit="CL", # exact was very slow for more than a couple
                                     lower=self$parlowertrans,
-                                    upper=self$paruppertrans)
+                                    upper=self$paruppertrans))
       }
       newXtrans <- EIout$par
       newXraw <- self$convert_trans_to_raw(newXtrans)
@@ -442,9 +460,9 @@ hype <- R6::R6Class(
           #ggplot2::facet_wrap(. ~ variable, scales='free_x') +
           ggplot2::scale_color_gradientn(colors=c('green', 'purple'))
         ggi <- ggi + ggplot2::scale_x_continuous(trans=self$parlist[[i]]$ggtrans)
-        ggi <- ggi + xlab(self$parnames[i])
+        ggi <- ggi + ggplot2::xlab(self$parnames[i])
         if (i > 1) {
-          ggi <- ggi + ylab(NULL)
+          ggi <- ggi + ggplot2::ylab(NULL)
         }
         ggs[[i]] <- ggi
       }
@@ -452,7 +470,7 @@ hype <- R6::R6Class(
 
       ggs$common.legend <- T
       ggs$legend <- "right"
-      do.call(ggpubr::ggarrange, ggs) + ylab("Outer ylab")
+      do.call(ggpubr::ggarrange, ggs) + ggplot2::ylab("Outer ylab")
 
     },
     #' @description Plot the 2D plots from inputs to the output.

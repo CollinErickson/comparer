@@ -24,12 +24,29 @@ print(p1)
 \item{\code{lower}}{Lower bound of the parameter}
 
 \item{\code{upper}}{Upper bound of the parameter}
+
+\item{\code{fromraw}}{Function}
+
+\item{\code{toraw}}{Function}
+
+\item{\code{ggtrans}}{Trans}
+}
+\if{html}{\out{</div>}}
+}
+\section{Active bindings}{
+\if{html}{\out{<div class="r6-active-bindings">}}
+\describe{
+\item{\code{fromraw}}{Function}
+
+\item{\code{toraw}}{Function}
 }
 \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
+\item \href{#method-fromraw}{\code{par_unif$fromraw()}}
+\item \href{#method-toraw}{\code{par_unif$toraw()}}
 \item \href{#method-new}{\code{par_unif$new()}}
 \item \href{#method-clone}{\code{par_unif$clone()}}
 }
@@ -39,6 +56,24 @@ print(p1)
 \itemize{
 }
 \out{</details>}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-fromraw"></a>}}
+\if{latex}{\out{\hypertarget{method-fromraw}{}}}
+\subsection{Method \code{fromraw()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{par_unif$fromraw(x)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-toraw"></a>}}
+\if{latex}{\out{\hypertarget{method-toraw}{}}}
+\subsection{Method \code{toraw()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{par_unif$toraw(x)}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-new"></a>}}

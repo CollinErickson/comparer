@@ -5,6 +5,8 @@ test_that("hype works", {
   expect_true("par_hype" %in% class(p1))
   p1 <- par_unif$new("a", -1, 1)
   expect_true("par_unif" %in% class(p1))
+  plog <- par_log10$new("a", 1e-8, 1)
+  expect_true("par_log10" %in% class(plog))
 
   # Create hype
   h1 <- hype$new(eval_func = function(a) {a^2}, p1, n_lhs=3)

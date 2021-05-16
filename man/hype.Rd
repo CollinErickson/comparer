@@ -38,9 +38,15 @@ next.}
 
 \item{\code{parnames}}{Names of the parameters}
 
-\item{\code{parlower}}{Lower bounds for each parameter}
+\item{\code{parlowerraw}}{Lower bounds for each parameter on raw scale}
 
-\item{\code{parupper}}{Upper bounds for each parameter}
+\item{\code{parupperraw}}{Upper bounds for each parameter on raw scale}
+
+\item{\code{parlowertrans}}{Lower bounds for each parameter on transformed scale}
+
+\item{\code{paruppertrans}}{Upper bounds for each parameter on transformed scale}
+
+\item{\code{parlist}}{List of all parameters}
 
 \item{\code{partrans}}{Transformation for each parameter}
 
@@ -61,6 +67,8 @@ the results.}
 \item \href{#method-add_data}{\code{hype$add_data()}}
 \item \href{#method-add_X}{\code{hype$add_X()}}
 \item \href{#method-add_LHS}{\code{hype$add_LHS()}}
+\item \href{#method-convert_trans_to_raw}{\code{hype$convert_trans_to_raw()}}
+\item \href{#method-convert_raw_to_trans}{\code{hype$convert_raw_to_trans()}}
 \item \href{#method-add_EI}{\code{hype$add_EI()}}
 \item \href{#method-run_all}{\code{hype$run_all()}}
 \item \href{#method-run_EI_for_time}{\code{hype$run_EI_for_time()}}
@@ -152,6 +160,40 @@ Latin hypercubes are usually more spacing than randomly picking points.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{n}}{Number of points to add.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-convert_trans_to_raw"></a>}}
+\if{latex}{\out{\hypertarget{method-convert_trans_to_raw}{}}}
+\subsection{Method \code{convert_trans_to_raw()}}{
+Convert parameters from transformed scale to raw scale.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{hype$convert_trans_to_raw(Xtrans)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{Xtrans}}{Parameters on the transformed scale}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-convert_raw_to_trans"></a>}}
+\if{latex}{\out{\hypertarget{method-convert_raw_to_trans}{}}}
+\subsection{Method \code{convert_raw_to_trans()}}{
+Convert parameters from raw scale to transformed scale.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{hype$convert_raw_to_trans(Xraw)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{Xraw}}{Parameters on the raw scale}
 }
 \if{html}{\out{</div>}}
 }
