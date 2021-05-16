@@ -252,6 +252,7 @@ evaluate them, and repeat until a specified amount of time has passed.
   batch_size,
   covtype = "matern5_2",
   nugget.estim = TRUE,
+  verbose = 0,
   ...
 )}\if{html}{\out{</div>}}
 }
@@ -268,6 +269,8 @@ limit, finish the current iteration, then stop.}
 model.}
 
 \item{\code{nugget.estim}}{Should a nugget be estimated?}
+
+\item{\code{verbose}}{Verbose parameter to pass to ffexp$}
 
 \item{\code{...}}{Passed into `ffexp$run_all`.}
 }

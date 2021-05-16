@@ -8,8 +8,26 @@ Hyperparameter on log10 scale
 
 Hyperparameter on log10 scale
 }
+\examples{
+p1 <- par_log10$new('x1', 1e-4, 1e4)
+class(p1)
+print(p1)
+}
 \section{Super class}{
 \code{\link[comparer:par_hype]{comparer::par_hype}} -> \code{par_log10}
+}
+\section{Public fields}{
+\if{html}{\out{<div class="r6-fields">}}
+\describe{
+\item{\code{name}}{Name of the parameter, must match the input to `eval_func`.}
+
+\item{\code{lower}}{Lower bound of the parameter}
+
+\item{\code{upper}}{Upper bound of the parameter}
+
+\item{\code{ggtrans}}{Transformation for ggplot, see ggplot2::scale_x_continuous()}
+}
+\if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -30,19 +48,35 @@ Hyperparameter on log10 scale
 \if{html}{\out{<a id="method-fromraw"></a>}}
 \if{latex}{\out{\hypertarget{method-fromraw}{}}}
 \subsection{Method \code{fromraw()}}{
+Function to convert from raw scale to transformed scale
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{par_log10$fromraw(x)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{x}}{Value of raw scale}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-toraw"></a>}}
 \if{latex}{\out{\hypertarget{method-toraw}{}}}
 \subsection{Method \code{toraw()}}{
+Function to convert from transformed scale to raw scale
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{par_log10$toraw(x)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{x}}{Value of transformed scale}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-new"></a>}}

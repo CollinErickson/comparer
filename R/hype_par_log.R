@@ -1,6 +1,16 @@
 
 #' Hyperparameter on log10 scale
 #' @export
+#' @field name Name of the parameter, must match the input to `eval_func`.
+#' @field lower Lower bound of the parameter
+#' @field upper Upper bound of the parameter
+# @field fromraw Function to convert from raw scale to transformed scale
+# @field toraw Function to convert from transformed scale to raw scale
+#' @field ggtrans Transformation for ggplot, see ggplot2::scale_x_continuous()
+#' @examples
+#' p1 <- par_log10$new('x1', 1e-4, 1e4)
+#' class(p1)
+#' print(p1)
 # par_log ----
 par_log10 <- R6::R6Class(
   classname="par_log10",
@@ -10,7 +20,11 @@ par_log10 <- R6::R6Class(
     lower=NULL,
     upper=NULL,
     # partrans="log",
+    #' @description Function to convert from raw scale to transformed scale
+    #' @param x Value of raw scale
     fromraw=function(x) {log(x, 10)},
+    #' @description Function to convert from transformed scale to raw scale
+    #' @param x Value of transformed scale
     toraw= function(x) {10 ^ x},
     ggtrans="log10", # ggplot trans to give to scale_x_continuous
     #' @description Create a hyperparameter with uniform distribution

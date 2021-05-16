@@ -5,6 +5,7 @@
 #' p1 <- par_hype$new()
 #' class(p1)
 #' print(p1)
+# par_hype ----
 par_hype <- R6::R6Class(
   classname="par_hype",
   public=list(
@@ -17,9 +18,9 @@ par_hype <- R6::R6Class(
 #' @field name Name of the parameter, must match the input to `eval_func`.
 #' @field lower Lower bound of the parameter
 #' @field upper Upper bound of the parameter
-#' @field fromraw Function
-#' @field toraw Function
-#' @field ggtrans Trans
+# @field fromraw Function to convert from raw scale to transformed scale
+# @field toraw Function to convert from transformed scale to raw scale
+#' @field ggtrans Transformation for ggplot, see ggplot2::scale_x_continuous()
 #' @examples
 #' p1 <- par_unif$new('x1', 0, 2)
 #' class(p1)
@@ -32,7 +33,11 @@ par_unif <- R6::R6Class(
     name=NULL,
     lower=NULL,
     upper=NULL,
+    #' @description Function to convert from raw scale to transformed scale
+    #' @param x Value of raw scale
     fromraw=function(x) {x}, #identity,
+    #' @description Function to convert from transformed scale to raw scale
+    #' @param x Value of transformed scale
     toraw= function(x) {x}, #identity,
     ggtrans="identity", # ggplot trans to give to scale_x_continuous
     # fromraw=NULL,
@@ -352,6 +357,7 @@ hype <- R6::R6Class(
     #' @param covtype Covariance function to use for the Gaussian process
     #' model.
     #' @param nugget.estim Should a nugget be estimated?
+    #' @param verbose Verbose parameter to pass to ffexp$
     #' @param ... Passed into `ffexp$run_all`.
     run_EI_for_time = function(sec, batch_size, covtype="matern5_2",
                                nugget.estim=TRUE, verbose=0, ...) {

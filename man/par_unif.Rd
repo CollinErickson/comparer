@@ -25,20 +25,7 @@ print(p1)
 
 \item{\code{upper}}{Upper bound of the parameter}
 
-\item{\code{fromraw}}{Function}
-
-\item{\code{toraw}}{Function}
-
-\item{\code{ggtrans}}{Trans}
-}
-\if{html}{\out{</div>}}
-}
-\section{Active bindings}{
-\if{html}{\out{<div class="r6-active-bindings">}}
-\describe{
-\item{\code{fromraw}}{Function}
-
-\item{\code{toraw}}{Function}
+\item{\code{ggtrans}}{Transformation for ggplot, see ggplot2::scale_x_continuous()}
 }
 \if{html}{\out{</div>}}
 }
@@ -61,19 +48,35 @@ print(p1)
 \if{html}{\out{<a id="method-fromraw"></a>}}
 \if{latex}{\out{\hypertarget{method-fromraw}{}}}
 \subsection{Method \code{fromraw()}}{
+Function to convert from raw scale to transformed scale
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{par_unif$fromraw(x)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{x}}{Value of raw scale}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-toraw"></a>}}
 \if{latex}{\out{\hypertarget{method-toraw}{}}}
 \subsection{Method \code{toraw()}}{
+Function to convert from transformed scale to raw scale
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{par_unif$toraw(x)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{x}}{Value of transformed scale}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-new"></a>}}

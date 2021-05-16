@@ -27,6 +27,7 @@ Suggests:
     ggplot2,
     GGally,
     ggpubr,
+    ContourFunctions,
     parallel,
     snow,
     rmarkdown,
