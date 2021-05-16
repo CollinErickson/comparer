@@ -40,4 +40,24 @@ test_that("hype works", {
   expect_error(h2$run_all(), NA)
   expect_error(h2$add_EI(n=3), NA)
   expect_error(h2$run_all(), NA)
+  # Add LHS
+  expect_error(h2$add_LHS(n=3), NA)
+  expect_error(h2$run_all(), NA)
+  # Plot interaction
+  expect_error(plotint <- h2$plotinteractions(), NA)
+  expect_is(plotint, 'ggplot')
+  # Print object
+  expect_error(printout <- capture.output(print(h2), NA))
+  printout <- capture.output(print(h2))
+  expect_true(is.character(printout), length(printout) >= 1)
+
+  # Break if no params
+  expect_error(hype$new(eval_func = function(a) {a^2}, n_lhs=3))
+  # Break if not a param
+  expect_error(hype$new(eval_func = function(a) {a^2}, sin, n_lhs=3))
+  # Break if X0 given
+  expect_error(hype$new(eval_func = function(a) {a^2}, par_unif$new('a',1,3), X0=matrix(1:3, ncol=1), n_lhs=3))
+  # Break if n_lhs not given
+  expect_error(hype$new(eval_func = function(a) {a^2}, par_unif$new('a',1,3)))
+
 })

@@ -579,3 +579,12 @@ if (F) { # test run_for_time
                   parallel_cores=3)
   f1$run_for_time(30, 12)
 }
+
+test_that("Run superbatch", {
+  f1 <- ffexp$new(a=1:10,
+                  eval_func=function(a) {{a^2}},
+                  parallel=F,
+                  parallel_cores=1)
+  expect_error(f1$run_superbatch(3), NA)
+  expect_true(sum(f1$completed_runs) > 0)
+})
