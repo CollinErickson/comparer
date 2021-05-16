@@ -354,12 +354,25 @@ hype <- R6::R6Class(
     #' @param nugget.estim Should a nugget be estimated?
     #' @param ... Passed into `ffexp$run_all`.
     run_EI_for_time = function(sec, batch_size, covtype="matern5_2",
-                               nugget.estim=TRUE, ...) {
-      start_time <- proc.time()
-      while(proc.time()[3] - start_time[3] < sec) {
+                               nugget.estim=TRUE, verbose=0, ...) {
+      pb <- progress::progress_bar$new(
+        format=paste0("  Running for time (:spin) [:bar] :elapsed / ", sec, "s"),
+        total=sec)
+      pb$tick(0)
+      start_time <- Sys.time() #proc.time()
+      ncompleted <- 0
+      minbefore <- min(self$Z)
+      # while(proc.time()[3] - start_time[3] < sec) {
+      while(as.numeric(Sys.time() - start_time, units='secs') < sec) {
         self$add_EI(n=batch_size, covtype=covtype, nugget.estim=nugget.estim)
-        self$run_all(...)
+        self$run_all(verbose=0, ...)
+        ncompleted <- ncompleted + 1
+        pb$update(ratio=min(1, as.numeric(Sys.time() - start_time, units='secs') / sec))
       }
+      pb$terminate()
+      message(paste0("Completed ", ncompleted, " new points in ",
+                     round(as.numeric(Sys.time() - start_time, units='secs'), 1), " seconds\n",
+                     "Reduced minimum from ", signif(minbefore,5), " to ", signif(min(self$Z),5)))
       invisible(self)
     },
     #' @description Make a plot to summarize the experiment.
