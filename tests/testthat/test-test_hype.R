@@ -46,6 +46,9 @@ test_that("hype works", {
   # Plot interaction
   expect_error(plotint <- h2$plotinteractions(), NA)
   expect_is(plotint, 'ggplot')
+  # Plot pairs
+  expect_error(plotpairs <- h2$pairs(), NA)
+  expect_is(plotpairs, 'ggplot')
   # Print object
   expect_error(printout <- capture.output(print(h2), NA))
   printout <- capture.output(print(h2))

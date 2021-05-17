@@ -175,7 +175,7 @@ hype <- R6::R6Class(
         Xlhstrans <- lhs::maximinLHS(n=n_lhs, k=length(self$parnames))
         # browser()
         Xlhstrans <- sweep(sweep(Xlhstrans,
-                            2, self$paruppertrans - self$parlowertrans, "*"
+                                 2, self$paruppertrans - self$parlowertrans, "*"
         ), 2, self$parlowertrans, "+")
         Xlhstrans <- as.data.frame(Xlhstrans)
         names(Xlhstrans) <- self$parnames
@@ -231,7 +231,7 @@ hype <- R6::R6Class(
     add_LHS = function(n) {
       Xlhstrans <- lhs::maximinLHS(n=n, k=length(self$parnames))
       Xlhstrans <- sweep(sweep(Xlhstrans,
-                          2, self$paruppertrans - self$parlowertrans, "*"
+                               2, self$paruppertrans - self$parlowertrans, "*"
       ), 2, self$parlowertrans, "+")
       Xlhstrans <- as.data.frame(Xlhstrans)
       names(Xlhstrans) <- self$parnames
@@ -316,10 +316,10 @@ hype <- R6::R6Class(
         # Select multiple points to be evaluated, useful when running in parallel
         # Suppress "Stopped because hard maximum generation limit was hit."
         EIout <- suppressWarnings(DiceOptim::max_qEI(model=self$mod,
-                                    npoints=n,
-                                    crit="CL", # exact was very slow for more than a couple
-                                    lower=self$parlowertrans,
-                                    upper=self$paruppertrans))
+                                                     npoints=n,
+                                                     crit="CL", # exact was very slow for more than a couple
+                                                     lower=self$parlowertrans,
+                                                     upper=self$paruppertrans))
       }
       newXtrans <- EIout$par
       newXraw <- self$convert_trans_to_raw(newXtrans)
@@ -387,8 +387,45 @@ hype <- R6::R6Class(
     },
     #' @description Plot pairs of inputs and output
     pairs = function() {
-      stop("Fix pairs for Xtrans")
-      GGally::ggpairs(cbind(self$X, Z=self$Z))
+      # stop("Fix pairs for Xtrans")
+      # GGally::ggpairs(cbind(self$X, Z=self$Z))
+      # browser()
+      df <- cbind(self$X, Z=self$Z)
+      ggs <- list()
+      for (i in 1:ncol(df)) {
+        for (j in 1:ncol(df)) {
+          si <- colnames(df)[i]
+          sj <- colnames(df)[j]
+          if (i == j) {
+            p <- ggplot2::ggplot(df, ggplot2::aes_string(si)) + ggplot2::geom_histogram(bins = 30)
+            if (i < ncol(df)) {
+              p <- p + ggplot2::scale_x_continuous(trans = self$parlist[[i]]$ggtrans)
+            }
+          } else {
+            p <- ggplot2::ggplot(df, ggplot2::aes_string(si, sj)) + ggplot2::geom_point()
+            if (i < ncol(df)) {
+              p <- p + ggplot2::scale_x_continuous(trans = self$parlist[[i]]$ggtrans)
+            }
+            if (j < ncol(df)) {
+              p <- p + ggplot2::scale_y_continuous(trans = self$parlist[[j]]$ggtrans)
+            }
+              #
+          }
+          if (i > 1) {
+            p <- p + ggplot2::ylab(NULL)
+          }
+          if (i==1 && j==1) {
+            p <- p + ggplot2::ylab(colnames(df)[1])
+          }
+          if (j < ncol(df)) {
+            p <- p + ggplot2::xlab(NULL)
+          }
+          # ggs <- c(ggs, p)
+          ggs[[(j-1) * ncol(df) + (i-1) + 1]] <- p
+        }
+      }
+      # ggpubr
+      do.call(ggpubr::ggarrange, ggs) #+ ggplot2::ylab("Outer ylab")
     },
     #' @description Plot the output of the points evaluated in order.
     plotorder = function() {
