@@ -160,20 +160,17 @@ hype <- R6::R6Class(
         self$parnames <- c(self$parnames, pari$name)
         self$parlowerraw <- c(self$parlowerraw, pari$lower)
         self$parupperraw <- c(self$parupperraw, pari$upper)
-        # browser()
         self$parlowertrans <- c(self$parlowertrans, pari$fromraw(pari$lower))
         self$paruppertrans <- c(self$paruppertrans, pari$fromraw(pari$upper))
         self$partrans <- c(self$partrans, pari$partrans)
       }
       self$parlist <- parlist
-      # browser()
       if (!is.null(X0)) {
         stop("X0 not working yet, need to check with raw/trans")
       }
       X0trans <- NULL
       if (!missing(n_lhs)) {
         Xlhstrans <- lhs::maximinLHS(n=n_lhs, k=length(self$parnames))
-        # browser()
         Xlhstrans <- sweep(sweep(Xlhstrans,
                                  2, self$paruppertrans - self$parlowertrans, "*"
         ), 2, self$parlowertrans, "+")
@@ -188,7 +185,6 @@ hype <- R6::R6Class(
       if (!is.data.frame(X0trans)) {stop("X0 is not a df?")}
       # Convert transformed back to raw
       # X0raw <- X0trans
-      # browser()
       X0raw <- self$convert_trans_to_raw(X0trans)
       # for (i in 1:ncol(X0trans)) {
       #   X0raw[, i] <- parlist[[i]]$toraw(X0trans[, i])
@@ -236,7 +232,6 @@ hype <- R6::R6Class(
       Xlhstrans <- as.data.frame(Xlhstrans)
       names(Xlhstrans) <- self$parnames
       # Convert trans to raw
-      # browser()
       Xlhsraw <- self$convert_trans_to_raw(Xlhstrans)
       self$add_X(Xlhsraw)
       invisible(self)
@@ -299,7 +294,6 @@ hype <- R6::R6Class(
       if (covtype == "random") {
         covtype <- sample(c("matern5_2", "matern3_2", "exp", "powexp", "gauss"), 1)
       }
-      # browser()
       self$mod <- DiceKriging::km(formula = ~1,
                                   covtype=covtype,
                                   design = Xtrans,
@@ -387,9 +381,8 @@ hype <- R6::R6Class(
     },
     #' @description Plot pairs of inputs and output
     pairs = function() {
-      # stop("Fix pairs for Xtrans")
+      # Before changing to transformed coordinates
       # GGally::ggpairs(cbind(self$X, Z=self$Z))
-      # browser()
       df <- cbind(self$X, Z=self$Z)
       ggs <- list()
       for (i in 1:ncol(df)) {
@@ -402,14 +395,16 @@ hype <- R6::R6Class(
               p <- p + ggplot2::scale_x_continuous(trans = self$parlist[[i]]$ggtrans)
             }
           } else {
-            p <- ggplot2::ggplot(df, ggplot2::aes_string(si, sj)) + ggplot2::geom_point()
+            p <- ggplot2::ggplot(df, ggplot2::aes_string(si, sj, color=colnames(df)[ncol(df)])) +
+              ggplot2::geom_point() +
+              ggplot2::theme(legend.position = "none") +
+              ggplot2::scale_color_gradientn(colors=c('green', 'purple'))
             if (i < ncol(df)) {
               p <- p + ggplot2::scale_x_continuous(trans = self$parlist[[i]]$ggtrans)
             }
             if (j < ncol(df)) {
               p <- p + ggplot2::scale_y_continuous(trans = self$parlist[[j]]$ggtrans)
             }
-              #
           }
           if (i > 1) {
             p <- p + ggplot2::ylab(NULL)
@@ -461,7 +456,6 @@ hype <- R6::R6Class(
                                response = self$Z,
                                nugget.estim=nugget.estim,
                                control=list(trace=FALSE))
-        # browser()
         for (i in 1:ncol(self$X)) {
           # Predict at points that are the same for all other components
           predXtrans <- matrix(rep(unlist(min_Xtrans), npts), ncol=ncol(self$X), byrow=T)
@@ -479,7 +473,6 @@ hype <- R6::R6Class(
           preddf <- rbind(preddf, df_i)
         }
       }
-      # browser()
       # p <- ggplot2::ggplot(reshape2::melt(tdf, id.vars=c('Z', 'Rank')),
       #                      ggplot2::aes(value, Z, color=Rank))
       # if (addlines) {

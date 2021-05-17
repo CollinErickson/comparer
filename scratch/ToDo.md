@@ -50,10 +50,6 @@ If yes, maybe don't.
 
 * tests
 
-* log distribution params
-Messes up plot, use
-ggpubr::ggarrange(p,p,p,p + scale_x_log10(), common.legend=T, legend="right")
-
 * Give best inputs, either already run, or optimized
 
 * Store proportion of time spent with DK vs running experiment
@@ -76,7 +72,7 @@ ggpubr::ggarrange(p,p,p,p + scale_x_log10(), common.legend=T, legend="right")
 
 * Don't print out all from ffexp, do progress
 
-* Fix ggpairs
+* par_discrete
 
 ## MAB: multi-armed bandit
 
