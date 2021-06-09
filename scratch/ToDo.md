@@ -46,6 +46,8 @@ If yes, maybe don't.
 
 ## hype
 
+* move to new hype package?
+
 * add hype to descr, readme, vignette
 
 * tests
@@ -72,7 +74,7 @@ If yes, maybe don't.
 
 * Don't print out all from ffexp, do progress
 
-* par_discrete
+* par_discrete: fix add LHS, EI search, plot, ...
 
 ## MAB: multi-armed bandit
 
