@@ -164,12 +164,18 @@ hype <- R6::R6Class(
         self$paruppertrans <- c(self$paruppertrans, pari$fromraw(pari$upper))
         self$partrans <- c(self$partrans, pari$partrans)
       }
+      stopifnot(length(self$parnames) == c(length(self$parlowerraw),
+                                          length(self$parupperraw),
+                                          length(self$parlowertrans),
+                                          length(self$paruppertrans),
+                                          length(self$partrans)))
       self$parlist <- parlist
       if (!is.null(X0)) {
         stop("X0 not working yet, need to check with raw/trans")
       }
       X0trans <- NULL
       if (!missing(n_lhs)) {
+        # Use add_LHS here?
         Xlhstrans <- lhs::maximinLHS(n=n_lhs, k=length(self$parnames))
         Xlhstrans <- sweep(sweep(Xlhstrans,
                                  2, self$paruppertrans - self$parlowertrans, "*"
@@ -366,7 +372,7 @@ hype <- R6::R6Class(
       while(as.numeric(Sys.time() - start_time, units='secs') < sec) {
         self$add_EI(n=batch_size, covtype=covtype, nugget.estim=nugget.estim)
         self$run_all(verbose=0, ...)
-        ncompleted <- ncompleted + 1
+        ncompleted <- ncompleted + batch_size
         pb$update(ratio=min(1, as.numeric(Sys.time() - start_time, units='secs') / sec))
       }
       pb$terminate()
