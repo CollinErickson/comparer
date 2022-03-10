@@ -604,13 +604,16 @@ ffexp <- R6::R6Class(
     #' this one be return?
     #' @param verbose How much should be printed when running. 0 is none,
     #' 2 is average.
+    #' @param force_this_as_output Value to use instead of evaluating
+    #' function.
     run_one = function(irow=NULL, save_output=self$save_output,
                        write_start_files=save_output,
                        write_error_files=save_output,
                        warn_repeat=TRUE,
                        is_parallel=FALSE,
                        return_list_result_of_one=FALSE,
-                       verbose=self$verbose) {
+                       verbose=self$verbose,
+                       force_this_as_output) {
       # Set up single row to run
       if (is.null(irow)) { # If irow not given, set to next not run
         if (any(self$completed_runs == FALSE)) {
@@ -732,11 +735,21 @@ ffexp <- R6::R6Class(
       }
 
       # Run and time it
-      try.run <- try({
-        start_time <- Sys.time()
-        systime <- system.time(output <- do.call(self$eval_func, row_list), gcFirst = FALSE)
-        end_time <- Sys.time()
-      }, silent=verbose<1)
+      if (missing(force_this_as_output)) {
+        try.run <- try({
+          start_time <- Sys.time()
+          systime <- system.time(output <- do.call(self$eval_func, row_list), gcFirst = FALSE)
+          end_time <- Sys.time()
+        }, silent=verbose<1)
+      } else {
+        # If user already knows value, this skips running it.
+        # Useful for adding in results from previous experiments.
+        try.run <- try({
+          start_time <- Sys.time()
+          systime <- system.time(output <- force_this_as_output, gcFirst = FALSE)
+          end_time <- Sys.time()
+        }, silent=verbose<1)
+      }
 
       # Delete write start file
       if (write_start_files && file.exists(write_start_file_path)) {

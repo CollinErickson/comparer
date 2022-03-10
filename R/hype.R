@@ -137,7 +137,8 @@ hype <- R6::R6Class(
     #' `eval_func` and returns the value we are trying to minimize.
     initialize = function(eval_func,
                           ..., # ... is params
-                          X0=NULL, n_lhs,
+                          X0=NULL, Z0=NULL,
+                          n_lhs,
                           extract_output_func
     ) {
       self$eval_func <- eval_func
@@ -165,16 +166,20 @@ hype <- R6::R6Class(
         self$partrans <- c(self$partrans, pari$partrans)
       }
       stopifnot(length(self$parnames) == c(length(self$parlowerraw),
-                                          length(self$parupperraw),
-                                          length(self$parlowertrans),
-                                          length(self$paruppertrans),
-                                          length(self$partrans)))
+                                           length(self$parupperraw),
+                                           length(self$parlowertrans),
+                                           length(self$paruppertrans),
+                                           length(self$partrans)))
       self$parlist <- parlist
       if (!is.null(X0)) {
-        stop("X0 not working yet, need to check with raw/trans")
+        # browser("X0 not working yet, need to check with raw/trans")
+        stopifnot(is.data.frame(X0), nrow(X0) > .5,
+                  colnames(X0) == self$parnames)
+        X0trans <- X0
+      } else {
+        X0trans <- NULL
       }
-      X0trans <- NULL
-      if (!missing(n_lhs)) {
+      if (!missing(n_lhs) && n_lhs > .5) {
         # Use add_LHS here?
         Xlhstrans <- lhs::maximinLHS(n=n_lhs, k=length(self$parnames))
         Xlhstrans <- sweep(sweep(Xlhstrans,
@@ -199,6 +204,13 @@ hype <- R6::R6Class(
       self$ffexp <- ffexp$new(eval_func=eval_func,
                               Xdftrans=X0raw
       )
+      # If Y0 given in with X0, put it in
+      if (!is.null(Z0)) {
+        stopifnot(is.numeric(Z0), length(Z0) == nrow(X0))
+        for (i in 1:nrow(X0)) {
+          self$ffexp$run_one(i, Z0[[i]])
+        }
+      }
       if (!missing(extract_output_func)) {
         self$extract_output_func <- extract_output_func
       }
@@ -206,13 +218,23 @@ hype <- R6::R6Class(
     },
     #' @description Add data to the experiment results.
     #' @param X Data frame with names matching the input parameters
-    #' @param Y Output at rows of X matching the experiment output.
-    add_data = function(X, Y) {
-      stop("Not yet implemented")
-      self$ffexp <- updatedffexp
-      nameoflevel <- "Xdf" #if (length(self$parnames) > 1) {"Xdf"} else {self$ffexp$allvars$name[1]}
-      updatedffexp <- self$ffexp$add_level(nameoflevel, X, suppressMessage=TRUE)
-      stop("need to add Y too")
+    #' @param Z Output at rows of X matching the experiment output.
+    add_data = function(X, Z) {
+      newffexp <- self$ffexp$add_level('Xdftrans', x0)
+      stopifnot(is.data.frame(X), nrow(X) > .5,
+                ncol(X) == ncol(self$X),
+                colnames(X) == colnames(self$X),
+                is.numeric(Z), nrow(X) == length(Z))
+      for (i in 1:nrow(X)) {
+        newffexp$run_one(self$ffexp$number_runs + i, Z[[i]])
+      }
+      self$ffexp <- newffexp
+
+      # stop("Not yet implemented")
+      # self$ffexp <- updatedffexp
+      # nameoflevel <- "Xdf" #if (length(self$parnames) > 1) {"Xdf"} else {self$ffexp$allvars$name[1]}
+      # updatedffexp <- self$ffexp$add_level(nameoflevel, X, suppressMessage=TRUE)
+      # stop("need to add Y too")
       invisible(self)
     },
     #' @description Add new inputs to run. This allows the user to specify
@@ -275,6 +297,30 @@ hype <- R6::R6Class(
         Xtrans <- Xtrans[1, , drop=TRUE]
       }
       Xtrans
+    },
+    #' @description Change lower/upper bounds of a parameter
+    #' @param parname Name of the parameter
+    #' @param lower New lower bound. Leave empty if not changing.
+    #' @param upper New upper bound. Leave empty if not changing.
+    change_par_bounds = function(parname, lower, upper) {
+      # browser()
+      stopifnot(parname %in% self$parnames)
+      parind <- which(parname == self$parnames)
+      stopifnot(length(parind) == 1)
+      if (!missing(lower)) {
+        stopifnot(!is.null(lower), !is.na(lower), length(lower) == 1, is.numeric(lower))
+        self$parlist[[parind]]$lower <- lower
+        self$parlowerraw[[parind]] <- lower
+        self$parlowertrans[[parind]] <- self$parlist[[parind]]$fromraw(lower)
+      }
+      if (!missing(upper)) {
+        stopifnot(!is.null(upper), !is.na(upper), length(upper) == 1, is.numeric(upper))
+        self$parlist[[parind]]$upper <- upper
+        self$parupperraw[[parind]] <- upper
+        self$paruppertrans[[parind]] <- self$parlist[[parind]]$fromraw(upper)
+      }
+      stopifnot(self$parlist[[parind]]$lower < self$parlist[[parind]]$upper)
+      invisible(self)
     },
     #' @description Add new inputs to run using the expected information
     #' criteria

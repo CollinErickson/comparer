@@ -31,9 +31,6 @@ If yes, maybe don't.
 
 * list outputs, get some for outcleandf
 
-* superbatches: If run_all with 100, give option to run in groups of 10.
-  would allow for progress print out and saving object
-
 * parallel masteroutput to "" by default to make it easier. Usually don't want it anyways
 
 * superbatch has nsb wrong. Give either n batches or n trials per batch.
@@ -75,6 +72,8 @@ If yes, maybe don't.
 * Don't print out all from ffexp, do progress
 
 * par_discrete: fix add LHS, EI search, plot, ...
+
+* mod using GauPro
 
 ## MAB: multi-armed bandit
 

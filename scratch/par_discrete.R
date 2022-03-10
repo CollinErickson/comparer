@@ -1,5 +1,5 @@
 par_discrete <- R6::R6Class(
-  classname="par_log10",
+  classname="par_discrete",
   inherit = par_hype,
   public=list(
     name=NULL,
