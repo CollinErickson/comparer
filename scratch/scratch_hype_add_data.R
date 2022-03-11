@@ -20,8 +20,9 @@ h1 <- hype$new(eval_func = f1,
                n_lhs=6)
 h1$run_all()
 h1$plotX()
-debugonce(h1$add_data)
-h1$add_data(X=x0, Y=y0)
+# debugonce(h1$add_data)
+h1$add_data(X=x0, Z=y0)
+h1
 # h1$plotX2()
 h1$add_EI(1)
 h1$run_all()

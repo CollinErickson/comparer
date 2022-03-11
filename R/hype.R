@@ -220,7 +220,7 @@ hype <- R6::R6Class(
     #' @param X Data frame with names matching the input parameters
     #' @param Z Output at rows of X matching the experiment output.
     add_data = function(X, Z) {
-      newffexp <- self$ffexp$add_level('Xdftrans', x0)
+      newffexp <- self$ffexp$add_level('Xdftrans', X)
       stopifnot(is.data.frame(X), nrow(X) > .5,
                 ncol(X) == ncol(self$X),
                 colnames(X) == colnames(self$X),
@@ -230,11 +230,10 @@ hype <- R6::R6Class(
       }
       self$ffexp <- newffexp
 
-      # stop("Not yet implemented")
-      # self$ffexp <- updatedffexp
-      # nameoflevel <- "Xdf" #if (length(self$parnames) > 1) {"Xdf"} else {self$ffexp$allvars$name[1]}
-      # updatedffexp <- self$ffexp$add_level(nameoflevel, X, suppressMessage=TRUE)
-      # stop("need to add Y too")
+      # Update this object
+      self$X <- self$ffexp$rungrid2()
+      self$Z <- unlist(self$ffexp$outlist)
+
       invisible(self)
     },
     #' @description Add new inputs to run. This allows the user to specify
@@ -416,8 +415,13 @@ hype <- R6::R6Class(
       minbefore <- min(self$Z)
       # while(proc.time()[3] - start_time[3] < sec) {
       while(as.numeric(Sys.time() - start_time, units='secs') < sec) {
-        self$add_EI(n=batch_size, covtype=covtype, nugget.estim=nugget.estim)
+        # Only add EI once all existing are run
+        if (sum(!h1$ffexp$completed_runs) < .5) {
+          self$add_EI(n=batch_size, covtype=covtype, nugget.estim=nugget.estim)
+        }
+        # Run it
         self$run_all(verbose=0, ...)
+        # Increment
         ncompleted <- ncompleted + batch_size
         pb$update(ratio=min(1, as.numeric(Sys.time() - start_time, units='secs') / sec))
       }
@@ -573,6 +577,9 @@ hype <- R6::R6Class(
       ggs$legend <- "right"
       do.call(ggpubr::ggarrange, ggs) + ggplot2::ylab("Outer ylab")
 
+    },
+    plotXorder = function() {
+      # browser()
     },
     #' @description Plot the 2D plots from inputs to the output.
     #' All other variables are held at their values for the best input.
