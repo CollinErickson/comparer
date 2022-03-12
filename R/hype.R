@@ -142,6 +142,9 @@ hype <- R6::R6Class(
                           extract_output_func
     ) {
       self$eval_func <- eval_func
+      if (!missing(extract_output_func)) {
+        self$extract_output_func <- extract_output_func
+      }
       dots <- list(...)
       if (length(dots) == 0) {
         stop("No hyperparameters given. Give a par_unif$new to hype$new.")
@@ -208,11 +211,12 @@ hype <- R6::R6Class(
       if (!is.null(Z0)) {
         stopifnot(is.numeric(Z0), length(Z0) == nrow(X0))
         for (i in 1:nrow(X0)) {
-          self$ffexp$run_one(i, Z0[[i]])
+          self$ffexp$run_one(i,
+                             force_this_as_output=Z0[[i]])
         }
-      }
-      if (!missing(extract_output_func)) {
-        self$extract_output_func <- extract_output_func
+        # Run this so it gathers X/Z properly.
+        # It won't actually run anything.
+        self$run_all()
       }
       invisible(self)
     },
@@ -302,7 +306,6 @@ hype <- R6::R6Class(
     #' @param lower New lower bound. Leave empty if not changing.
     #' @param upper New upper bound. Leave empty if not changing.
     change_par_bounds = function(parname, lower, upper) {
-      # browser()
       stopifnot(parname %in% self$parnames)
       parind <- which(parname == self$parnames)
       stopifnot(length(parind) == 1)
@@ -493,42 +496,73 @@ hype <- R6::R6Class(
     #' @param covtype Covariance function to use for the Gaussian process
     #' model.
     #' @param nugget.estim Should a nugget be estimated?
-    plotX = function(addlines=TRUE, covtype="matern5_2", nugget.estim=TRUE) {
+    plotX = function(addlines=TRUE, addEIlines=TRUE,
+                     covtype="matern5_2", nugget.estim=TRUE) {
       if (is.null(self$X) || is.null(self$Z)) {
         stop("Nothing has been evaluated yet. Call $run_all() first.")
       }
       stopifnot(!is.null(self$X), !is.null(self$Z), nrow(self$X) == length(self$Z))
       tdf <- cbind(self$X, Z=self$Z, Rank=order(order(self$Z)))
       Xtrans <- self$convert_raw_to_trans(self$X)
-      if (addlines) {
+      if (addlines || addEIlines) {
         min_ind <- which.min(self$Z)[1]
         min_Xraw <- self$X[min_ind,,drop=TRUE]
         min_Xtrans <- Xtrans[min_ind,,drop=TRUE]
-        preddf <- NULL
-        npts <- 30
         mod <- DiceKriging::km(formula = ~1,
                                covtype=covtype,
                                design = Xtrans,
                                response = self$Z,
                                nugget.estim=nugget.estim,
                                control=list(trace=FALSE))
-        for (i in 1:ncol(self$X)) {
-          # Predict at points that are the same for all other components
-          predXtrans <- matrix(rep(unlist(min_Xtrans), npts), ncol=ncol(self$X), byrow=T)
-          # predZ <- mod
-          predXtrans[, i] <- seq(self$parlowertrans[i], self$paruppertrans[i],l=npts)
-          predXtransdf <- as.data.frame(predXtrans)
-          names(predXtransdf) <- names(self$X)
-          predout <- DiceKriging::predict.km(mod, predXtransdf, type="SK", light.return = T)
-          predout$mean
-          df_i <- data.frame(valuetrans=predXtrans[, i],
-                             valueraw=self$parlist[[i]]$toraw((predXtrans[, i])),
-                             mean=predout$mean,
-                             lower95=predout$lower95, upper95=predout$upper95,
-                             index=i, variable=colnames(self$X)[i])
-          preddf <- rbind(preddf, df_i)
+        if (addlines) {
+          preddf <- NULL
+          npts <- 30
+          for (i in 1:ncol(self$X)) {
+            # Predict at points that are the same for all other components
+            predXtrans <- matrix(rep(unlist(min_Xtrans), npts), ncol=ncol(self$X), byrow=T)
+            # predZ <- mod
+            predXtrans[, i] <- seq(self$parlowertrans[i], self$paruppertrans[i],l=npts)
+            predXtransdf <- as.data.frame(predXtrans)
+            names(predXtransdf) <- names(self$X)
+            predout <- DiceKriging::predict.km(mod, predXtransdf, type="SK", light.return = T)
+            predout$mean
+            df_i <- data.frame(valuetrans=predXtrans[, i],
+                               valueraw=self$parlist[[i]]$toraw((predXtrans[, i])),
+                               mean=predout$mean,
+                               lower95=predout$lower95, upper95=predout$upper95,
+                               index=i, variable=colnames(self$X)[i])
+            preddf <- rbind(preddf, df_i)
+          }
+        }
+        if (addEIlines) {
+          EIdf <- NULL
+          npts <- 30
+          for (i in 1:ncol(self$X)) {
+            # Predict at points that are the same for all other components
+            EIXtrans <- matrix(rep(unlist(min_Xtrans), npts),
+                               ncol=ncol(self$X), byrow=T)
+            EIXtrans[, i] <- seq(self$parlowertrans[i], self$paruppertrans[i],l=npts)
+            EIXtransdf <- as.data.frame(EIXtrans)
+            names(EIXtransdf) <- names(self$X)
+            EIout <- apply(EIXtransdf, 1,
+                           function(xxx) {
+                             DiceOptim::EI(xxx, mod,
+                                           type="SK")
+                           }
+            )
+            df_i <- data.frame(valuetrans=EIXtrans[, i],
+                               valueraw=self$parlist[[i]]$toraw((EIXtrans[, i])),
+                               EI=EIout,
+                               index=i, variable=colnames(self$X)[i])
+            EIdf <- rbind(EIdf, df_i)
+          }
+          # Scale EI to find on same axes as Z
+          EIdf$EIrescaled <- ((EIdf$EI - min(EIdf$EI)) / (max(EIdf$EI) - min(EIdf$EI))
+                              ) * (max(self$Z) - min(self$Z)) + min(self$Z)
         }
       }
+
+
       # p <- ggplot2::ggplot(reshape2::melt(tdf, id.vars=c('Z', 'Rank')),
       #                      ggplot2::aes(value, Z, color=Rank))
       # if (addlines) {
@@ -551,14 +585,23 @@ hype <- R6::R6Class(
         #                        ggplot2::aes(value, Z, color=Rank))
         ggi <- ggplot2::ggplot(dfi,
                                ggplot2::aes(value, Z, color=Rank))
+        # Add EI lines
+        if (addEIlines) {
+          EIdfi <-  EIdf[EIdf$index==i, ]
+          ggi <- ggi +
+            ggplot2::geom_line(data=EIdfi,
+                               ggplot2::aes(valueraw, EIrescaled, color=NULL),
+                               color="red",
+                               alpha=.3)
+        }
         # Add prediction lines
         # ggi <- ggi + preddf[preddf$index==i, ]
         if (addlines) {
           preddfi <-  preddf[preddf$index==i, ]
           ggi <- ggi +
-            ggplot2::geom_line(data=preddfi, ggplot2::aes(valueraw,    mean,color=NULL), alpha=.1) +
-            ggplot2::geom_line(data=preddfi, ggplot2::aes(valueraw, lower95,color=NULL), alpha=.1) +
-            ggplot2::geom_line(data=preddfi, ggplot2::aes(valueraw, upper95,color=NULL), alpha=.1)
+            ggplot2::geom_line(data=preddfi, ggplot2::aes(valueraw,    mean,color=NULL), alpha=.3) +
+            ggplot2::geom_line(data=preddfi, ggplot2::aes(valueraw, lower95,color=NULL), alpha=.2) +
+            ggplot2::geom_line(data=preddfi, ggplot2::aes(valueraw, upper95,color=NULL), alpha=.2)
         }
         # Add points
         ggi <- ggi + ggplot2::geom_point() +

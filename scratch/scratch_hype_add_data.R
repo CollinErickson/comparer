@@ -48,7 +48,7 @@ h1 <- hype$new(eval_func = f1,
                par_unif$new("c", 1,2),
                X0=x0, Z0=y0)
 h1
-
+h1$plotX()
 
 # Test changing parameter bounds
 

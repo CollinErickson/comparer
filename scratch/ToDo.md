@@ -75,6 +75,8 @@ If yes, maybe don't.
 
 * mod using GauPro
 
+* Make xgboost param tuning example
+
 ## MAB: multi-armed bandit
 
 * run batches, easy access function, df/list input, log scale.
