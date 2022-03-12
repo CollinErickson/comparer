@@ -579,7 +579,33 @@ hype <- R6::R6Class(
 
     },
     plotXorder = function() {
-      # browser()
+      if (is.null(self$X) || is.null(self$Z)) {
+        stop("Nothing has been evaluated yet. Call $run_all() first.")
+      }
+      stopifnot(!is.null(self$X), !is.null(self$Z), nrow(self$X) == length(self$Z))
+      Xtrans <- self$convert_raw_to_trans(self$X)
+
+      ggs <- list()
+      for (i in 1:ncol(Xtrans)) {
+        dfi <- data.frame(value=self$X[, i], Z=self$Z,
+                          Rank=order(order(self$Z)), index=1:length(self$Z))
+        ggi <- ggplot2::ggplot(dfi,
+                               ggplot2::aes(index, value, color=Z))
+        # Add points
+        ggi <- ggi + ggplot2::geom_point() +
+          #ggplot2::facet_wrap(. ~ variable, scales='free_x') +
+          ggplot2::scale_color_gradientn(colors=c('green', 'purple'))
+        ggi <- ggi + ggplot2::scale_y_continuous(trans=self$parlist[[i]]$ggtrans)
+        ggi <- ggi + ggplot2::ylab(self$parnames[i])
+        if (i > 1) {
+          ggi <- ggi + ggplot2::xlab(NULL)
+        }
+        ggs[[i]] <- ggi
+      }
+
+      ggs$common.legend <- T
+      ggs$legend <- "right"
+      do.call(ggpubr::ggarrange, ggs) + ggplot2::ylab("Outer ylab")
     },
     #' @description Plot the 2D plots from inputs to the output.
     #' All other variables are held at their values for the best input.
