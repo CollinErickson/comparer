@@ -212,7 +212,8 @@ hype <- R6::R6Class(
         stopifnot(is.numeric(Z0), length(Z0) == nrow(X0))
         for (i in 1:nrow(X0)) {
           self$ffexp$run_one(i,
-                             force_this_as_output=Z0[[i]])
+                             force_this_as_output=Z0[[i]],
+                             verbose=0)
         }
         # Run this so it gathers X/Z properly.
         # It won't actually run anything.
@@ -330,7 +331,8 @@ hype <- R6::R6Class(
     #' @param covtype Covariance function to use for the Gaussian process
     #' model.
     #' @param nugget.estim Should a nugget be estimated?
-    add_EI = function(n, covtype="matern5_2", nugget.estim=TRUE) {
+    add_EI = function(n, covtype="matern5_2", nugget.estim=TRUE,
+                      model="DK") {
       if (is.null(self$X)) {
         stop('X is null, you need to run_all first.')
       }
@@ -348,26 +350,47 @@ hype <- R6::R6Class(
       if (covtype == "random") {
         covtype <- sample(c("matern5_2", "matern3_2", "exp", "powexp", "gauss"), 1)
       }
-      self$mod <- DiceKriging::km(formula = ~1,
-                                  covtype=covtype,
-                                  design = Xtrans,
-                                  response = Z,
-                                  nugget.estim=nugget.estim,
-                                  control=list(trace=FALSE))
-      if (n==1) {
-        # Suppress "Stopped because hard maximum generation limit was hit"
-        EIout <- suppressWarnings(DiceOptim::max_EI(model=self$mod,
-                                                    lower=self$parlowertrans,
-                                                    upper=self$paruppertrans,
-                                                    control=list(print.level=0)))
+
+      stopifnot(length(model) == 1, is.character(model))
+      if (tolower(model) %in% c('dk', 'dice', 'dicekriging')) {
+        self$mod <- DiceKriging::km(formula = ~1,
+                                    covtype=covtype,
+                                    design = Xtrans,
+                                    response = Z,
+                                    nugget.estim=nugget.estim,
+                                    control=list(trace=FALSE))
+        if (n==1) {
+          # Suppress "Stopped because hard maximum generation limit was hit"
+          EIout <- suppressWarnings(DiceOptim::max_EI(model=self$mod,
+                                                      lower=self$parlowertrans,
+                                                      upper=self$paruppertrans,
+                                                      control=list(print.level=0)))
+        } else {
+          # Select multiple points to be evaluated, useful when running in parallel
+          # Suppress "Stopped because hard maximum generation limit was hit."
+          EIout <- suppressWarnings(DiceOptim::max_qEI(model=self$mod,
+                                                       npoints=n,
+                                                       crit="CL", # exact was very slow for more than a couple
+                                                       lower=self$parlowertrans,
+                                                       upper=self$paruppertrans))
+        }
+      } else if (tolower(model) %in% c("gaupro")) {
+        browser()
+        self$mod <- GauPro::GauPro_kernel_model$new(X=as.matrix(Xtrans),
+                                                    Z=Z,
+                                                    nug.est=nugget.estim,
+                                                    kernel=covtype)
+        if (n==1) {
+          EIout <- self$mod$maxEI(lower=self$parlowertrans,
+                                  upper=self$paruppertrans)
+        } else {
+          # Select multiple points to be evaluated, useful when running in parallel
+          EIout <- self$mod$maxqEI(npoints=n, method="CL",
+                                   lower=self$parlowertrans,
+                                   upper=self$paruppertrans)
+        }
       } else {
-        # Select multiple points to be evaluated, useful when running in parallel
-        # Suppress "Stopped because hard maximum generation limit was hit."
-        EIout <- suppressWarnings(DiceOptim::max_qEI(model=self$mod,
-                                                     npoints=n,
-                                                     crit="CL", # exact was very slow for more than a couple
-                                                     lower=self$parlowertrans,
-                                                     upper=self$paruppertrans))
+        stop(paste("Model given to add_EI is not valid (", model, "), should be one of: DK"))
       }
       newXtrans <- EIout$par
       newXraw <- self$convert_trans_to_raw(newXtrans)
@@ -558,7 +581,7 @@ hype <- R6::R6Class(
           }
           # Scale EI to find on same axes as Z
           EIdf$EIrescaled <- ((EIdf$EI - min(EIdf$EI)) / (max(EIdf$EI) - min(EIdf$EI))
-                              ) * (max(self$Z) - min(self$Z)) + min(self$Z)
+          ) * (max(self$Z) - min(self$Z)) + min(self$Z)
         }
       }
 
