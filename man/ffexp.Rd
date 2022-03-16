@@ -448,7 +448,8 @@ instead.
   warn_repeat = TRUE,
   is_parallel = FALSE,
   return_list_result_of_one = FALSE,
-  verbose = self$verbose
+  verbose = self$verbose,
+  force_this_as_output
 )}\if{html}{\out{</div>}}
 }
 
@@ -474,6 +475,9 @@ this one be return?}
 
 \item{\code{verbose}}{How much should be printed when running. 0 is none,
 2 is average.}
+
+\item{\code{force_this_as_output}}{Value to use instead of evaluating
+function.}
 }
 \if{html}{\out{</div>}}
 }

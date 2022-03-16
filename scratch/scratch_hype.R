@@ -44,13 +44,14 @@ h1 <- hype$new(eval_func = function(a, b,d,e,f) {3*a^2 + cos(b) + .3*d},
                par_unif$new("f", 0, 10),
                n_lhs=6)
 h1$run_all()
-h1$plotX2()
+h1$plotX()
 h1$add_LHS(13)
 h1$run_all()
 # h1$plotX2()
 h1$plotX()
 h1$plotX(F)
-
+h1$add_EI(1, model='dk', just_return = T)
+h1$add_EI(1, model='gaupro', just_return = T)
 
 # 5 inputs with noise
 h1 <- hype$new(eval_func = function(a, b,d,e,f) {3*a^2 + cos(b) + .3*d + rnorm(length(a),0,.3)},

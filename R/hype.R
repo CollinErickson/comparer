@@ -130,7 +130,9 @@ hype <- R6::R6Class(
     #' @description Create hype R6 object.
     #' @param eval_func The function used to evaluate new points.
     #' @param ... Hyperparameters to optimize over.
-    #' @param X0 Data frame of initial points to run.
+    #' @param X0 Data frame of initial points to run, or points already
+    #' evaluated. If already evaluated, give in outputs in "Z0"
+    #' @param Z0 Evaluated outputs at "X0".
     #' @param n_lhs The number that should initially be run using
     #' a maximin Latin hypercube.
     #' @param extract_output_func A function that takes in the output from
@@ -331,8 +333,16 @@ hype <- R6::R6Class(
     #' @param covtype Covariance function to use for the Gaussian process
     #' model.
     #' @param nugget.estim Should a nugget be estimated?
+    #' @param model Which package should be used to fit the model and
+    #' calculate the EI? Use "DK" for DiceKriging or "GauPro" for GauPro.
+    #' @param eps Exploration parameter. The minimum amount of improvement
+    #' you care about.
+    #' @param just_return Just return the EI info, don't actually add the
+    #' points to the design.
+    #' @param calculate_at Calculate the EI at a specific point.
     add_EI = function(n, covtype="matern5_2", nugget.estim=TRUE,
-                      model="DK") {
+                      model="DK", eps, just_return=FALSE,
+                      calculate_at) {
       if (is.null(self$X)) {
         stop('X is null, you need to run_all first.')
       }
@@ -359,6 +369,9 @@ hype <- R6::R6Class(
                                     response = Z,
                                     nugget.estim=nugget.estim,
                                     control=list(trace=FALSE))
+        if (!missing(eps)) {
+          warning("eps isn't used in add_EI for DiceKriging model")
+        }
         if (n==1) {
           # Suppress "Stopped because hard maximum generation limit was hit"
           EIout <- suppressWarnings(DiceOptim::max_EI(model=self$mod,
@@ -375,22 +388,36 @@ hype <- R6::R6Class(
                                                        upper=self$paruppertrans))
         }
       } else if (tolower(model) %in% c("gaupro")) {
-        browser()
+        # browser()
         self$mod <- GauPro::GauPro_kernel_model$new(X=as.matrix(Xtrans),
                                                     Z=Z,
                                                     nug.est=nugget.estim,
                                                     kernel=covtype)
+        if (missing(eps)) {eps <- 0}
+        stopifnot(length(eps)==1, eps>=0)
         if (n==1) {
           EIout <- self$mod$maxEI(lower=self$parlowertrans,
-                                  upper=self$paruppertrans)
+                                  upper=self$paruppertrans,
+                                  minimize=TRUE,
+                                  eps=eps)
         } else {
           # Select multiple points to be evaluated, useful when running in parallel
           EIout <- self$mod$maxqEI(npoints=n, method="CL",
                                    lower=self$parlowertrans,
-                                   upper=self$paruppertrans)
+                                   upper=self$paruppertrans,
+                                   minimize=TRUE,
+                                   eps=eps)
+        }
+        EIout <- list(par=EIout)
+        if (just_return) {
+          # Add EI value to list
+          EIout$val <- self$mod$EI(x=EIout$par, minimize=TRUE)
         }
       } else {
         stop(paste("Model given to add_EI is not valid (", model, "), should be one of: DK"))
+      }
+      if (just_return) {
+        return(EIout)
       }
       newXtrans <- EIout$par
       newXraw <- self$convert_trans_to_raw(newXtrans)
@@ -516,6 +543,7 @@ hype <- R6::R6Class(
     },
     #' @description Plot the output as a function of each input.
     #' @param addlines Should prediction mean and 95\% interval be plotted?
+    #' @param addEIlines Should expected improvement lines be plotted?
     #' @param covtype Covariance function to use for the Gaussian process
     #' model.
     #' @param nugget.estim Should a nugget be estimated?
@@ -644,6 +672,8 @@ hype <- R6::R6Class(
       do.call(ggpubr::ggarrange, ggs) + ggplot2::ylab("Outer ylab")
 
     },
+    #' @description Plot each input in the order they were chosen.
+    #' Colored by quality.
     plotXorder = function() {
       if (is.null(self$X) || is.null(self$Z)) {
         stop("Nothing has been evaluated yet. Call $run_all() first.")

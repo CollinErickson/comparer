@@ -69,6 +69,7 @@ the results.}
 \item \href{#method-add_LHS}{\code{hype$add_LHS()}}
 \item \href{#method-convert_trans_to_raw}{\code{hype$convert_trans_to_raw()}}
 \item \href{#method-convert_raw_to_trans}{\code{hype$convert_raw_to_trans()}}
+\item \href{#method-change_par_bounds}{\code{hype$change_par_bounds()}}
 \item \href{#method-add_EI}{\code{hype$add_EI()}}
 \item \href{#method-run_all}{\code{hype$run_all()}}
 \item \href{#method-run_EI_for_time}{\code{hype$run_EI_for_time()}}
@@ -76,6 +77,7 @@ the results.}
 \item \href{#method-pairs}{\code{hype$pairs()}}
 \item \href{#method-plotorder}{\code{hype$plotorder()}}
 \item \href{#method-plotX}{\code{hype$plotX()}}
+\item \href{#method-plotXorder}{\code{hype$plotXorder()}}
 \item \href{#method-plotinteractions}{\code{hype$plotinteractions()}}
 \item \href{#method-print}{\code{hype$print()}}
 \item \href{#method-clone}{\code{hype$clone()}}
@@ -87,7 +89,7 @@ the results.}
 \subsection{Method \code{new()}}{
 Create hype R6 object.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{hype$new(eval_func, ..., X0 = NULL, n_lhs, extract_output_func)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{hype$new(eval_func, ..., X0 = NULL, Z0 = NULL, n_lhs, extract_output_func)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -97,7 +99,10 @@ Create hype R6 object.
 
 \item{\code{...}}{Hyperparameters to optimize over.}
 
-\item{\code{X0}}{Data frame of initial points to run.}
+\item{\code{X0}}{Data frame of initial points to run, or points already
+evaluated. If already evaluated, give in outputs in "Z0"}
+
+\item{\code{Z0}}{Evaluated outputs at "X0".}
 
 \item{\code{n_lhs}}{The number that should initially be run using
 a maximin Latin hypercube.}
@@ -114,7 +119,7 @@ a maximin Latin hypercube.}
 \subsection{Method \code{add_data()}}{
 Add data to the experiment results.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{hype$add_data(X, Y)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{hype$add_data(X, Z)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -122,7 +127,7 @@ Add data to the experiment results.
 \describe{
 \item{\code{X}}{Data frame with names matching the input parameters}
 
-\item{\code{Y}}{Output at rows of X matching the experiment output.}
+\item{\code{Z}}{Output at rows of X matching the experiment output.}
 }
 \if{html}{\out{</div>}}
 }
@@ -199,13 +204,41 @@ Convert parameters from raw scale to transformed scale.
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-change_par_bounds"></a>}}
+\if{latex}{\out{\hypertarget{method-change_par_bounds}{}}}
+\subsection{Method \code{change_par_bounds()}}{
+Change lower/upper bounds of a parameter
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{hype$change_par_bounds(parname, lower, upper)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{parname}}{Name of the parameter}
+
+\item{\code{lower}}{New lower bound. Leave empty if not changing.}
+
+\item{\code{upper}}{New upper bound. Leave empty if not changing.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-add_EI"></a>}}
 \if{latex}{\out{\hypertarget{method-add_EI}{}}}
 \subsection{Method \code{add_EI()}}{
 Add new inputs to run using the expected information
 criteria
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{hype$add_EI(n, covtype = "matern5_2", nugget.estim = TRUE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{hype$add_EI(
+  n,
+  covtype = "matern5_2",
+  nugget.estim = TRUE,
+  model = "DK",
+  eps,
+  just_return = FALSE
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -217,6 +250,15 @@ criteria
 model.}
 
 \item{\code{nugget.estim}}{Should a nugget be estimated?}
+
+\item{\code{model}}{Which package should be used to fit the model and
+calculate the EI? Use "DK" for DiceKriging or "GauPro" for GauPro.}
+
+\item{\code{eps}}{Exploration parameter. The minimum amount of improvement
+you care about.}
+
+\item{\code{just_return}}{Just return the EI info, don't actually add the
+points to the design.}
 }
 \if{html}{\out{</div>}}
 }
@@ -313,13 +355,20 @@ Plot the output of the points evaluated in order.
 \subsection{Method \code{plotX()}}{
 Plot the output as a function of each input.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{hype$plotX(addlines = TRUE, covtype = "matern5_2", nugget.estim = TRUE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{hype$plotX(
+  addlines = TRUE,
+  addEIlines = TRUE,
+  covtype = "matern5_2",
+  nugget.estim = TRUE
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{addlines}}{Should prediction mean and 95\% interval be plotted?}
+
+\item{\code{addEIlines}}{Should expected improvement lines be plotted?}
 
 \item{\code{covtype}}{Covariance function to use for the Gaussian process
 model.}
@@ -328,6 +377,17 @@ model.}
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-plotXorder"></a>}}
+\if{latex}{\out{\hypertarget{method-plotXorder}{}}}
+\subsection{Method \code{plotXorder()}}{
+Plot each input in the order they were chosen.
+Colored by quality.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{hype$plotXorder()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-plotinteractions"></a>}}
