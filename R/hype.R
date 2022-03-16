@@ -369,8 +369,16 @@ hype <- R6::R6Class(
                                     response = Z,
                                     nugget.estim=nugget.estim,
                                     control=list(trace=FALSE))
-        if (!missing(eps)) {
+        if (!missing(eps) && !is.null(eps) && eps>0) {
           warning("eps isn't used in add_EI for DiceKriging model")
+        }
+        if (!missing(calculate_at) && !is.null(calculate_at)) {
+          if (is.matrix(calculate_at) || is.data.frame(calculate_at)) {
+            return(apply(calculate_at, 1,
+                         function(xrow) DiceOptim::EI(x=xrow, model=self$mod)))
+          } else {
+            return(DiceOptim::EI(x=calculate_at, model=self$mod))
+          }
         }
         if (n==1) {
           # Suppress "Stopped because hard maximum generation limit was hit"
@@ -395,6 +403,14 @@ hype <- R6::R6Class(
                                                     kernel=covtype)
         if (missing(eps)) {eps <- 0}
         stopifnot(length(eps)==1, eps>=0)
+        if (!missing(calculate_at) && !is.null(calculate_at)) {
+          if (is.matrix(calculate_at) || is.data.frame(calculate_at)) {
+            return(apply(calculate_at, 1,
+                         function(xrow) self$mod$EI(x=xrow, minimize = T, eps=eps)))
+          } else {
+            return(self$mod$EI(x=calculate_at, minimize = T, eps=eps))
+          }
+        }
         if (n==1) {
           EIout <- self$mod$maxEI(lower=self$parlowertrans,
                                   upper=self$paruppertrans,
@@ -411,7 +427,7 @@ hype <- R6::R6Class(
         EIout <- list(par=EIout)
         if (just_return) {
           # Add EI value to list
-          EIout$val <- self$mod$EI(x=EIout$par, minimize=TRUE)
+          EIout$val <- self$mod$EI(x=EIout$par, minimize=TRUE, eps=eps)
         }
       } else {
         stop(paste("Model given to add_EI is not valid (", model, "), should be one of: DK"))
@@ -458,7 +474,9 @@ hype <- R6::R6Class(
     #' @param verbose Verbose parameter to pass to ffexp$
     #' @param ... Passed into `ffexp$run_all`.
     run_EI_for_time = function(sec, batch_size, covtype="matern5_2",
-                               nugget.estim=TRUE, verbose=0, ...) {
+                               nugget.estim=TRUE, verbose=0,
+                               model="DK", eps=0,
+                               ...) {
       pb <- progress::progress_bar$new(
         format=paste0("  Running for time (:spin) [:bar] :elapsed / ", sec, "s"),
         total=sec)
@@ -470,7 +488,8 @@ hype <- R6::R6Class(
       while(as.numeric(Sys.time() - start_time, units='secs') < sec) {
         # Only add EI once all existing are run
         if (sum(!h1$ffexp$completed_runs) < .5) {
-          self$add_EI(n=batch_size, covtype=covtype, nugget.estim=nugget.estim)
+          self$add_EI(n=batch_size, covtype=covtype, nugget.estim=nugget.estim,
+                      model=model, eps=eps)
         }
         # Run it
         self$run_all(verbose=0, ...)

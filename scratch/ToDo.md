@@ -77,6 +77,8 @@ If yes, maybe don't.
 
 * Make xgboost param tuning example
 
+* plotXorder: add hor lines at bounds
+
 ## MAB: multi-armed bandit
 
 * run batches, easy access function, df/list input, log scale.

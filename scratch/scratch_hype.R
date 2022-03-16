@@ -34,6 +34,17 @@ h1$add_LHS(13)
 h1$run_all()
 h1$plotX()
 h1$plotinteractions()
+# Compare EI
+h1$add_EI(1, model='dk', just_return = T)
+h1$add_EI(1, model='gaupro', just_return = T)
+h1$add_EI(1, model='dk', calculate_at = c(0, 4))
+h1$add_EI(1, model='dk', calculate_at = c(0, -3))
+h1$add_EI(1, model='gaupro', calculate_at = c(0, 4))
+h1$add_EI(1, model='gaupro', calculate_at = c(0, -3))
+xmat <- cbind(runif(1000,-1,1), runif(100,-3,4))
+ei_gp <- h1$add_EI(1, model='gaupro', calculate_at = xmat)
+ei_dk <- h1$add_EI(1, model='dk', calculate_at = xmat)
+plot(ei_gp, ei_dk); abline(a=0,b=1, col=2)
 
 # 5 inputs
 h1 <- hype$new(eval_func = function(a, b,d,e,f) {3*a^2 + cos(b) + .3*d},

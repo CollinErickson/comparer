@@ -237,7 +237,8 @@ criteria
   nugget.estim = TRUE,
   model = "DK",
   eps,
-  just_return = FALSE
+  just_return = FALSE,
+  calculate_at
 )}\if{html}{\out{</div>}}
 }
 
@@ -259,6 +260,8 @@ you care about.}
 
 \item{\code{just_return}}{Just return the EI info, don't actually add the
 points to the design.}
+
+\item{\code{calculate_at}}{Calculate the EI at a specific point.}
 }
 \if{html}{\out{</div>}}
 }
@@ -295,6 +298,8 @@ evaluate them, and repeat until a specified amount of time has passed.
   covtype = "matern5_2",
   nugget.estim = TRUE,
   verbose = 0,
+  model = "DK",
+  eps = 0,
   ...
 )}\if{html}{\out{</div>}}
 }
