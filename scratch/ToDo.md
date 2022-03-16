@@ -2,84 +2,89 @@
 
 ## ffexp
 
-* change_folder_path
-  - change folder_path
-  - check if folder already exists
-  - copy files over
-  - delete old folder
+-   change_folder_path
 
-* check if folder_path already exists when creating ffexp.
-If yes, maybe don't.
+    -   change folder_path
+    -   check if folder already exists
+    -   copy files over
+    -   delete old folder
 
-* If saved object exists in folder, stop. Add arg to overwrite.
+-   check if folder_path already exists when creating ffexp. If yes, maybe don't.
 
-* ffexp run_all for time tests, cleanup
+-   If saved object exists in folder, stop. Add arg to overwrite.
 
-* recover temp gives error, print which one
+-   ffexp run_all for time tests, cleanup
 
-* Delete results of a trial (flip completed, remove from outlist and outdfs)
+-   recover temp gives error, print which one
 
-* Rename ffexp? 
+-   Delete results of a trial (flip completed, remove from outlist and outdfs)
 
-* Create non-R6 function for ffexp. FFexp, Experiment, CompExp?
+-   Rename ffexp?
 
-* Run fractional experiments?
+-   Create non-R6 function for ffexp. FFexp, Experiment, CompExp?
 
-* ffexp plot effects?
+-   Run fractional experiments?
 
-* calculate effects that calculates slopes instead of for each level.
+-   ffexp plot effects?
 
-* list outputs, get some for outcleandf
+-   calculate effects that calculates slopes instead of for each level.
 
-* parallel masteroutput to "" by default to make it easier. Usually don't want it anyways
+-   list outputs, get some for outcleandf
 
-* superbatch has nsb wrong. Give either n batches or n trials per batch.
+-   parallel masteroutput to "" by default to make it easier. Usually don't want it anyways
 
-* ffexp: if parallel error, error message say to use varlist?
+-   superbatch has nsb wrong. Give either n batches or n trials per batch.
 
-* Fix calculate effects 2
+-   ffexp: if parallel error, error message say to use varlist?
 
-* run_all, not parallel, a lot, don't print, use progress?
+-   Fix calculate effects 2
+
+-   run_all, not parallel, a lot, don't print, use progress?
 
 ## hype
 
-* move to new hype package?
+-   move to new hype package?
 
-* add hype to descr, readme, vignette
+-   add hype to descr, readme, vignette
 
-* tests
+-   tests
 
-* Give best inputs, either already run, or optimized
+-   Give best inputs, either already run, or optimized
 
-* Store proportion of time spent with DK vs running experiment
+-   Store proportion of time spent with DK vs running experiment
 
-* Run_all in parallel, does it work?
+-   Run_all in parallel, does it work?
 
-* Factor levels. Start with binary?
+-   Factor levels. Start with binary?
 
-* Give DK GP info. Plot? Show which inputs are important.
+-   Give DK GP info. Plot? Show which inputs are important.
 
-* Save mod as active so it's only fit in one spot.
+-   Save mod as active so it's only fit in one spot.
 
-* Maximize option?
+-   Maximize option?
 
-* set parallel in init, give in varlist, save_folder
+-   set parallel in init, give in varlist, save_folder
 
-* qEI is slow, print what it's doing?
+-   qEI is slow, print what it's doing?
 
-* Avoid outliers. Allow output on log scale.
+-   Avoid outliers. Allow output on log scale.
 
-* Don't print out all from ffexp, do progress
+-   Don't print out all from ffexp, do progress
 
-* par_discrete: fix add LHS, EI search, plot, ...
+-   par_discrete: fix add LHS, EI search, plot, ...
 
-* mod using GauPro
+-   mod using GauPro
 
-* Make xgboost param tuning example
+-   Make xgboost param tuning example
 
-* plotXorder: add hor lines at bounds
+-   plotXorder: add hor lines at bounds
+
+-   par_integer: hard part is optim
+
+-   Remove unrun. E.g., add EI but want to undo it.
+
+-   Plot run time
 
 ## MAB: multi-armed bandit
 
-* run batches, easy access function, df/list input, log scale.
-   Check that all have been run. Binary. Pass through args.
+-   run batches, easy access function, df/list input, log scale. Check that all have been run. Binary. Pass through args.
