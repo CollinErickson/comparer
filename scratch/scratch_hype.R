@@ -152,3 +152,11 @@ h1$plotX()
 h1$run_all()
 h1$plotX()
 h1$plotinteractions()
+
+
+
+h1 <- hype$new(eval_func = function(a, b, c) {-a^2*b^2*ifelse(c=='a', 1, 2)},
+               par_unif$new("a", 6, 8),
+               par_log10$new("b", 1e-8, 1e-2),
+               par_discrete$new("c", c('a', 'b')),
+               n_lhs=6)
