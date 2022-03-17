@@ -454,7 +454,7 @@ hype <- R6::R6Class(
       # while(proc.time()[3] - start_time[3] < sec) {
       while(as.numeric(Sys.time() - start_time, units='secs') < sec) {
         # Only add EI once all existing are run
-        if (sum(!h1$ffexp$completed_runs) < .5) {
+        if (sum(!self$ffexp$completed_runs) < .5) {
           self$add_EI(n=batch_size, covtype=covtype, nugget.estim=nugget.estim,
                       model=model, eps=eps)
         }
