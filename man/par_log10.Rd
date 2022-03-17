@@ -34,6 +34,7 @@ print(p1)
 \itemize{
 \item \href{#method-fromraw}{\code{par_log10$fromraw()}}
 \item \href{#method-toraw}{\code{par_log10$toraw()}}
+\item \href{#method-generate}{\code{par_log10$generate()}}
 \item \href{#method-new}{\code{par_log10$new()}}
 \item \href{#method-clone}{\code{par_log10$clone()}}
 }
@@ -74,6 +75,23 @@ Function to convert from transformed scale to raw scale
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{x}}{Value of transformed scale}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-generate"></a>}}
+\if{latex}{\out{\hypertarget{method-generate}{}}}
+\subsection{Method \code{generate()}}{
+Generate values in the raw space based on quantiles.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{par_log10$generate(q)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{q}}{In [0,1].}
 }
 \if{html}{\out{</div>}}
 }

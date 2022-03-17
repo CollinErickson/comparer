@@ -319,6 +319,12 @@ model.}
 
 \item{\code{verbose}}{Verbose parameter to pass to ffexp$}
 
+\item{\code{model}}{Which package should be used to fit the model and
+calculate the EI? Use "DK" for DiceKriging or "GauPro" for GauPro.}
+
+\item{\code{eps}}{Exploration parameter. The minimum amount of improvement
+you care about.}
+
 \item{\code{...}}{Passed into `ffexp$run_all`.}
 }
 \if{html}{\out{</div>}}

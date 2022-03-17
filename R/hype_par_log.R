@@ -26,6 +26,11 @@ par_log10 <- R6::R6Class(
     #' @description Function to convert from transformed scale to raw scale
     #' @param x Value of transformed scale
     toraw= function(x) {10 ^ x},
+    #' @description Generate values in the raw space based on quantiles.
+    #' @param q In [0,1].
+    generate = function(q) {
+      self$toraw(self$fromraw(self$lower) + q * (self$fromraw(self$upper) - self$fromraw(self$lower)))
+    },
     ggtrans="log10", # ggplot trans to give to scale_x_continuous
     #' @description Create a hyperparameter with uniform distribution
     #' @param name Name of the parameter, must match the input to `eval_func`.
@@ -39,4 +44,10 @@ par_log10 <- R6::R6Class(
     }
   )
 )
+if (F) {
+  p1 <- par_log10$new('x1', 1e-4, 1e4)
+  p1$generate(0)
+  p1$generate((0:8)/8)
+  curve(p1$generate(x))
+}
 

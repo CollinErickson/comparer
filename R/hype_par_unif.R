@@ -24,6 +24,14 @@ par_unif <- R6::R6Class(
     #' @description Function to convert from transformed scale to raw scale
     #' @param x Value of transformed scale
     toraw= function(x) {x}, #identity,
+    #' @description Generate values in the raw space based on quantiles.
+    #' @param q In [0,1].
+    # generate = function(q) {
+    #   self$toraw(self$fromraw(self$lower) + q * (self$fromraw(self$upper) - self$fromraw(self$lower)))
+    # },
+    generate = function(q) {
+      self$lower + q * (self$upper - self$lower)
+    },
     ggtrans="identity", # ggplot trans to give to scale_x_continuous
     # fromraw=NULL,
     # toraw= NULL,

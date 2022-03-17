@@ -210,6 +210,7 @@ hype <- R6::R6Class(
     #' @description Convert parameters from transformed scale to raw scale.
     #' @param Xtrans Parameters on the transformed scale
     convert_trans_to_raw = function(Xtrans) {
+      # Does it need to be converted back into a vector?
       convert_back <- FALSE
       if (is.vector(Xtrans)) {
         convert_back <- TRUE
@@ -409,6 +410,10 @@ hype <- R6::R6Class(
     #' model.
     #' @param nugget.estim Should a nugget be estimated?
     #' @param verbose Verbose parameter to pass to ffexp$
+    #' @param model Which package should be used to fit the model and
+    #' calculate the EI? Use "DK" for DiceKriging or "GauPro" for GauPro.
+    #' @param eps Exploration parameter. The minimum amount of improvement
+    #' you care about.
     #' @param ... Passed into `ffexp$run_all`.
     run_EI_for_time = function(sec, batch_size, covtype="matern5_2",
                                nugget.estim=TRUE, verbose=0,
