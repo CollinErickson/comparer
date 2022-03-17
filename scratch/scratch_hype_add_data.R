@@ -72,3 +72,18 @@ h1$parlowertrans
 h1$parupperraw
 h1$paruppertrans
 h1$plotX()
+
+
+
+
+
+# 3 inputs, 2 matter, interaction
+h1 <- hype$new(eval_func = f1,
+               par_unif$new("a", -1, 1),
+               par_unif$new("b", -3, 4),
+               par_log10$new("c", 1,1e8),
+               n_lhs=6,
+               X0=data.frame(a=runif(10, -1,1),
+                        b=runif(10,-3,4),
+                        c=10^runif(10,0,8)))
+

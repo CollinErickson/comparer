@@ -117,28 +117,31 @@ hype <- R6::R6Class(
         # browser("X0 not working yet, need to check with raw/trans")
         stopifnot(is.data.frame(X0), nrow(X0) > .5,
                   colnames(X0) == self$parnames)
-        X0trans <- X0
+        X0raw <- X0
       } else {
-        X0trans <- NULL
+        X0raw <- NULL
       }
+      # browser()
       if (!missing(n_lhs) && n_lhs > .5) {
         # Use add_LHS here?
-        Xlhstrans <- lhs::maximinLHS(n=n_lhs, k=length(self$parnames))
-        Xlhstrans <- sweep(sweep(Xlhstrans,
-                                 2, self$paruppertrans - self$parlowertrans, "*"
-        ), 2, self$parlowertrans, "+")
-        Xlhstrans <- as.data.frame(Xlhstrans)
-        names(Xlhstrans) <- self$parnames
-        X0trans <- rbind(X0trans, Xlhstrans)
+        # Xlhstrans <- lhs::maximinLHS(n=n_lhs, k=length(self$parnames))
+        # Xlhstrans <- sweep(sweep(Xlhstrans,
+        #                          2, self$paruppertrans - self$parlowertrans, "*"
+        # ), 2, self$parlowertrans, "+")
+        # Xlhstrans <- as.data.frame(Xlhstrans)
+        # names(Xlhstrans) <- self$parnames
+        # X0trans <- rbind(X0trans, Xlhstrans)
+        Xlhsraw <- self$add_LHS(n_lhs, TRUE)
+        X0raw <- rbind(X0raw, Xlhsraw)
       }
-      if (is.null(X0trans)) {
+      if (is.null(X0raw)) {
         stop(paste('Give in n_lhs, the number of initial points to evaluate.',
                    '(X0 is null.)'))
       }
-      if (!is.data.frame(X0trans)) {stop("X0 is not a df?")}
+      if (!is.data.frame(X0raw)) {stop("X0 is not a df?")}
       # Convert transformed back to raw
       # X0raw <- X0trans
-      X0raw <- self$convert_trans_to_raw(X0trans)
+      # X0raw <- self$convert_trans_to_raw(X0trans)
       # for (i in 1:ncol(X0trans)) {
       #   X0raw[, i] <- parlist[[i]]$toraw(X0trans[, i])
       # }
@@ -195,15 +198,37 @@ hype <- R6::R6Class(
     #' Latin hypercube.
     #' Latin hypercubes are usually more spacing than randomly picking points.
     #' @param n Number of points to add.
-    add_LHS = function(n) {
-      Xlhstrans <- lhs::maximinLHS(n=n, k=length(self$parnames))
-      Xlhstrans <- sweep(sweep(Xlhstrans,
-                               2, self$paruppertrans - self$parlowertrans, "*"
-      ), 2, self$parlowertrans, "+")
-      Xlhstrans <- as.data.frame(Xlhstrans)
-      names(Xlhstrans) <- self$parnames
+    add_LHS = function(n, just_return_df=FALSE) {
+      #   Xlhstrans <- lhs::maximinLHS(n=n, k=length(self$parnames))
+      #   Xlhstrans <- sweep(sweep(Xlhstrans,
+      #                            2, self$paruppertrans - self$parlowertrans, "*"
+      #   ), 2, self$parlowertrans, "+")
+      #   Xlhstrans <- as.data.frame(Xlhstrans)
+      #   names(Xlhstrans) <- self$parnames
+      #   # Convert trans to raw
+      #   Xlhsraw <- self$convert_trans_to_raw(Xlhstrans)
+      #   self$add_X(Xlhsraw)
+      #   invisible(self)
+      # },
+      # add_LHS2 = function(n) {
+      # browser()
+      lhs <- lhs::maximinLHS(n=n, k=length(self$parnames))
+      lst <- rep(list(NULL), length(self$parnames))
+      for (i in 1:length(self$parnames)) {
+        lst[[i]] <- self$parlist[[i]]$generate(lhs[, i])
+      }
+      names(lst) <- self$parnames
+      Xlhsraw <- as.data.frame(lst)
+      # Xlhstrans <- sweep(sweep(Xlhstrans,
+      #                          2, self$paruppertrans - self$parlowertrans, "*"
+      # ), 2, self$parlowertrans, "+")
+      # Xlhstrans <- as.data.frame(Xlhstrans)
+      # names(Xlhsraw) <- self$parnames
       # Convert trans to raw
-      Xlhsraw <- self$convert_trans_to_raw(Xlhstrans)
+      # Xlhsraw <- self$convert_trans_to_raw(Xlhstrans)
+      if (just_return_df) {
+        return(Xlhsraw)
+      }
       self$add_X(Xlhsraw)
       invisible(self)
     },

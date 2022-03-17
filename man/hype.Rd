@@ -158,7 +158,7 @@ Add new input points using a maximin
 Latin hypercube.
 Latin hypercubes are usually more spacing than randomly picking points.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{hype$add_LHS(n)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{hype$add_LHS(n, just_return_df = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
