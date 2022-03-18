@@ -25,6 +25,9 @@ set.seed(0)
 [![Coverage Status](https://codecov.io/gh/CollinErickson/comparer/branch/master/graph/badge.svg)](https://codecov.io/github/CollinErickson/comparer?branch=master)
 <!-- [![Coverage Status](https://img.shields.io/coveralls/CollinErickson/comparer.svg)](https://coveralls.io/r/CollinErickson/comparer?branch=master) -->
 [![Coverage Status](https://coveralls.io/repos/github/CollinErickson/comparer/badge.svg?branch=master)](https://coveralls.io/github/CollinErickson/comparer?branch=master)
+  <!-- badges: start -->
+  [![R-CMD-check](https://github.com/CollinErickson/comparer/workflows/R-CMD-check/badge.svg)](https://github.com/CollinErickson/comparer/actions)
+  <!-- badges: end -->
 
 The goal of comparer is to make it easy to compare the results of different code
 chunks that are trying to do the same thing.
