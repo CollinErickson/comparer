@@ -154,9 +154,38 @@ h1$plotX()
 h1$plotinteractions()
 
 
-
+# Test discrete par
 h1 <- hype$new(eval_func = function(a, b, c) {-a^2*b^2*ifelse(c=='a', 1, 2)},
                par_unif$new("a", 6, 8),
                par_log10$new("b", 1e-8, 1e-2),
                par_discrete$new("c", c('a', 'b')),
                n_lhs=6)
+
+
+
+# 7 inputs, 2 are log
+u4 <- hype$new(eval_func = function(a, b, d,e,f,g,h) {-a^2*b^2*log(d)*sqrt(f)},
+               par_unif$new("a", -1, 1),
+               par_unif$new("b", -3, 4),
+               par_log10$new("d", 1e-8, 1e-2),
+               par_unif$new("e", -1, 1),
+               par_log10$new("f", 1, 1000),
+               par_unif$new("g", 13, 23),
+               par_log10$new("h", 1e4, 1e8),
+               n_lhs=10)
+u4$run_all()
+u4$plotX()
+u4$add_LHS(50)
+u4$run_all()
+u4$plotX()
+u4$add_LHS(50)
+u4$run_all()
+u4$plotX()
+# 6.9 sec, 6.0
+system.time({u4$add_EI(1, just_return = T, model="dk")})
+# 65.85 sec, mostly in C_dC. Way too slow.
+# 11.4 after changing restarts to 0.
+system.time({u4$add_EI(1, just_return = T, model="gaupro")})
+# u4$run_all()
+# u4$plotX()
+# u4$plotinteractions()

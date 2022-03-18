@@ -131,7 +131,8 @@ hype <- R6::R6Class(
         # Xlhstrans <- as.data.frame(Xlhstrans)
         # names(Xlhstrans) <- self$parnames
         # X0trans <- rbind(X0trans, Xlhstrans)
-        Xlhsraw <- self$add_LHS(n_lhs, TRUE)
+        # Just get the X from add_LHS since ffexp not created yet
+        Xlhsraw <- self$add_LHS(n_lhs, just_return_df = TRUE)
         X0raw <- rbind(X0raw, Xlhsraw)
       }
       if (is.null(X0raw)) {
@@ -362,6 +363,7 @@ hype <- R6::R6Class(
         # browser()
         self$mod <- GauPro::GauPro_kernel_model$new(X=as.matrix(Xtrans),
                                                     Z=Z,
+                                                    restarts=0, # Speed it up
                                                     nug.est=nugget.estim,
                                                     kernel=covtype)
         if (missing(eps)) {eps <- 0}
