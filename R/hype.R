@@ -174,7 +174,9 @@ hype <- R6::R6Class(
                 colnames(X) == colnames(self$X),
                 is.numeric(Z), nrow(X) == length(Z))
       for (i in 1:nrow(X)) {
-        newffexp$run_one(self$ffexp$number_runs + i, Z[[i]])
+        newffexp$run_one(self$ffexp$number_runs + i,
+                         force_this_as_output = Z[[i]],
+                         verbose=0)
       }
       self$ffexp <- newffexp
 

@@ -32,11 +32,16 @@ test_that("hype works", {
   expect_is(plotX, 'ggplot')
   expect_error(plotplot <- plot(h1), NA)
   expect_is(plotplot, 'ggplot')
+  expect_error(plotXorder <- h1$plotXorder(), NA)
+  expect_is(plotXorder, 'ggplot')
   rm(h1)
 
   # Two inputs
   expect_error({
-    h2 <- hype$new(eval_func = function(a, b) {a^2 - sin(2*pi*b)}, p1, par_unif$new("b", -1,1), n_lhs=3)
+    h2 <- hype$new(eval_func = function(a, b) {a^2 - sin(2*pi*b)},
+                   p1,
+                   par_unif$new("b", -1,1),
+                   n_lhs=3)
   }, NA)
   expect_error(h2$run_all(), NA)
   expect_error(h2$add_EI(n=3), NA)
@@ -64,4 +69,115 @@ test_that("hype works", {
   # Break if n_lhs not given
   expect_error(hype$new(eval_func = function(a) {a^2}, par_unif$new('a',1,3)))
 
+})
+
+
+# Hype add data ----
+test_that("Hype add data", {
+  # Test adding in data using add_data
+
+  f1 <- function(a, b, c) {-a^2*log(b,10)^2}
+
+  n0 <- 10
+  x0 <- data.frame(a=runif(n0, -1,1),
+                   b=10^runif(n0, -3,4),
+                   c=runif(n0,  1,2))
+  y0 <- numeric(n0)
+  for (i in 1:n0) {
+    y0[i] <- f1(x0$a[i], x0$b[i], x0$c[i])
+  }
+  cbind(x0, y0)
+
+  # 3 inputs, 2 matter, interaction
+  expect_error({
+    x9 <- hype$new(eval_func = f1,
+                   par_unif$new("a", -1, 1),
+                   par_log10$new("b", 10^-3, 10^4),
+                   par_unif$new("c", 1,2),
+                   n_lhs=6)
+    x9$run_all()
+  }, NA)
+  expect_true(length(x9$Z) == 6)
+  # x9$plotX()
+  # debugonce(x9$add_data)
+  expect_error({
+    x9$add_data(X=x0, Z=y0)
+  }, NA)
+  # x9
+  # x9$plotX2()
+  expect_error({
+    x9$add_EI(1)
+    x9$run_all()
+  }, NA)
+  # x9$plotorder()
+  # x9$plotX()
+  # x9$plotinteractions()
+
+
+
+  # Test adding data when creating object
+
+  # Give in X0, but not Z0
+  expect_error({
+    r5 <- hype$new(eval_func = f1,
+                   par_unif$new("a", -1, 1),
+                   par_log10$new("b", 10^-3, 10^4),
+                   par_unif$new("c", 1,2),
+                   X0=x0)
+  }, NA)
+  expect_true(length(r5$ffexp$completed_runs) == 10,
+              is.null(r5$X),
+              !r5$ffexp$completed_runs)
+  # r5
+
+  # Give in X0 and Z0
+  expect_error({
+    r8 <- hype$new(eval_func = f1,
+                   par_unif$new("a", -1, 1),
+                   par_log10$new("b", 10^-3, 10^4),
+                   par_unif$new("c", 1,2),
+                   X0=x0, Z0=y0)
+  }, NA)
+  # r8
+  # r8$plotX()
+
+  # Test changing parameter bounds
+
+  n2 <- hype$new(eval_func = f1,
+                 par_unif$new("a", -1, 1),
+                 par_log10$new("b", 10^-3, 10^4),
+                 par_log10$new("c", 1,100),
+                 n_lhs=6)
+  n2$run_all()
+  # n2$plotX()
+  # n2$parlist
+  # n2$parlowerraw
+  # n2$parlowertrans
+  # n2$parupperraw
+  # n2$paruppertrans
+  expect_equal(n2$parlowerraw, c(-1, .001, 1))
+  expect_equal(n2$parlowertrans, c(-1, -3, 0))
+  expect_equal(n2$parupperraw, c(1, 1e4, 1e2))
+  expect_equal(n2$paruppertrans, c(1, 4, 2))
+  n2$change_par_bounds('a', lower=0)
+  n2$change_par_bounds('b', upper=10^8)
+  n2$change_par_bounds('c', lower=.1, upper=1e3)
+  expect_equal(n2$parlowerraw, c(0, .001, .1))
+  expect_equal(n2$parlowertrans, c(0, -3, -1))
+  expect_equal(n2$parupperraw, c(1, 1e8, 1e3))
+  expect_equal(n2$paruppertrans, c(1, 8, 3))
+  # expect_true(n2$)
+  # n2$parlowerraw
+  # n2$parlowertrans
+  # n2$parupperraw
+  # n2$paruppertrans
+  # n2$plotX()
+
+  expect_error({
+    hype$new(eval_func = f1,
+             par_unif$new("a", -1, 1),
+             par_log10$new("b", 10^-3, 10^4),
+             par_unif$new("c", 1,2),
+             X0=list(a=runif(5)))
+  })
 })
