@@ -85,6 +85,14 @@
 
 -   Plot run time
 
+- latentdim in EI
+
+- multiple factor dims in hyp
+
+- fix plotX with discrete
+
+- Track when something has changed, then refit when needed
+
 ## MAB: multi-armed bandit
 
 -   run batches, easy access function, df/list input, log scale. Check that all have been run. Binary. Pass through args.

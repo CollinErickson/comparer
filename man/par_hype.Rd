@@ -23,8 +23,18 @@ print(p1)
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
+\item \href{#method-getseq}{\code{par_hype$getseq()}}
 \item \href{#method-clone}{\code{par_hype$clone()}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-getseq"></a>}}
+\if{latex}{\out{\hypertarget{method-getseq}{}}}
+\subsection{Method \code{getseq()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{par_hype$getseq(n)}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

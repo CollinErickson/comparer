@@ -9,6 +9,15 @@
 par_hype <- R6::R6Class(
   classname="par_hype",
   public=list(
-    partrans=""
+    partrans="",
+    getseq = function(n) {
+      # Sequence equally spaced on transformed scale
+      xtrans <- seq(self$fromraw(self$lower), self$fromraw(self$upper), l=n)
+      xraw <- self$toraw(xtrans)
+      list(
+        trans=xtrans,
+        raw=xraw
+      )
+    }
   )
 )

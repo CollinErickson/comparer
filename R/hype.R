@@ -14,7 +14,7 @@
 #' @field parlowertrans Lower bounds for each parameter on transformed scale
 #' @field paruppertrans Upper bounds for each parameter on transformed scale
 #' @field parlist List of all parameters
-#' @field partrans Transformation for each parameter
+# @field partrans Transformation for each parameter
 #' @field ffexp An ffexp R6 object used to run the experiment and store
 #' the results.
 #' @field eval_func The function we evaluate.
@@ -59,7 +59,8 @@ hype <- R6::R6Class(
     parupperraw=NULL,
     parlowertrans=NULL,
     paruppertrans=NULL,
-    partrans=NULL,
+    par_all_cts=NULL,
+    # partrans=NULL,
     parlist=NULL,
     ffexp = NULL,
     eval_func = NULL,
@@ -90,38 +91,49 @@ hype <- R6::R6Class(
       }
       parlist <- list()
       self$parnames <- c()
-      self$parlowerraw <- c()
-      self$parupperraw <- c()
+      # self$parlowerraw <- c()
+      # self$parupperraw <- c()
       self$parlowertrans <- c()
       self$paruppertrans <- c()
-      self$partrans <- c()
+      # self$partrans <- c()
       for (pari in dots) {
         if (!("par_hype" %in% class(pari))) {
           stop("All ... should be par_hype objects")
         }
         parlist <- c(parlist, pari)
         self$parnames <- c(self$parnames, pari$name)
-        self$parlowerraw <- c(self$parlowerraw, pari$lower)
-        self$parupperraw <- c(self$parupperraw, pari$upper)
+        # self$parlowerraw <- c(self$parlowerraw, pari$lower)
+        # self$parupperraw <- c(self$parupperraw, pari$upper)
         self$parlowertrans <- c(self$parlowertrans, pari$fromraw(pari$lower))
         self$paruppertrans <- c(self$paruppertrans, pari$fromraw(pari$upper))
-        self$partrans <- c(self$partrans, pari$partrans)
+        # self$partrans <- c(self$partrans, pari$partrans)
       }
-      stopifnot(length(self$parnames) == c(length(self$parlowerraw),
-                                           length(self$parupperraw),
-                                           length(self$parlowertrans),
-                                           length(self$paruppertrans),
-                                           length(self$partrans)))
+      # stopifnot(length(self$parnames) == c(length(self$parlowerraw),
+      #                                      length(self$parupperraw),
+      #                                      length(self$parlowertrans),
+      #                                      length(self$paruppertrans),
+      #                                      length(self$partrans)))
+      # List of parameters
       self$parlist <- parlist
+      self$par_all_cts <- TRUE
+      for (i in 1:length(self$parlist)) {
+        if (!any(c("par_unif", "par_log10") %in% class(self$parlist[[i]]))) {
+          self$par_all_cts <- FALSE
+        }
+      }
+      # if (self$par_all_cts) {
+      #   self$parlowerraw <- sapply(self$parlist, function(p) {par$lower})
+      #   self$parupperraw <- sapply(self$parlist, function(p) {par$upper})
+      #   self$parlowertrans <- sapply(self$parlist, function(p) {par$fromraw(par$lower)})
+      #   self$paruppertrans <- sapply(self$parlist, function(p) {par$fromraw(par$upper)})
+      # }
       if (!is.null(X0)) {
-        # browser("X0 not working yet, need to check with raw/trans")
         stopifnot(is.data.frame(X0), nrow(X0) > .5,
                   colnames(X0) == self$parnames)
         X0raw <- X0
       } else {
         X0raw <- NULL
       }
-      # browser()
       if (!missing(n_lhs) && n_lhs > .5) {
         # Use add_LHS here?
         # Xlhstrans <- lhs::maximinLHS(n=n_lhs, k=length(self$parnames))
@@ -148,7 +160,7 @@ hype <- R6::R6Class(
       # }
       # Use an ffexp object to manage simulations
       self$ffexp <- ffexp$new(eval_func=eval_func,
-                              Xdftrans=X0raw
+                              Xdfraw=X0raw
       )
       # If Y0 given in with X0, put it in
       if (!is.null(Z0)) {
@@ -168,7 +180,7 @@ hype <- R6::R6Class(
     #' @param X Data frame with names matching the input parameters
     #' @param Z Output at rows of X matching the experiment output.
     add_data = function(X, Z) {
-      newffexp <- self$ffexp$add_level('Xdftrans', X)
+      newffexp <- self$ffexp$add_level('Xdfraw', X)
       stopifnot(is.data.frame(X), nrow(X) > .5,
                 ncol(X) == ncol(self$X),
                 colnames(X) == colnames(self$X),
@@ -192,7 +204,7 @@ hype <- R6::R6Class(
     add_X = function(X) {
       stopifnot(is.data.frame(X))
       stopifnot(all(colnames(X) == colnames(self$X)))
-      nameoflevel <- "Xdftrans" #if (length(self$parnames) > 1) {"Xdf"} else {self$ffexp$allvars$name[1]}
+      nameoflevel <- "Xdfraw" #if (length(self$parnames) > 1) {"Xdf"} else {self$ffexp$allvars$name[1]}
       updatedffexp <- self$ffexp$add_level(nameoflevel, X, suppressMessage=T)
       self$ffexp <- updatedffexp
       invisible(self)
@@ -214,7 +226,6 @@ hype <- R6::R6Class(
       #   invisible(self)
       # },
       # add_LHS2 = function(n) {
-      # browser()
       lhs <- lhs::maximinLHS(n=n, k=length(self$parnames))
       lst <- rep(list(NULL), length(self$parnames))
       for (i in 1:length(self$parnames)) {
@@ -242,15 +253,18 @@ hype <- R6::R6Class(
       convert_back <- FALSE
       if (is.vector(Xtrans)) {
         convert_back <- TRUE
-        Xtrans <- matrix(Xtrans, nrow=1)
+        # Xtrans <- matrix(Xtrans, nrow=1)
+        Xtrans <- as.data.frame(as.list(Xtrans))
+        colnames(Xtrans) <- self$parnames
+        stopifnot(nrow(Xtrans) == 1)
       }
       Xraw <- Xtrans
       for (i in 1:ncol(Xtrans)) {
         Xraw[, i] <- self$parlist[[i]]$toraw(Xtrans[, i])
       }
-      if (convert_back) {
-        Xraw <- Xraw[1, , drop=TRUE]
-      }
+      # if (convert_back) {
+      #   Xraw <- Xraw[1, , drop=TRUE]
+      # }
       Xraw
     },
     #' @description Convert parameters from raw scale to transformed scale.
@@ -312,6 +326,9 @@ hype <- R6::R6Class(
       if (is.null(self$X)) {
         stop('X is null, you need to run_all first.')
       }
+      # if (!self$par_all_cts) {
+      #   stop("Can only add EI if all parameters are continuous (par_unif, par_log10)")
+      # }
       # If unevaluated points, set lowest value.
       Xraw <- self$ffexp$rungrid2()
       Xtrans <- self$convert_raw_to_trans(Xraw)
@@ -327,14 +344,25 @@ hype <- R6::R6Class(
         covtype <- sample(c("matern5_2", "matern3_2", "exp", "powexp", "gauss"), 1)
       }
 
+      # Fit model
       stopifnot(length(model) == 1, is.character(model))
-      if (tolower(model) %in% c('dk', 'dice', 'dicekriging')) {
-        self$mod <- DiceKriging::km(formula = ~1,
-                                    covtype=covtype,
-                                    design = Xtrans,
-                                    response = Z,
-                                    nugget.estim=nugget.estim,
-                                    control=list(trace=FALSE))
+      self$fit_mod(model=model,
+                   nugget.estim=nugget.estim,
+                   covtype=covtype
+      )
+
+      # browser()
+      if ("km" %in% class(self$mod)) {
+        if (!self$par_all_cts) {
+          stop(paste0("Can only add EI with DiceKriging if all",
+                      "parameters are continuous (par_unif, par_log10)"))
+        }
+        # self$mod <- DiceKriging::km(formula = ~1,
+        #                             covtype=covtype,
+        #                             design = Xtrans,
+        #                             response = Z,
+        #                             nugget.estim=nugget.estim,
+        #                             control=list(trace=FALSE))
         if (!missing(eps) && !is.null(eps) && eps>0) {
           warning("eps isn't used in add_EI for DiceKriging model")
         }
@@ -361,35 +389,76 @@ hype <- R6::R6Class(
                                                        lower=self$parlowertrans,
                                                        upper=self$paruppertrans))
         }
-      } else if (tolower(model) %in% c("gaupro")) {
-        # browser()
-        self$mod <- GauPro::GauPro_kernel_model$new(X=as.matrix(Xtrans),
-                                                    Z=Z,
-                                                    restarts=0, # Speed it up
-                                                    nug.est=nugget.estim,
-                                                    kernel=covtype)
+      } else if ("GauPro" %in% class(self$mod)) {#tolower(model) %in% c("gaupro")) {
+        # if (self$par_all_cts) {
+        #   kern <- covtype
+        # } else {
+        #   factorindsTF <- sapply(self$parlist, function(p) {"par_discrete" %in% class(p)})
+        #   factorinds <- which(factorindsTF)
+        #   stopifnot(length(factorinds) == 1)
+        #   kern1inner <-  if (covtype=="gauss") {
+        #     GauPro::Gaussian$new(D=sum(!factorindsTF))
+        #   } else if (covtype == "matern5_2") {
+        #     GauPro::Matern52$new(D=sum(!factorindsTF))
+        #   } else {stop("bad covtype for GauPro with discrete par")}
+        #   kern1 <- GauPro::IgnoreIndsKernel$new(k=kern1inner,
+        #                                         ignoreinds = factorinds)
+        #   kern2 <- GauPro::LatentFactorKernel$new(
+        #     D=length(self$parlist),
+        #     nlevels=length(self$parlist[[factorinds]]$values),
+        #     xindex=factorinds,
+        #     latentdim=1
+        #   )
+        #   kern <- kern1*kern2
+        #   # Need to replace factor/chars with integers
+        #   # Xtrans[,factorinds] <- self$parlist[[factorinds]]$toint(Xtrans[,factorinds])
+        # }
+        # self$mod <- GauPro::GauPro_kernel_model$new(X=as.matrix(Xtrans),
+        #                                             Z=Z,
+        #                                             restarts=0, # Speed it up
+        #                                             nug.est=nugget.estim,
+        #                                             kernel=kern)
         if (missing(eps)) {eps <- 0}
         stopifnot(length(eps)==1, eps>=0)
         if (!missing(calculate_at) && !is.null(calculate_at)) {
           if (is.matrix(calculate_at) || is.data.frame(calculate_at)) {
             return(apply(calculate_at, 1,
-                         function(xrow) self$mod$EI(x=xrow, minimize = T, eps=eps)))
+                         function(xrow) {
+                           suppressWarnings({
+                             self$mod$EI(x=xrow, minimize = T, eps=eps)
+                           })
+                         }))
           } else {
-            return(self$mod$EI(x=calculate_at, minimize = T, eps=eps))
+            return(suppressWarnings(
+              self$mod$EI(x=calculate_at, minimize = T, eps=eps)))
           }
         }
-        if (n==1) {
-          EIout <- self$mod$maxEI(lower=self$parlowertrans,
-                                  upper=self$paruppertrans,
-                                  minimize=TRUE,
-                                  eps=eps)
+        if (self$par_all_cts) {
+          if (n==1) {
+            EIout <- self$mod$maxEI(lower=self$parlowertrans,
+                                    upper=self$paruppertrans,
+                                    minimize=TRUE,
+                                    eps=eps)
+          } else {
+            # Select multiple points to be evaluated, useful when running in parallel
+            EIout <- self$mod$maxqEI(npoints=n, method="CL",
+                                     lower=self$parlowertrans,
+                                     upper=self$paruppertrans,
+                                     minimize=TRUE,
+                                     eps=eps)
+          }
         } else {
-          # Select multiple points to be evaluated, useful when running in parallel
-          EIout <- self$mod$maxqEI(npoints=n, method="CL",
-                                   lower=self$parlowertrans,
-                                   upper=self$paruppertrans,
-                                   minimize=TRUE,
-                                   eps=eps)
+          if (n==1) {
+            EIout <- suppressWarnings({
+              self$mod$maxEIwithfactors(
+                lower=self$parlowertrans,
+                upper=self$paruppertrans,
+                minimize=TRUE,
+                eps=eps)
+            })
+          } else {
+            stop("Can't do EI with n>1 with factors")
+          }
         }
         EIout <- list(par=EIout)
         if (just_return) {
@@ -404,10 +473,85 @@ hype <- R6::R6Class(
       }
       newXtrans <- EIout$par
       newXraw <- self$convert_trans_to_raw(newXtrans)
-      nameoflevel <- "Xdftrans" #if (length(self$parnames) > 1) {"Xdf"} else {self$ffexp$allvars$name[1]}
+      nameoflevel <- "Xdfraw" #if (length(self$parnames) > 1) {"Xdf"} else {self$ffexp$allvars$name[1]}
       updatedffexp <- self$ffexp$add_level(nameoflevel, newXraw, suppressMessage=TRUE)
       self$ffexp <- updatedffexp
       invisible(self)
+    },
+    # calculate_EI = function() {
+    #
+    # },
+    fit_mod = function(covtype="matern5_2", nugget.estim=TRUE,
+                       model="DK") {
+      if (is.null(self$X)) {
+        stop('X is null, you need to run_all first.')
+      }
+      # if (!self$par_all_cts) {
+      #   stop("Can only add EI if all parameters are continuous (par_unif, par_log10)")
+      # }
+      # If unevaluated points, set lowest value.
+      Xraw <- self$ffexp$rungrid2()
+      Xtrans <- self$convert_raw_to_trans(Xraw)
+      if (nrow(Xtrans) == length(self$Z)) { # All have been evaluated
+        Z <- self$Z
+      } else { # Unevaluated points exist, set to constant liar
+        Z <- c(self$Z, rep(min(self$Z), nrow(Xtrans) - length(self$Z)))
+        message("Unevaluated points already exist, using constant liar")
+      }
+
+      # Just update mod? Set covtype?
+      if (covtype == "random") {
+        covtype <- sample(c("matern5_2", "matern3_2", "exp", "powexp", "gauss"), 1)
+      }
+
+      if (!self$par_all_cts) {
+        model <- "GauPro"
+      }
+      stopifnot(length(model) == 1, is.character(model))
+      if (tolower(model) %in% c('dk', 'dice', 'dicekriging')) {
+        if (!self$par_all_cts) {
+          stop("Can only add EI if all parameters are continuous (par_unif, par_log10)")
+        }
+        self$mod <- DiceKriging::km(formula = ~1,
+                                    covtype=covtype,
+                                    design = Xtrans,
+                                    response = Z,
+                                    nugget.estim=nugget.estim,
+                                    control=list(trace=FALSE))
+      } else if (tolower(model) %in% c("gaupro")) {
+        if (self$par_all_cts) {
+          kern <- covtype
+        } else {
+          factorindsTF <- sapply(self$parlist, function(p) {"par_discrete" %in% class(p)})
+          factorinds <- which(factorindsTF)
+          stopifnot(length(factorinds) == 1)
+          kern1inner <-  if (covtype=="gauss") {
+            GauPro::Gaussian$new(D=sum(!factorindsTF))
+          } else if (covtype == "matern5_2") {
+            GauPro::Matern52$new(D=sum(!factorindsTF))
+          } else {stop("bad covtype for GauPro with discrete par")}
+          kern1 <- GauPro::IgnoreIndsKernel$new(k=kern1inner,
+                                                ignoreinds = factorinds)
+          kern2 <- GauPro::LatentFactorKernel$new(
+            D=length(self$parlist),
+            nlevels=length(self$parlist[[factorinds]]$values),
+            xindex=factorinds,
+            latentdim=1
+          )
+          kern <- kern1*kern2
+          # Need to replace factor/chars with integers
+          # Xtrans[,factorinds] <- self$parlist[[factorinds]]$toint(Xtrans[,factorinds])
+        }
+        self$mod <- GauPro::GauPro_kernel_model$new(X=as.matrix(Xtrans),
+                                                    Z=Z,
+                                                    restarts=0, # Speed it up
+                                                    nug.est=nugget.estim,
+                                                    kernel=kern)
+        # self$modlist <- list(model='gaupro')
+      } else {
+        stop(paste("Model given is not valid (", model, "), should be one of: DK"))
+      }
+
     },
     #' @description Run all unevaluated input points.
     #' @param ... Passed into `ffexp$run_all`. Can set 'parallel=TRUE'
@@ -538,68 +682,104 @@ hype <- R6::R6Class(
     #' model.
     #' @param nugget.estim Should a nugget be estimated?
     plotX = function(addlines=TRUE, addEIlines=TRUE,
-                     covtype="matern5_2", nugget.estim=TRUE) {
+                     covtype="matern5_2", nugget.estim=TRUE,
+                     model='DK') {
+      # browser()
       if (is.null(self$X) || is.null(self$Z)) {
         stop("Nothing has been evaluated yet. Call $run_all() first.")
       }
-      stopifnot(!is.null(self$X), !is.null(self$Z), nrow(self$X) == length(self$Z))
+      stopifnot(!is.null(self$X), !is.null(self$Z),
+                nrow(self$X) == length(self$Z))
       tdf <- cbind(self$X, Z=self$Z, Rank=order(order(self$Z)))
       Xtrans <- self$convert_raw_to_trans(self$X)
-      if (addlines || addEIlines) {
+      if (addlines || addEIlines && self$par_all_cts) {
         min_ind <- which.min(self$Z)[1]
         min_Xraw <- self$X[min_ind,,drop=TRUE]
         min_Xtrans <- Xtrans[min_ind,,drop=TRUE]
-        mod <- DiceKriging::km(formula = ~1,
-                               covtype=covtype,
-                               design = Xtrans,
-                               response = self$Z,
-                               nugget.estim=nugget.estim,
-                               control=list(trace=FALSE))
+        # mod <- DiceKriging::km(formula = ~1,
+        #                        covtype=covtype,
+        #                        design = Xtrans,
+        #                        response = self$Z,
+        #                        nugget.estim=nugget.estim,
+        #                        control=list(trace=FALSE))
+        self$fit_mod(covtype=covtype, nugget.estim=nugget.estim,
+                     model=model)
         if (addlines) {
-          preddf <- NULL
+          preddf <- list()
           npts <- 30
           for (i in 1:ncol(self$X)) {
+            # browser()
+            # Get sequence of points for par
+            parseq <- self$parlist[[i]]$getseq(n=npts)
             # Predict at points that are the same for all other components
-            predXtrans <- matrix(rep(unlist(min_Xtrans), npts), ncol=ncol(self$X), byrow=T)
+            predXtrans <- matrix(rep(unlist(min_Xtrans), length(parseq$trans)),
+                                 ncol=ncol(self$X), byrow=T)
             # predZ <- mod
-            predXtrans[, i] <- seq(self$parlowertrans[i], self$paruppertrans[i],l=npts)
+            # Change current component
+            # predXtrans[, i] <- seq(self$parlowertrans[i], self$paruppertrans[i],l=npts)
+            predXtrans[, i] <- parseq$trans
             predXtransdf <- as.data.frame(predXtrans)
             names(predXtransdf) <- names(self$X)
-            predout <- DiceKriging::predict.km(mod, predXtransdf, type="SK", light.return = T)
+            if ("km" %in% class(self$mod)) {
+              predout <- DiceKriging::predict.km(self$mod, predXtransdf, type="SK", light.return = T)
+            } else if ("GauPro" %in% class(self$mod)) {
+              # browser()
+              predout <- suppressWarnings({
+                self$mod$pred(as.matrix(predXtransdf), se.fit=TRUE)
+              })
+              predout$lower95 <- with(predout, mean - 2*se)
+              predout$upper95 <- with(predout, mean + 2*se)
+            } else {
+              stop("Error: 23587asd9723")
+            }
             predout$mean
             df_i <- data.frame(valuetrans=predXtrans[, i],
-                               valueraw=self$parlist[[i]]$toraw((predXtrans[, i])),
+                               valueraw=parseq$raw, #self$parlist[[i]]$toraw((predXtrans[, i])),
                                mean=predout$mean,
                                lower95=predout$lower95, upper95=predout$upper95,
                                index=i, variable=colnames(self$X)[i])
-            preddf <- rbind(preddf, df_i)
+            # preddf <- rbind(preddf, df_i)
+            preddf[[i]] <- df_i
           }
         }
         if (addEIlines) {
-          EIdf <- NULL
+          EIdf <- list()
           npts <- 30
           for (i in 1:ncol(self$X)) {
+            # Get sequence of points for par
+            parseq <- self$parlist[[i]]$getseq(n=npts)
             # Predict at points that are the same for all other components
-            EIXtrans <- matrix(rep(unlist(min_Xtrans), npts),
+            EIXtrans <- matrix(rep(unlist(min_Xtrans), length(parseq$trans)),
                                ncol=ncol(self$X), byrow=T)
-            EIXtrans[, i] <- seq(self$parlowertrans[i], self$paruppertrans[i],l=npts)
+            # EIXtrans[, i] <- seq(self$parlowertrans[i], self$paruppertrans[i],l=npts)
+            EIXtrans[, i] <- parseq$trans
             EIXtransdf <- as.data.frame(EIXtrans)
             names(EIXtransdf) <- names(self$X)
-            EIout <- apply(EIXtransdf, 1,
-                           function(xxx) {
-                             DiceOptim::EI(xxx, mod,
-                                           type="SK")
-                           }
-            )
-            df_i <- data.frame(valuetrans=EIXtrans[, i],
-                               valueraw=self$parlist[[i]]$toraw((EIXtrans[, i])),
+            # EIout <- apply(EIXtransdf, 1,
+            #                function(xxx) {
+            #                  DiceOptim::EI(xxx, self$mod,
+            #                                type="SK")
+            #                }
+            # )
+            # browser()
+            EIout <- self$add_EI(calculate_at = EIXtransdf)
+            df_i <- data.frame(valuetrans=parseq$trans,
+                               valueraw=parseq$raw,
                                EI=EIout,
                                index=i, variable=colnames(self$X)[i])
-            EIdf <- rbind(EIdf, df_i)
+            # EIdf <- rbind(EIdf, df_i)
+            EIdf[[i]] <- df_i
           }
           # Scale EI to find on same axes as Z
-          EIdf$EIrescaled <- ((EIdf$EI - min(EIdf$EI)) / (max(EIdf$EI) - min(EIdf$EI))
-          ) * (max(self$Z) - min(self$Z)) + min(self$Z)
+          # EIdf$EIrescaled <- ((EIdf$EI - min(EIdf$EI)) / (max(EIdf$EI) - min(EIdf$EI))
+          # ) * (max(self$Z) - min(self$Z)) + min(self$Z)
+          # browser()
+          minEI <- min(sapply(EIdf, function(ll) {min(ll$EI)}))
+          maxEI <- max(sapply(EIdf, function(ll) {max(ll$EI)}))
+          for (i in 1:ncol(self$X)) {
+            EIdf[[i]]$EIrescaled <- ((EIdf[[i]]$EI - minEI) / (maxEI - minEI)
+            ) * (max(self$Z) - min(self$Z)) + min(self$Z)
+          }
         }
       }
 
@@ -619,6 +799,7 @@ hype <- R6::R6Class(
 
       # New with transformations on x axis
 
+      # browser()
       ggs <- list()
       for (i in 1:ncol(Xtrans)) {
         dfi <- data.frame(value=self$X[, i], Z=self$Z, Rank=order(order(self$Z)))
@@ -628,7 +809,7 @@ hype <- R6::R6Class(
                                ggplot2::aes(value, Z, color=Rank))
         # Add EI lines
         if (addEIlines) {
-          EIdfi <-  EIdf[EIdf$index==i, ]
+          EIdfi <-  EIdf[[i]] #EIdf[EIdf$index==i, ]
           ggi <- ggi +
             ggplot2::geom_line(data=EIdfi,
                                ggplot2::aes(valueraw, EIrescaled, color=NULL),
@@ -638,17 +819,32 @@ hype <- R6::R6Class(
         # Add prediction lines
         # ggi <- ggi + preddf[preddf$index==i, ]
         if (addlines) {
-          preddfi <-  preddf[preddf$index==i, ]
-          ggi <- ggi +
-            ggplot2::geom_line(data=preddfi, ggplot2::aes(valueraw,    mean,color=NULL), alpha=.3) +
-            ggplot2::geom_line(data=preddfi, ggplot2::aes(valueraw, lower95,color=NULL), alpha=.2) +
-            ggplot2::geom_line(data=preddfi, ggplot2::aes(valueraw, upper95,color=NULL), alpha=.2)
+          preddfi <-  preddf[[i]] #preddf[preddf$index==i, ]
+          if (is.numeric(preddfi$valueraw)) {
+            ggi <- ggi +
+              ggplot2::geom_line(data=preddfi, ggplot2::aes(valueraw,    mean,color=NULL), alpha=.3) +
+              ggplot2::geom_line(data=preddfi, ggplot2::aes(valueraw, lower95,color=NULL), alpha=.2) +
+              ggplot2::geom_line(data=preddfi, ggplot2::aes(valueraw, upper95,color=NULL), alpha=.2)
+          } else {
+            # browser()
+            ggi <- ggi +
+              ggplot2::geom_point(data=preddfi, ggplot2::aes(valueraw,    mean,color=NULL), shape=18, size=3) +
+              ggplot2::geom_point(data=preddfi, ggplot2::aes(valueraw, lower95,color=NULL), shape=18, size=3) +
+              ggplot2::geom_point(data=preddfi, ggplot2::aes(valueraw, upper95,color=NULL), shape=18, size=3)
+          }
         }
         # Add points
-        ggi <- ggi + ggplot2::geom_point() +
+        if (any(c("par_discrete") %in% class(self$parlist[[i]]))) {
+          ggi <- ggi + ggplot2::geom_jitter(width=.15)
+        } else {
+          ggi <- ggi + ggplot2::geom_point()
+        }
+        ggi <- ggi +
           #ggplot2::facet_wrap(. ~ variable, scales='free_x') +
           ggplot2::scale_color_gradientn(colors=c('green', 'purple'))
-        ggi <- ggi + ggplot2::scale_x_continuous(trans=self$parlist[[i]]$ggtrans)
+        if (any(c("par_log10") %in% class(self$parlist[[i]]))) {
+          ggi <- ggi + ggplot2::scale_x_continuous(trans=self$parlist[[i]]$ggtrans)
+        }
         ggi <- ggi + ggplot2::xlab(self$parnames[i])
         if (i > 1) {
           ggi <- ggi + ggplot2::ylab(NULL)
@@ -657,10 +853,14 @@ hype <- R6::R6Class(
       }
       # ggpubr::ggarrange(ggs[[1]], ggs[[2]], common.legend=T, legend="right")
 
+      # browser()
       ggs$common.legend <- T
       ggs$legend <- "right"
-      do.call(ggpubr::ggarrange, ggs) + ggplot2::ylab("Outer ylab")
-
+      # browser()
+      # Gave a warning for a sampler, doesn't seem important
+      suppressWarnings({
+        do.call(ggpubr::ggarrange, ggs) + ggplot2::ylab("Outer ylab")
+      })
     },
     #' @description Plot each input in the order they were chosen.
     #' Colored by quality.
@@ -677,11 +877,22 @@ hype <- R6::R6Class(
                           Rank=order(order(self$Z)), index=1:length(self$Z))
         ggi <- ggplot2::ggplot(dfi,
                                ggplot2::aes(index, value, color=Z))
-        # Add points
-        ggi <- ggi + ggplot2::geom_point() +
+        # # Add points
+        # ggi <- ggi + ggplot2::geom_point() +
+        #   #ggplot2::facet_wrap(. ~ variable, scales='free_x') +
+        #   ggplot2::scale_color_gradientn(colors=c('green', 'purple'))
+        # ggi <- ggi + ggplot2::scale_y_continuous(trans=self$parlist[[i]]$ggtrans)
+        if (any(c("par_discrete") %in% class(self$parlist[[i]]))) {
+          ggi <- ggi + ggplot2::geom_point() #jitter(width=.15)
+        } else {
+          ggi <- ggi + ggplot2::geom_point()
+        }
+        ggi <- ggi +
           #ggplot2::facet_wrap(. ~ variable, scales='free_x') +
           ggplot2::scale_color_gradientn(colors=c('green', 'purple'))
-        ggi <- ggi + ggplot2::scale_y_continuous(trans=self$parlist[[i]]$ggtrans)
+        if (any(c("par_log10") %in% class(self$parlist[[i]]))) {
+          ggi <- ggi + ggplot2::scale_y_continuous(trans=self$parlist[[i]]$ggtrans)
+        }
         ggi <- ggi + ggplot2::ylab(self$parnames[i])
         if (i > 1) {
           ggi <- ggi + ggplot2::xlab(NULL)
@@ -704,6 +915,9 @@ hype <- R6::R6Class(
       }
       if (ncol(self$X) == 1) {
         stop("Can't plot interactions with single input.")
+      }
+      if (!self$par_all_cts) {
+        stop("Can't plotinteractions with discrete factors")
       }
 
       Xtrans <- self$convert_raw_to_trans(self$X)

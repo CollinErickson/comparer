@@ -42,6 +42,7 @@ print(p1)
 \if{html}{
 \out{<details open ><summary>Inherited methods</summary>}
 \itemize{
+\item \out{<span class="pkg-link" data-pkg="comparer" data-topic="par_hype" data-id="getseq">}\href{../../comparer/html/par_hype.html#method-getseq}{\code{comparer::par_hype$getseq()}}\out{</span>}
 }
 \out{</details>}
 }

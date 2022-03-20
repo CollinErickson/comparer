@@ -1,4 +1,6 @@
 library(testthat)
+
+# Hype basics ----
 test_that("hype works", {
   # Create params
   p1 <- par_hype$new()
@@ -155,16 +157,16 @@ test_that("Hype add data", {
   # n2$parlowertrans
   # n2$parupperraw
   # n2$paruppertrans
-  expect_equal(n2$parlowerraw, c(-1, .001, 1))
+  # expect_equal(n2$parlowerraw, c(-1, .001, 1))
   expect_equal(n2$parlowertrans, c(-1, -3, 0))
-  expect_equal(n2$parupperraw, c(1, 1e4, 1e2))
+  # expect_equal(n2$parupperraw, c(1, 1e4, 1e2))
   expect_equal(n2$paruppertrans, c(1, 4, 2))
   n2$change_par_bounds('a', lower=0)
   n2$change_par_bounds('b', upper=10^8)
   n2$change_par_bounds('c', lower=.1, upper=1e3)
-  expect_equal(n2$parlowerraw, c(0, .001, .1))
+  # expect_equal(n2$parlowerraw, c(0, .001, .1))
   expect_equal(n2$parlowertrans, c(0, -3, -1))
-  expect_equal(n2$parupperraw, c(1, 1e8, 1e3))
+  # expect_equal(n2$parupperraw, c(1, 1e8, 1e3))
   expect_equal(n2$paruppertrans, c(1, 8, 3))
   # expect_true(n2$)
   # n2$parlowerraw
@@ -180,4 +182,31 @@ test_that("Hype add data", {
              par_unif$new("c", 1,2),
              X0=list(a=runif(5)))
   })
+})
+
+# Discrete params ----
+test_that("discrete params", {
+  # Test discrete par
+  expect_error({
+  hp <- hype$new(eval_func = function(a, b, c) {-1e-3*a^2*log(b,10)^2*ifelse(c=='a', 1, 2) + rnorm(length(a),0,1e-1)},
+                 par_unif$new("a", 6, 8),
+                 par_log10$new("b", 1e-8, 1e-2),
+                 par_discrete$new("c", c('a', 'b')),
+                 n_lhs=21)
+  }, NA)
+  expect_true(!hp$par_all_cts)
+  hp$run_all()
+  expect_equal(length(hp$Z), 21)
+  expect_error({
+    hp$plotX(addEIlines = T, addlines = T)
+  }, NA)
+  expect_error({
+    hp$plotXorder()
+  }, NA)
+  expect_error({
+    hp$add_EI(1, model='gaupro')
+    hp$run_all()
+  }, NA)
+  print('hpZ length is'); print(length(hp$Z))
+  expect_equal(length(hp$Z), 22)
 })

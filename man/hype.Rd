@@ -48,8 +48,6 @@ next.}
 
 \item{\code{parlist}}{List of all parameters}
 
-\item{\code{partrans}}{Transformation for each parameter}
-
 \item{\code{ffexp}}{An ffexp R6 object used to run the experiment and store
 the results.}
 
@@ -71,6 +69,7 @@ the results.}
 \item \href{#method-convert_raw_to_trans}{\code{hype$convert_raw_to_trans()}}
 \item \href{#method-change_par_bounds}{\code{hype$change_par_bounds()}}
 \item \href{#method-add_EI}{\code{hype$add_EI()}}
+\item \href{#method-fit_mod}{\code{hype$fit_mod()}}
 \item \href{#method-run_all}{\code{hype$run_all()}}
 \item \href{#method-run_EI_for_time}{\code{hype$run_EI_for_time()}}
 \item \href{#method-plot}{\code{hype$plot()}}
@@ -267,6 +266,15 @@ points to the design.}
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-fit_mod"></a>}}
+\if{latex}{\out{\hypertarget{method-fit_mod}{}}}
+\subsection{Method \code{fit_mod()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{hype$fit_mod(covtype = "matern5_2", nugget.estim = TRUE, model = "DK")}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-run_all"></a>}}
 \if{latex}{\out{\hypertarget{method-run_all}{}}}
 \subsection{Method \code{run_all()}}{
@@ -370,7 +378,8 @@ Plot the output as a function of each input.
   addlines = TRUE,
   addEIlines = TRUE,
   covtype = "matern5_2",
-  nugget.estim = TRUE
+  nugget.estim = TRUE,
+  model = "DK"
 )}\if{html}{\out{</div>}}
 }
 
