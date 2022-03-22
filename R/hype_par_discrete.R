@@ -5,6 +5,8 @@
 # @field fromraw Function to convert from raw scale to transformed scale
 # @field toraw Function to convert from transformed scale to raw scale
 #' @field ggtrans Transformation for ggplot, see ggplot2::scale_x_continuous()
+#' @field lower Lower bound of the parameter
+#' @field upper Upper bound of the parameter
 #' @examples
 #' p1 <- par_discrete$new('x1', c('a', 'b', 'c'))
 #' class(p1)
@@ -25,7 +27,11 @@ par_discrete <- R6::R6Class(
     #' @description Function to convert from transformed scale to raw scale
     #' @param x Value of transformed scale
     toraw= function(x) {self$fromint(x)},
+    #' @description Convert from integer index to actual value
+    #' @param x Integer index
     fromint=function(x) {self$values[x]},
+    #' @description Convert from value to integer index
+    #' @param x Value
     toint=function(x) {
       if (length(x) > 1) {
         return(sapply(x, self$toint))
@@ -42,6 +48,8 @@ par_discrete <- R6::R6Class(
       stopifnot(inds>=1, inds <= length(self$values))
       self$values[inds]
     },
+    #' @description Get a sequence, uniform on the transformed scale
+    #' @param n Number of points. Ignored for discrete.
     getseq = function(n) {
       list(
         trans=1:length(self$values),

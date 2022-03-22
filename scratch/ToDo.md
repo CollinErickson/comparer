@@ -85,13 +85,9 @@
 
 -   Plot run time
 
-- latentdim in EI
-
-- multiple factor dims in hyp
-
 - fix plotX with discrete
 
-- Track when something has changed, then refit when needed
+- Track when something has changed, then refit mod when needed
 
 ## MAB: multi-armed bandit
 

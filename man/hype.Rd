@@ -55,6 +55,8 @@ the results.}
 
 \item{\code{extract_output_func}}{A function that takes in the output from
 `eval_func` and returns the value we are trying to minimize.}
+
+\item{\code{par_all_cts}}{Are all the parameters continuous?}
 }
 \if{html}{\out{</div>}}
 }
@@ -164,6 +166,9 @@ Latin hypercubes are usually more spacing than randomly picking points.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{n}}{Number of points to add.}
+
+\item{\code{just_return_df}}{Instead of adding to experiment, should
+it just return the new set of values?}
 }
 \if{html}{\out{</div>}}
 }
@@ -269,10 +274,24 @@ points to the design.}
 \if{html}{\out{<a id="method-fit_mod"></a>}}
 \if{latex}{\out{\hypertarget{method-fit_mod}{}}}
 \subsection{Method \code{fit_mod()}}{
+Fit model to the data collected so far
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{hype$fit_mod(covtype = "matern5_2", nugget.estim = TRUE, model = "DK")}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{covtype}}{Covariance function to use for the Gaussian process
+model.}
+
+\item{\code{nugget.estim}}{Should a nugget be estimated?}
+
+\item{\code{model}}{Which package should be used to fit the model and
+calculate the EI? Use "DK" for DiceKriging or "GauPro" for GauPro.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-run_all"></a>}}
@@ -394,6 +413,9 @@ Plot the output as a function of each input.
 model.}
 
 \item{\code{nugget.estim}}{Should a nugget be estimated?}
+
+\item{\code{model}}{Which package should be used to fit the model and
+calculate the EI? Use "DK" for DiceKriging or "GauPro" for GauPro.}
 }
 \if{html}{\out{</div>}}
 }

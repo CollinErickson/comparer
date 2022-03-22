@@ -31,10 +31,18 @@ print(p1)
 \if{html}{\out{<a id="method-getseq"></a>}}
 \if{latex}{\out{\hypertarget{method-getseq}{}}}
 \subsection{Method \code{getseq()}}{
+Get a sequence, uniform on the transformed scale
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{par_hype$getseq(n)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{n}}{Number of points. Ignored for discrete.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

@@ -24,7 +24,7 @@ Suggests:
     testthat (>= 2.1.0),
     covr,
     knitr,
-    GauPro,
+    GauPro (>= 0.2.4.9001),
     ggplot2,
     GGally,
     ggpubr,

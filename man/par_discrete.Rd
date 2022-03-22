@@ -24,6 +24,10 @@ print(p1)
 \item{\code{values}}{Vector of values}
 
 \item{\code{ggtrans}}{Transformation for ggplot, see ggplot2::scale_x_continuous()}
+
+\item{\code{lower}}{Lower bound of the parameter}
+
+\item{\code{upper}}{Upper bound of the parameter}
 }
 \if{html}{\out{</div>}}
 }
@@ -84,19 +88,35 @@ Function to convert from transformed scale to raw scale
 \if{html}{\out{<a id="method-fromint"></a>}}
 \if{latex}{\out{\hypertarget{method-fromint}{}}}
 \subsection{Method \code{fromint()}}{
+Convert from integer index to actual value
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{par_discrete$fromint(x)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{x}}{Integer index}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-toint"></a>}}
 \if{latex}{\out{\hypertarget{method-toint}{}}}
 \subsection{Method \code{toint()}}{
+Convert from value to integer index
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{par_discrete$toint(x)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{x}}{Value}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-generate"></a>}}
@@ -119,10 +139,18 @@ Generate values in the raw space based on quantiles.
 \if{html}{\out{<a id="method-getseq"></a>}}
 \if{latex}{\out{\hypertarget{method-getseq}{}}}
 \subsection{Method \code{getseq()}}{
+Get a sequence, uniform on the transformed scale
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{par_discrete$getseq(n)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{n}}{Number of points. Ignored for discrete.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-new"></a>}}

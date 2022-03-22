@@ -20,6 +20,7 @@
 #' @field eval_func The function we evaluate.
 #' @field extract_output_func A function that takes in the output from
 #' `eval_func` and returns the value we are trying to minimize.
+#' @field par_all_cts Are all the parameters continuous?
 #' @examples
 #'
 #' # Have df output, but only use one value from it
@@ -213,6 +214,8 @@ hype <- R6::R6Class(
     #' Latin hypercube.
     #' Latin hypercubes are usually more spacing than randomly picking points.
     #' @param n Number of points to add.
+    #' @param just_return_df Instead of adding to experiment, should
+    #' it just return the new set of values?
     add_LHS = function(n, just_return_df=FALSE) {
       #   Xlhstrans <- lhs::maximinLHS(n=n, k=length(self$parnames))
       #   Xlhstrans <- sweep(sweep(Xlhstrans,
@@ -481,6 +484,12 @@ hype <- R6::R6Class(
     # calculate_EI = function() {
     #
     # },
+    #' @description Fit model to the data collected so far
+    #' @param covtype Covariance function to use for the Gaussian process
+    #' model.
+    #' @param nugget.estim Should a nugget be estimated?
+    #' @param model Which package should be used to fit the model and
+    #' calculate the EI? Use "DK" for DiceKriging or "GauPro" for GauPro.
     fit_mod = function(covtype="matern5_2", nugget.estim=TRUE,
                        model="DK") {
       if (is.null(self$X)) {
@@ -524,21 +533,30 @@ hype <- R6::R6Class(
         } else {
           factorindsTF <- sapply(self$parlist, function(p) {"par_discrete" %in% class(p)})
           factorinds <- which(factorindsTF)
-          stopifnot(length(factorinds) == 1)
+          stopifnot(length(factorinds) > 1.5)
           kern1inner <-  if (covtype=="gauss") {
             GauPro::Gaussian$new(D=sum(!factorindsTF))
           } else if (covtype == "matern5_2") {
             GauPro::Matern52$new(D=sum(!factorindsTF))
           } else {stop("bad covtype for GauPro with discrete par")}
-          kern1 <- GauPro::IgnoreIndsKernel$new(k=kern1inner,
-                                                ignoreinds = factorinds)
-          kern2 <- GauPro::LatentFactorKernel$new(
-            D=length(self$parlist),
-            nlevels=length(self$parlist[[factorinds]]$values),
-            xindex=factorinds,
-            latentdim=1
-          )
-          kern <- kern1*kern2
+          kern <- GauPro::IgnoreIndsKernel$new(k=kern1inner,
+                                               ignoreinds = factorinds)
+          # browser()
+          # kern2 <- GauPro::LatentFactorKernel$new(
+          #   D=length(self$parlist),
+          #   nlevels=length(self$parlist[[factorinds]]$values),
+          #   xindex=factorinds,
+          #   latentdim=1
+          # )
+          for (i in 1:length(factorinds)) {
+            kern <- kern * GauPro::LatentFactorKernel$new(
+              D=length(self$parlist),
+              nlevels=length(self$parlist[[factorinds[[i]]]]$values),
+              xindex=factorinds[[i]],
+              latentdim=if (length(self$parlist[[factorinds[[i]]]]$values) < 3.5) {1} else {2}
+            )
+          }
+          kern <- kern #*kern2
           # Need to replace factor/chars with integers
           # Xtrans[,factorinds] <- self$parlist[[factorinds]]$toint(Xtrans[,factorinds])
         }
@@ -681,6 +699,8 @@ hype <- R6::R6Class(
     #' @param covtype Covariance function to use for the Gaussian process
     #' model.
     #' @param nugget.estim Should a nugget be estimated?
+    #' @param model Which package should be used to fit the model and
+    #' calculate the EI? Use "DK" for DiceKriging or "GauPro" for GauPro.
     plotX = function(addlines=TRUE, addEIlines=TRUE,
                      covtype="matern5_2", nugget.estim=TRUE,
                      model='DK') {
@@ -872,6 +892,7 @@ hype <- R6::R6Class(
       Xtrans <- self$convert_raw_to_trans(self$X)
 
       ggs <- list()
+      # Loop over each input
       for (i in 1:ncol(Xtrans)) {
         dfi <- data.frame(value=self$X[, i], Z=self$Z,
                           Rank=order(order(self$Z)), index=1:length(self$Z))
@@ -885,6 +906,11 @@ hype <- R6::R6Class(
         if (any(c("par_discrete") %in% class(self$parlist[[i]]))) {
           ggi <- ggi + ggplot2::geom_point() #jitter(width=.15)
         } else {
+          # Add horizontal lines at lower and upper
+          # browser()
+          ggi <- ggi +
+            ggplot2::geom_hline(yintercept=self$parlist[[i]]$lower, alpha=.2) +
+            ggplot2::geom_hline(yintercept=self$parlist[[i]]$upper, alpha=.2)
           ggi <- ggi + ggplot2::geom_point()
         }
         ggi <- ggi +
