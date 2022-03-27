@@ -77,17 +77,21 @@
 
 -   Make xgboost param tuning example
 
--   plotXorder: add hor lines at bounds
-
 -   par_integer: hard part is optim
 
--   Remove unrun. E.g., add EI but want to undo it.
+-   Remove unevaluated run. E.g., add EI but want to undo it.
 
 -   Plot run time
 
-- fix plotX with discrete
-
 - Track when something has changed, then refit mod when needed
+
+- Run EI for time: add based on EI/(exp time to fit)
+
+- Return best params, estimated
+
+- when add data, override runtime to be NA
+
+- Add in verbose printouts
 
 ## MAB: multi-armed bandit
 

@@ -383,13 +383,18 @@ ffexp <- R6::R6Class(
         }
       } else { # Not parallel
         runs_with_error <- integer()
+        show_progress <- TRUE
+        pbar <- progress::progress_bar$new(
+          format=paste0("Running [:bar] :current/:total (:percent) ETA: :eta"),
+          total = length(to_run))
         for (ii in to_run) {
+          pbar$tick()
           try_one <- try({
             tout <- self$run_one(ii, write_start_files=write_start_files,
                                  write_error_files=write_error_files,
                                  warn_repeat=warn_repeat,
                                  save_output=save_output,
-                                 verbose=verbose,
+                                 verbose=0,
                                  return_list_result_of_one=T)
             # tout is only the right thing to save if is_parallel=T
             # in run_one, this shouldn't work
@@ -406,6 +411,7 @@ ffexp <- R6::R6Class(
             runs_with_error <- c(runs_with_error, ii)
           }
         }
+        pbar$terminate()
         if (length(runs_with_error) > 0) {
           if (verbose >= 1) {
             cat('Errors in run_all with runs:', runs_with_error, '\n')

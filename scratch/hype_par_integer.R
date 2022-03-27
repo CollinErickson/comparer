@@ -63,3 +63,14 @@ if (F) {
   p1$generate(runif(22))
   table(p1$generate(runif(1e5)))
 }
+
+if (F) {
+  par_integer2 <- function(name, lower, upper) {
+    par_integer$new(
+      name=name,
+      lower=lower,
+      upper=upper
+    )
+  }
+  par_integer
+}

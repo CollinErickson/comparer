@@ -207,6 +207,6 @@ test_that("discrete params", {
     hp$add_EI(1, model='gaupro')
     hp$run_all()
   }, NA)
-  print('hpZ length is'); print(length(hp$Z))
+  # print('hpZ length is'); print(length(hp$Z))
   expect_equal(length(hp$Z), 22)
 })

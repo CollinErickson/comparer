@@ -34,7 +34,7 @@ next.}
 
 \item{\code{Z}}{Output at X}
 
-\item{\code{mod}}{Gaussian process model used to predict what the output will be.}
+\item{\code{runtime}}{The time it took to evaluate each row of X}
 
 \item{\code{parnames}}{Names of the parameters}
 
@@ -48,6 +48,9 @@ next.}
 
 \item{\code{parlist}}{List of all parameters}
 
+\item{\code{modlist}}{A list with details about the model. The user shouldn't
+ever edit this directly.}
+
 \item{\code{ffexp}}{An ffexp R6 object used to run the experiment and store
 the results.}
 
@@ -57,6 +60,16 @@ the results.}
 `eval_func` and returns the value we are trying to minimize.}
 
 \item{\code{par_all_cts}}{Are all the parameters continuous?}
+
+\item{\code{verbose}}{How much should be printed? 0 is none, 1 is standard,
+2 is more, 5+ is a lot}
+}
+\if{html}{\out{</div>}}
+}
+\section{Active bindings}{
+\if{html}{\out{<div class="r6-active-bindings">}}
+\describe{
+\item{\code{mod}}{Gaussian process model used to predict what the output will be.}
 }
 \if{html}{\out{</div>}}
 }
@@ -81,6 +94,8 @@ the results.}
 \item \href{#method-plotXorder}{\code{hype$plotXorder()}}
 \item \href{#method-plotinteractions}{\code{hype$plotinteractions()}}
 \item \href{#method-print}{\code{hype$print()}}
+\item \href{#method-best_params}{\code{hype$best_params()}}
+\item \href{#method-update_mod_userspeclist}{\code{hype$update_mod_userspeclist()}}
 \item \href{#method-clone}{\code{hype$clone()}}
 }
 }
@@ -90,7 +105,18 @@ the results.}
 \subsection{Method \code{new()}}{
 Create hype R6 object.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{hype$new(eval_func, ..., X0 = NULL, Z0 = NULL, n_lhs, extract_output_func)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{hype$new(
+  eval_func,
+  ...,
+  X0 = NULL,
+  Z0 = NULL,
+  n_lhs,
+  extract_output_func,
+  verbose = 1,
+  model = "GauPro",
+  covtype = "matern5_2",
+  nugget.estim = TRUE
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -110,6 +136,17 @@ a maximin Latin hypercube.}
 
 \item{\code{extract_output_func}}{A function that takes in the output from
 `eval_func` and returns the value we are trying to minimize.}
+
+\item{\code{verbose}}{How much should be printed? 0 is none, 1 is standard,
+2 is more, 5+ is a lot}
+
+\item{\code{model}}{What package to fit the Gaussian process model with.
+Either "GauPro" or "DiceKriging"/"DK".}
+
+\item{\code{covtype}}{Covariance/correlation/kernel function for the GP model.}
+
+\item{\code{nugget.estim}}{Should the nugget be estimated when fitting
+the GP model?}
 }
 \if{html}{\out{</div>}}
 }
@@ -237,9 +274,9 @@ criteria
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{hype$add_EI(
   n,
-  covtype = "matern5_2",
-  nugget.estim = TRUE,
-  model = "DK",
+  covtype = NULL,
+  nugget.estim = NULL,
+  model = NULL,
   eps,
   just_return = FALSE,
   calculate_at
@@ -276,7 +313,7 @@ points to the design.}
 \subsection{Method \code{fit_mod()}}{
 Fit model to the data collected so far
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{hype$fit_mod(covtype = "matern5_2", nugget.estim = TRUE, model = "DK")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{hype$fit_mod(covtype = NULL, nugget.estim = NULL, model = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -396,9 +433,9 @@ Plot the output as a function of each input.
 \if{html}{\out{<div class="r">}}\preformatted{hype$plotX(
   addlines = TRUE,
   addEIlines = TRUE,
-  covtype = "matern5_2",
-  nugget.estim = TRUE,
-  model = "DK"
+  covtype = NULL,
+  nugget.estim = NULL,
+  model = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -465,6 +502,40 @@ Print details of the object.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{...}}{not used}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-best_params"></a>}}
+\if{latex}{\out{\hypertarget{method-best_params}{}}}
+\subsection{Method \code{best_params()}}{
+Returns the best parameters
+evaluated so far.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{hype$best_params()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-update_mod_userspeclist"></a>}}
+\if{latex}{\out{\hypertarget{method-update_mod_userspeclist}{}}}
+\subsection{Method \code{update_mod_userspeclist()}}{
+Updates the specifications for the GP model.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{hype$update_mod_userspeclist(model = NULL, covtype = NULL, nugget.estim = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{model}}{What package to fit the Gaussian process model with.
+Either "GauPro" or "DiceKriging"/"DK".}
+
+\item{\code{covtype}}{Covariance/correlation/kernel function for the GP model.}
+
+\item{\code{nugget.estim}}{Should the nugget be estimated when fitting
+the GP model?}
 }
 \if{html}{\out{</div>}}
 }

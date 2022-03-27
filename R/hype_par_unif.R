@@ -1,3 +1,5 @@
+#' Uniform parameter
+#'
 #' Parameter with uniform distribution for hyperparameter optimization
 #' @export
 #' @field name Name of the parameter, must match the input to `eval_func`.
@@ -54,4 +56,14 @@ par_unif <- R6::R6Class(
 if (F) {
   p1 <- par_unif$new('x1', 0, 2)
   class(p1)
+}
+
+if (F) {
+  # @rdname par_unif
+  # @export
+  par_unif2 <- function(name, lower, upper) {
+    par_unif$new(name=name,
+                 lower=lower,
+                 upper=upper)
+  }
 }

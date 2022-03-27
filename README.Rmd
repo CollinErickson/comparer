@@ -131,3 +131,16 @@ Now to see the results in a clean format, look at `f1$outcleandf`.
 f1$outcleandf
 ```
 
+
+## `hype`: Hyperparameter Optimization
+
+`hype` uses Bayesian optimization to find the best parameters/inputs
+for a function that is slow to evaluate.
+(If the function can be evaluated quickly, then you can use standard
+optimization methods.)
+A common use case is for hyperparameter tuning:
+when fitting a model that has multiple hyperparameters,
+you want to find the best values to set the hyperparameters to
+but can only evaluate a small number of settings since
+each is slow.
+

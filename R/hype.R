@@ -7,6 +7,7 @@
 #' @field X Data frame of inputs that have been evaluated or will be evaluated
 #' next.
 #' @field Z Output at X
+#' @field runtime The time it took to evaluate each row of X
 #' @field mod Gaussian process model used to predict what the output will be.
 #' @field parnames Names of the parameters
 #' @field parlowerraw Lower bounds for each parameter on raw scale
@@ -15,12 +16,16 @@
 #' @field paruppertrans Upper bounds for each parameter on transformed scale
 #' @field parlist List of all parameters
 # @field partrans Transformation for each parameter
+#' @field modlist A list with details about the model. The user shouldn't
+#' ever edit this directly.
 #' @field ffexp An ffexp R6 object used to run the experiment and store
 #' the results.
 #' @field eval_func The function we evaluate.
 #' @field extract_output_func A function that takes in the output from
 #' `eval_func` and returns the value we are trying to minimize.
 #' @field par_all_cts Are all the parameters continuous?
+#' @field verbose How much should be printed? 0 is none, 1 is standard,
+#' 2 is more, 5+ is a lot
 #' @examples
 #'
 #' # Have df output, but only use one value from it
@@ -53,7 +58,9 @@ hype <- R6::R6Class(
   public=list(
     X=NULL,
     Z=NULL,
-    mod=NULL,
+    runtime=NULL,
+    # mod=NULL,
+    modlist=NULL,
     # params=NULL,
     parnames=NULL,
     parlowerraw=NULL,
@@ -65,6 +72,7 @@ hype <- R6::R6Class(
     parlist=NULL,
     ffexp = NULL,
     eval_func = NULL,
+    verbose=NULL,
     extract_output_func = NULL,
     #' @description Create hype R6 object.
     #' @param eval_func The function used to evaluate new points.
@@ -76,11 +84,22 @@ hype <- R6::R6Class(
     #' a maximin Latin hypercube.
     #' @param extract_output_func A function that takes in the output from
     #' `eval_func` and returns the value we are trying to minimize.
+    #' @param verbose How much should be printed? 0 is none, 1 is standard,
+    #' 2 is more, 5+ is a lot
+    #' @param model What package to fit the Gaussian process model with.
+    #' Either "GauPro" or "DiceKriging"/"DK".
+    #' @param covtype Covariance/correlation/kernel function for the GP model.
+    #' @param nugget.estim Should the nugget be estimated when fitting
+    #' the GP model?
     initialize = function(eval_func,
                           ..., # ... is params
                           X0=NULL, Z0=NULL,
                           n_lhs,
-                          extract_output_func
+                          extract_output_func,
+                          verbose=1,
+                          model="GauPro",
+                          covtype="matern5_2",
+                          nugget.estim=TRUE
     ) {
       self$eval_func <- eval_func
       if (!missing(extract_output_func)) {
@@ -90,6 +109,9 @@ hype <- R6::R6Class(
       if (length(dots) == 0) {
         stop("No hyperparameters given. Give a par_unif$new to hype$new.")
       }
+      stopifnot(length(verbose) == 1, is.numeric(verbose))
+      self$verbose <- verbose
+
       parlist <- list()
       self$parnames <- c()
       # self$parlowerraw <- c()
@@ -128,6 +150,17 @@ hype <- R6::R6Class(
       #   self$parlowertrans <- sapply(self$parlist, function(p) {par$fromraw(par$lower)})
       #   self$paruppertrans <- sapply(self$parlist, function(p) {par$fromraw(par$upper)})
       # }
+
+      self$modlist <- list(
+        needs_update=TRUE,
+        type="NULL",
+        mod=NULL,
+        userspeclist=list(model='null', covtype='null', nugget.estim='null')
+      )
+      self$update_mod_userspeclist(model=model,
+                                   covtype=covtype,
+                                   nugget.estim=nugget.estim)
+
       if (!is.null(X0)) {
         stopifnot(is.data.frame(X0), nrow(X0) > .5,
                   colnames(X0) == self$parnames)
@@ -196,6 +229,7 @@ hype <- R6::R6Class(
       # Update this object
       self$X <- self$ffexp$rungrid2()
       self$Z <- unlist(self$ffexp$outlist)
+      self$modlist$needs_update <- TRUE
 
       invisible(self)
     },
@@ -253,13 +287,16 @@ hype <- R6::R6Class(
     #' @param Xtrans Parameters on the transformed scale
     convert_trans_to_raw = function(Xtrans) {
       # Does it need to be converted back into a vector?
-      convert_back <- FALSE
+      # convert_back <- FALSE
       if (is.vector(Xtrans)) {
-        convert_back <- TRUE
+        # convert_back <- TRUE
         # Xtrans <- matrix(Xtrans, nrow=1)
         Xtrans <- as.data.frame(as.list(Xtrans))
         colnames(Xtrans) <- self$parnames
         stopifnot(nrow(Xtrans) == 1)
+      } else if (is.matrix(Xtrans)) {
+        Xtrans <- as.data.frame(Xtrans)
+        colnames(Xtrans) <- self$parnames
       }
       Xraw <- Xtrans
       for (i in 1:ncol(Xtrans)) {
@@ -323,8 +360,8 @@ hype <- R6::R6Class(
     #' @param just_return Just return the EI info, don't actually add the
     #' points to the design.
     #' @param calculate_at Calculate the EI at a specific point.
-    add_EI = function(n, covtype="matern5_2", nugget.estim=TRUE,
-                      model="DK", eps, just_return=FALSE,
+    add_EI = function(n, covtype=NULL, nugget.estim=NULL,
+                      model=NULL, eps, just_return=FALSE,
                       calculate_at) {
       if (is.null(self$X)) {
         stop('X is null, you need to run_all first.')
@@ -342,17 +379,21 @@ hype <- R6::R6Class(
         message("Unevaluated points already exist, using constant liar")
       }
 
-      # Just update mod? Set covtype?
-      if (covtype == "random") {
-        covtype <- sample(c("matern5_2", "matern3_2", "exp", "powexp", "gauss"), 1)
-      }
+      # # Just update mod? Set covtype?
+      # if (covtype == "random") {
+      #   covtype <- sample(c("matern5_2", "matern3_2", "exp", "powexp", "gauss"), 1)
+      # }
 
       # Fit model
-      stopifnot(length(model) == 1, is.character(model))
-      self$fit_mod(model=model,
-                   nugget.estim=nugget.estim,
-                   covtype=covtype
-      )
+      # stopifnot(length(model) == 1, is.character(model))
+      # self$fit_mod(model=model,
+      #              nugget.estim=nugget.estim,
+      #              covtype=covtype
+      # )
+      # warning('covtype and nugest here')
+      self$update_mod_userspeclist(model=model,
+                                  nugget.estim=nugget.estim,
+                                  covtype=covtype)
 
       # browser()
       if ("km" %in% class(self$mod)) {
@@ -490,8 +531,8 @@ hype <- R6::R6Class(
     #' @param nugget.estim Should a nugget be estimated?
     #' @param model Which package should be used to fit the model and
     #' calculate the EI? Use "DK" for DiceKriging or "GauPro" for GauPro.
-    fit_mod = function(covtype="matern5_2", nugget.estim=TRUE,
-                       model="DK") {
+    fit_mod = function(covtype=NULL, nugget.estim=NULL,
+                       model=NULL) {
       if (is.null(self$X)) {
         stop('X is null, you need to run_all first.')
       }
@@ -508,32 +549,40 @@ hype <- R6::R6Class(
         message("Unevaluated points already exist, using constant liar")
       }
 
-      # Just update mod? Set covtype?
-      if (covtype == "random") {
-        covtype <- sample(c("matern5_2", "matern3_2", "exp", "powexp", "gauss"), 1)
-      }
+      # browser()
+      self$update_mod_userspeclist(model=model, covtype=covtype,
+                                   nugget.estim=nugget.estim)
+      model <- self$modlist$userspeclist$model
+      covtype <- self$modlist$userspeclist$covtype
+      nugget.estim <- self$modlist$userspeclist$nugget.estim
 
-      if (!self$par_all_cts) {
-        model <- "GauPro"
-      }
+      # # Just update mod? Set covtype?
+      # if (covtype == "random") {
+      #   covtype <- sample(c("matern5_2", "matern3_2", "exp", "powexp", "gauss"), 1)
+      # }
+
+      # if (!self$par_all_cts) {
+      #   model <- "GauPro"
+      # }
       stopifnot(length(model) == 1, is.character(model))
       if (tolower(model) %in% c('dk', 'dice', 'dicekriging')) {
         if (!self$par_all_cts) {
           stop("Can only add EI if all parameters are continuous (par_unif, par_log10)")
         }
-        self$mod <- DiceKriging::km(formula = ~1,
-                                    covtype=covtype,
-                                    design = Xtrans,
-                                    response = Z,
-                                    nugget.estim=nugget.estim,
-                                    control=list(trace=FALSE))
+        self$modlist$mod <- DiceKriging::km(formula = ~1,
+                                            covtype=covtype,
+                                            design = Xtrans,
+                                            response = Z,
+                                            nugget.estim=nugget.estim,
+                                            control=list(trace=FALSE))
+        self$modlist$type <-  "DK"
       } else if (tolower(model) %in% c("gaupro")) {
         if (self$par_all_cts) {
           kern <- covtype
         } else {
           factorindsTF <- sapply(self$parlist, function(p) {"par_discrete" %in% class(p)})
           factorinds <- which(factorindsTF)
-          stopifnot(length(factorinds) > 1.5)
+          stopifnot(length(factorinds) > 0.5)
           kern1inner <-  if (covtype=="gauss") {
             GauPro::Gaussian$new(D=sum(!factorindsTF))
           } else if (covtype == "matern5_2") {
@@ -560,16 +609,20 @@ hype <- R6::R6Class(
           # Need to replace factor/chars with integers
           # Xtrans[,factorinds] <- self$parlist[[factorinds]]$toint(Xtrans[,factorinds])
         }
-        self$mod <- GauPro::GauPro_kernel_model$new(X=as.matrix(Xtrans),
-                                                    Z=Z,
-                                                    restarts=0, # Speed it up
-                                                    nug.est=nugget.estim,
-                                                    kernel=kern)
+        self$modlist$mod <- GauPro::GauPro_kernel_model$new(X=as.matrix(Xtrans),
+                                                            Z=Z,
+                                                            restarts=0, # Speed it up
+                                                            nug.est=nugget.estim,
+                                                            kernel=kern)
         # self$modlist <- list(model='gaupro')
+        self$modlist$type <- "GauPro"
       } else {
         stop(paste("Model given is not valid (", model, "), should be one of: DK"))
       }
 
+      self$modlist$needs_update <- FALSE
+
+      invisible(self)
     },
     #' @description Run all unevaluated input points.
     #' @param ... Passed into `ffexp$run_all`. Can set 'parallel=TRUE'
@@ -589,6 +642,8 @@ hype <- R6::R6Class(
         self$Z <- sapply(self$ffexp$outlist, self$extract_output_func)
       }
       self$X <- self$ffexp$rungrid2()
+      self$runtime <- self$ffexp$outcleandf$runtime
+      self$modlist$needs_update <- TRUE
       # self$Xtrans <- s
       invisible(self)
     },
@@ -702,14 +757,18 @@ hype <- R6::R6Class(
     #' @param model Which package should be used to fit the model and
     #' calculate the EI? Use "DK" for DiceKriging or "GauPro" for GauPro.
     plotX = function(addlines=TRUE, addEIlines=TRUE,
-                     covtype="matern5_2", nugget.estim=TRUE,
-                     model='DK') {
+                     covtype=NULL, nugget.estim=NULL,
+                     model=NULL) {
       # browser()
       if (is.null(self$X) || is.null(self$Z)) {
         stop("Nothing has been evaluated yet. Call $run_all() first.")
       }
       stopifnot(!is.null(self$X), !is.null(self$Z),
                 nrow(self$X) == length(self$Z))
+      self$update_mod_userspeclist(model=model,
+                                   covtype=covtype,
+                                   nugget.estim=nugget.estim)
+
       tdf <- cbind(self$X, Z=self$Z, Rank=order(order(self$Z)))
       Xtrans <- self$convert_raw_to_trans(self$X)
       if (addlines || addEIlines && self$par_all_cts) {
@@ -722,8 +781,9 @@ hype <- R6::R6Class(
         #                        response = self$Z,
         #                        nugget.estim=nugget.estim,
         #                        control=list(trace=FALSE))
-        self$fit_mod(covtype=covtype, nugget.estim=nugget.estim,
-                     model=model)
+        # self$fit_mod(covtype=covtype, nugget.estim=nugget.estim,
+        #              model=model)
+        # warning("covtype and nugest here")
         if (addlines) {
           preddf <- list()
           npts <- 30
@@ -1002,9 +1062,104 @@ hype <- R6::R6Class(
       )
       cat(ts)
       invisible(self)
+    },
+    #' @description Returns the best parameters
+    #' evaluated so far.
+    best_params = function() {
+      out <- list()
+
+      # Best value that was already seen
+      out$evaluated_params <- self$X[which.min(self$Z)[1], ]
+      out$evaluated_value <- min(self$Z)
+
+      # Best predicted value, probably not seen yet
+
+
+      # Return list
+      out
+    },
+    #' @description Updates the specifications for the GP model.
+    #' @param model What package to fit the Gaussian process model with.
+    #' Either "GauPro" or "DiceKriging"/"DK".
+    #' @param covtype Covariance/correlation/kernel function for the GP model.
+    #' @param nugget.estim Should the nugget be estimated when fitting
+    #' the GP model?
+    update_mod_userspeclist = function(model=NULL, covtype=NULL,
+                                       nugget.estim=NULL) {
+      # browser()
+      if (!is.null(model)) {
+        stopifnot(is.character(model), length(model) == 1)
+        if (tolower(model) %in% c("dk", "dicekriging", "dice")) {
+          model <- "DK"
+        }
+        if (tolower(model) %in% c("gaupro", "gp")) {
+          model <- "GauPro"
+        }
+        if (!(model %in% c("DK", "GauPro"))) {
+          stop(paste0('model (', model, ') must be one of: ',
+                      '"DK", "GauPro"'))
+        }
+
+        if (!self$par_all_cts && model != "GauPro") {
+          message(paste0("Can only using GauPro for model when there are",
+                         " discrete inputs"))
+        }
+        if (self$modlist$userspeclist$model != model) {
+          self$modlist$userspeclist$model <- model
+          self$modlist$needs_update <- TRUE
+        }
+      }
+      if (!is.null(covtype)) {
+        stopifnot(is.character(covtype), length(covtype) == 1)
+        if (!(covtype %in% c("matern5_2", "matern3_2", "exp", "powexp", "gauss"))) {
+          stop(paste0('covtype must be one of: ',
+                      '"matern5_2", "matern3_2", "exp", "powexp", "gauss"'))
+        }
+        # coerce to matern3_2
+        if (self$modlist$userspeclist$covtype != covtype) {
+          self$modlist$userspeclist$covtype <- covtype
+          self$modlist$needs_update <- TRUE
+        }
+      }
+      if (!is.null(nugget.estim)) {
+        stopifnot(is.logical(nugget.estim), length(nugget.estim) == 1)
+        if (self$modlist$userspeclist$nugget.estim != nugget.estim) {
+          self$modlist$userspeclist$nugget.estim <- nugget.estim
+          self$modlist$needs_update <- TRUE
+        }
+      }
+      invisible(self)
+    }
+  ),
+  active = list(
+    mod = function(value) {
+      # mod is an active binding since it returns the model, but first checks
+      # to make sure it is up to date. If it isn't, it refits the model
+      if (!missing(value)) {
+        stop("You can't set the model")
+      }
+      stopifnot(!is.null(self$modlist),
+                !is.null(self$modlist$needs_update),
+                length(self$modlist$needs_update) == 1,
+                is.logical(self$modlist$needs_update))
+      if (self$modlist$needs_update) {
+        if (self$verbose>=2) {
+          cat("Updating model...\n")
+        }
+        # browser()
+        self$fit_mod()
+      } else {
+        if (self$verbose>=5) {
+          cat("Model is up to date\n")
+        }
+      }
+      # Model is up to date. Return it.
+      return(self$modlist$mod)
     }
   )
 )
+
+# Examples ----
 if (F) {
   h1 <- hype$new(
     eval_func = function(a, b) {a^2+b^2},

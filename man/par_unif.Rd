@@ -2,10 +2,13 @@
 % Please edit documentation in R/hype_par_unif.R
 \name{par_unif}
 \alias{par_unif}
-\title{Parameter with uniform distribution for hyperparameter optimization}
+\title{Uniform parameter}
 \description{
-Parameter with uniform distribution for hyperparameter optimization
+Uniform parameter
 
+Uniform parameter
+}
+\details{
 Parameter with uniform distribution for hyperparameter optimization
 }
 \examples{
