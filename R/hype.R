@@ -485,6 +485,7 @@ hype <- R6::R6Class(
                                     eps=eps)
           } else {
             # Select multiple points to be evaluated, useful when running in parallel
+            # browser()
             EIout <- self$mod$maxqEI(npoints=n, method="CL",
                                      lower=self$parlowertrans,
                                      upper=self$paruppertrans,
@@ -504,7 +505,7 @@ hype <- R6::R6Class(
             stop("Can't do EI with n>1 with factors")
           }
         }
-        EIout <- list(par=EIout)
+        # EIout <- list(par=EIout)
         if (just_return) {
           # Add EI value to list
           EIout$val <- self$mod$EI(x=EIout$par, minimize=TRUE, eps=eps)

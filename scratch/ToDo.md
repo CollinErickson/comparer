@@ -73,8 +73,6 @@
 
 -   par_discrete: fix add LHS, EI search, plot, ...
 
--   mod using GauPro
-
 -   Make xgboost param tuning example
 
 -   par_integer: hard part is optim
@@ -82,8 +80,6 @@
 -   Remove unevaluated run. E.g., add EI but want to undo it.
 
 -   Plot run time
-
-- Track when something has changed, then refit mod when needed
 
 - Run EI for time: add based on EI/(exp time to fit)
 
@@ -93,6 +89,18 @@
 
 - Add in verbose printouts
 
+- Straighten out mean se vs sample se for EI
+
+- Only update GauPro model, instead of refit, when no change to spec
+
 ## MAB: multi-armed bandit
 
 -   run batches, easy access function, df/list input, log scale. Check that all have been run. Binary. Pass through args.
+
+## mbc
+
+- Change print of object
+
+- Fix plot error
+
+- Change plots from base to ggplot2
