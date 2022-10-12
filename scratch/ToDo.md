@@ -59,8 +59,6 @@
 
 -   Give DK GP info. Plot? Show which inputs are important.
 
--   Save mod as active so it's only fit in one spot.
-
 -   Maximize option?
 
 -   set parallel in init, give in varlist, save_folder
@@ -88,8 +86,6 @@
 - when add data, override runtime to be NA
 
 - Add in verbose printouts
-
-- Straighten out mean se vs sample se for EI
 
 - Only update GauPro model, instead of refit, when no change to spec
 
