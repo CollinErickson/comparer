@@ -3,136 +3,21 @@
 \name{par_log10}
 \alias{par_log10}
 \title{Hyperparameter on log10 scale}
-\description{
-Hyperparameter on log10 scale
+\usage{
+par_log10(name, lower, upper)
+}
+\arguments{
+\item{name}{Name of the parameter, must match the input to `eval_func`.}
 
+\item{lower}{Lower bound of the parameter}
+
+\item{upper}{Upper bound of the parameter}
+}
+\description{
 Hyperparameter on log10 scale
 }
 \examples{
-p1 <- par_log10$new('x1', 1e-4, 1e4)
+p1 <- par_log10('x1', 1e-4, 1e4)
 class(p1)
 print(p1)
-}
-\section{Super class}{
-\code{\link[comparer:par_hype]{comparer::par_hype}} -> \code{par_log10}
-}
-\section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
-\describe{
-\item{\code{name}}{Name of the parameter, must match the input to `eval_func`.}
-
-\item{\code{lower}}{Lower bound of the parameter}
-
-\item{\code{upper}}{Upper bound of the parameter}
-
-\item{\code{ggtrans}}{Transformation for ggplot, see ggplot2::scale_x_continuous()}
-}
-\if{html}{\out{</div>}}
-}
-\section{Methods}{
-\subsection{Public methods}{
-\itemize{
-\item \href{#method-par_log10-fromraw}{\code{par_log10$fromraw()}}
-\item \href{#method-par_log10-toraw}{\code{par_log10$toraw()}}
-\item \href{#method-par_log10-generate}{\code{par_log10$generate()}}
-\item \href{#method-par_log10-new}{\code{par_log10$new()}}
-\item \href{#method-par_log10-clone}{\code{par_log10$clone()}}
-}
-}
-\if{html}{\out{
-<details open><summary>Inherited methods</summary>
-<ul>
-<li><span class="pkg-link" data-pkg="comparer" data-topic="par_hype" data-id="getseq"><a href='../../comparer/html/par_hype.html#method-par_hype-getseq'><code>comparer::par_hype$getseq()</code></a></span></li>
-</ul>
-</details>
-}}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-par_log10-fromraw"></a>}}
-\if{latex}{\out{\hypertarget{method-par_log10-fromraw}{}}}
-\subsection{Method \code{fromraw()}}{
-Function to convert from raw scale to transformed scale
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{par_log10$fromraw(x)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{x}}{Value of raw scale}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-par_log10-toraw"></a>}}
-\if{latex}{\out{\hypertarget{method-par_log10-toraw}{}}}
-\subsection{Method \code{toraw()}}{
-Function to convert from transformed scale to raw scale
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{par_log10$toraw(x)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{x}}{Value of transformed scale}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-par_log10-generate"></a>}}
-\if{latex}{\out{\hypertarget{method-par_log10-generate}{}}}
-\subsection{Method \code{generate()}}{
-Generate values in the raw space based on quantiles.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{par_log10$generate(q)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{q}}{In [0,1].}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-par_log10-new"></a>}}
-\if{latex}{\out{\hypertarget{method-par_log10-new}{}}}
-\subsection{Method \code{new()}}{
-Create a hyperparameter with uniform distribution
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{par_log10$new(name, lower, upper)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{name}}{Name of the parameter, must match the input to `eval_func`.}
-
-\item{\code{lower}}{Lower bound of the parameter}
-
-\item{\code{upper}}{Upper bound of the parameter}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-par_log10-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-par_log10-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{par_log10$clone(deep = FALSE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

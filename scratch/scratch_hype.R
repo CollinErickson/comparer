@@ -128,7 +128,7 @@ h1$plotinteractions()
 # 2 inputs, second is null
 h1 <- hype$new(eval_func = function(a, b) {a^2 + .2*log(b) + .3*a*log(b)},
                par_unif("a", -1, 1),
-               par_log10$new("b", 1e-8, 1e-2), n_lhs=6)
+               par_log10("b", 1e-8, 1e-2), n_lhs=6)
 h1$run_all()
 # h1$plotX2()
 h1$add_LHS(13)
@@ -141,9 +141,9 @@ h1$pairs()
 h1 <- hype$new(eval_func = function(a, b, d,e,f) {-a^2*b^2*log(d)*sqrt(f)},
                par_unif("a", -1, 1),
                par_unif("b", -3, 4),
-               par_log10$new("d", 1e-8, 1e-2),
+               par_log10("d", 1e-8, 1e-2),
                par_unif("e", -1, 1),
-               par_log10$new("f", 1, 1000),
+               par_log10("f", 1, 1000),
                n_lhs=6)
 # h1$plotX()
 h1$run_all()
@@ -157,7 +157,7 @@ h1$plotinteractions()
 # Test discrete par
 h1 <- hype$new(eval_func = function(a, b, c) {-a^2*b^2*ifelse(c=='a', 1, 2)},
                par_unif("a", 6, 8),
-               par_log10$new("b", 1e-8, 1e-2),
+               par_log10("b", 1e-8, 1e-2),
                par_discrete$new("c", c('a', 'b')),
                n_lhs=6)
 
@@ -167,11 +167,11 @@ h1 <- hype$new(eval_func = function(a, b, c) {-a^2*b^2*ifelse(c=='a', 1, 2)},
 u4 <- hype$new(eval_func = function(a, b, d,e,f,g,h) {-a^2*b^2*log(d)*sqrt(f)},
                par_unif("a", -1, 1),
                par_unif("b", -3, 4),
-               par_log10$new("d", 1e-8, 1e-2),
+               par_log10("d", 1e-8, 1e-2),
                par_unif("e", -1, 1),
-               par_log10$new("f", 1, 1000),
+               par_log10("f", 1, 1000),
                par_unif("g", 13, 23),
-               par_log10$new("h", 1e4, 1e8),
+               par_log10("h", 1e4, 1e8),
                n_lhs=10)
 u4$run_all()
 u4$plotX()

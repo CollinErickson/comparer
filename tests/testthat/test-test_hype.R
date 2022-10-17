@@ -7,7 +7,7 @@ test_that("hype works", {
   expect_true("par_hype" %in% class(p1))
   p1 <- par_unif("a", -1, 1)
   expect_true("par_unif" %in% class(p1))
-  plog <- par_log10$new("a", 1e-8, 1)
+  plog <- par_log10("a", 1e-8, 1)
   expect_true("par_log10" %in% class(plog))
 
   # Create hype
@@ -94,7 +94,7 @@ test_that("Hype add data", {
   expect_error({
     x9 <- hype$new(eval_func = f1,
                    par_unif("a", -1, 1),
-                   par_log10$new("b", 10^-3, 10^4),
+                   par_log10("b", 10^-3, 10^4),
                    par_unif("c", 1,2),
                    n_lhs=6)
     x9$run_all()
@@ -123,7 +123,7 @@ test_that("Hype add data", {
   expect_error({
     r5 <- hype$new(eval_func = f1,
                    par_unif("a", -1, 1),
-                   par_log10$new("b", 10^-3, 10^4),
+                   par_log10("b", 10^-3, 10^4),
                    par_unif("c", 1,2),
                    X0=x0)
   }, NA)
@@ -136,7 +136,7 @@ test_that("Hype add data", {
   expect_error({
     r8 <- hype$new(eval_func = f1,
                    par_unif("a", -1, 1),
-                   par_log10$new("b", 10^-3, 10^4),
+                   par_log10("b", 10^-3, 10^4),
                    par_unif("c", 1,2),
                    X0=x0, Z0=y0)
   }, NA)
@@ -147,8 +147,8 @@ test_that("Hype add data", {
 
   n2 <- hype$new(eval_func = f1,
                  par_unif("a", -1, 1),
-                 par_log10$new("b", 10^-3, 10^4),
-                 par_log10$new("c", 1,100),
+                 par_log10("b", 10^-3, 10^4),
+                 par_log10("c", 1,100),
                  n_lhs=6)
   n2$run_all()
   # n2$plotX()
@@ -178,7 +178,7 @@ test_that("Hype add data", {
   expect_error({
     hype$new(eval_func = f1,
              par_unif("a", -1, 1),
-             par_log10$new("b", 10^-3, 10^4),
+             par_log10("b", 10^-3, 10^4),
              par_unif("c", 1,2),
              X0=list(a=runif(5)))
   })
@@ -190,7 +190,7 @@ test_that("discrete params", {
   expect_error({
   hp <- hype$new(eval_func = function(a, b, c) {-1e-3*a^2*log(b,10)^2*ifelse(c=='a', 1, 2) + rnorm(length(a),0,1e-1)},
                  par_unif("a", 6, 8),
-                 par_log10$new("b", 1e-8, 1e-2),
+                 par_log10("b", 1e-8, 1e-2),
                  par_discrete$new("c", c('a', 'b')),
                  n_lhs=21)
   }, NA)

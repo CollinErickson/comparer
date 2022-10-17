@@ -1,6 +1,24 @@
 
 #' Hyperparameter on log10 scale
 #' @export
+#' @param name Name of the parameter, must match the input to `eval_func`.
+#' @param lower Lower bound of the parameter
+#' @param upper Upper bound of the parameter
+#' @examples
+#' p1 <- par_log10('x1', 1e-4, 1e4)
+#' class(p1)
+#' print(p1)
+# par_log ----
+par_log10 <- function(name, lower, upper) {
+  R6_par_log10$new(
+    name=name,
+    lower=lower,
+    upper=upper
+  )
+}
+
+#' R6 class for hyperparameter on log10 scale
+#' @export
 #' @field name Name of the parameter, must match the input to `eval_func`.
 #' @field lower Lower bound of the parameter
 #' @field upper Upper bound of the parameter
@@ -8,11 +26,10 @@
 # @field toraw Function to convert from transformed scale to raw scale
 #' @field ggtrans Transformation for ggplot, see ggplot2::scale_x_continuous()
 #' @examples
-#' p1 <- par_log10$new('x1', 1e-4, 1e4)
+#' p1 <- par_log10('x1', 1e-4, 1e4)
 #' class(p1)
 #' print(p1)
-# par_log ----
-par_log10 <- R6::R6Class(
+R6_par_log10 <- R6::R6Class(
   classname="par_log10",
   inherit = par_hype,
   public=list(
@@ -45,7 +62,7 @@ par_log10 <- R6::R6Class(
   )
 )
 if (F) {
-  p1 <- par_log10$new('x1', 1e-4, 1e4)
+  p1 <- par_log10('x1', 1e-4, 1e4)
   p1$generate(0)
   p1$generate((0:8)/8)
   curve(p1$generate(x))

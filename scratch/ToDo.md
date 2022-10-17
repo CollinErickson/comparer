@@ -45,6 +45,8 @@
 
 - Remove R6, so hype() instead of hype$new()
 
+- print for hype pars
+
 -   move to new hype package?
 
 -   add hype to descr, readme, vignette

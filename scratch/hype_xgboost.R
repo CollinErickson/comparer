@@ -39,7 +39,7 @@ xgb_rmse <- function(eta, nrounds, gamma, max_depth, min_child_weight,
 h1 <- hype$new(
   eval_func=xgb_rmse,
   n_lhs=20,
-  eta=par_log10$new('eta', 1e-4, 1e-1),
+  eta=par_log10('eta', 1e-4, 1e-1),
   nrounds=par_unif('nrounds', 5, 100),
   gamma=par_unif('gamma', 0, 1),
   max_depth=par_unif('max_depth', 2, 12),

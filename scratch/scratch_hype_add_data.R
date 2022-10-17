@@ -55,7 +55,7 @@ h1$plotX()
 h1 <- hype$new(eval_func = f1,
                par_unif("a", -1, 1),
                par_unif("b", -3, 4),
-               par_log10$new("c", 1,100),
+               par_log10("c", 1,100),
                n_lhs=6)
 h1$run_all()
 h1$plotX()
@@ -81,7 +81,7 @@ h1$plotX()
 h1 <- hype$new(eval_func = f1,
                par_unif("a", -1, 1),
                par_unif("b", -3, 4),
-               par_log10$new("c", 1,1e8),
+               par_log10("c", 1,1e8),
                n_lhs=6,
                X0=data.frame(a=runif(10, -1,1),
                         b=runif(10,-3,4),
