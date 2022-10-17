@@ -13,11 +13,11 @@ for (i in 1:n0) {
 cbind(x0, y0)
 
 # 3 inputs, 2 matter, interaction
-h1 <- hype$new(eval_func = f1,
-               par_unif("a", -1, 1),
-               par_unif("b", -3, 4),
-               par_unif("c", 1,2),
-               n_lhs=6)
+h1 <- hype(eval_func = f1,
+           par_unif("a", -1, 1),
+           par_unif("b", -3, 4),
+           par_unif("c", 1,2),
+           n_lhs=6)
 h1$run_all()
 h1$plotX()
 # debugonce(h1$add_data)
@@ -35,28 +35,28 @@ h1$plotinteractions()
 # Test adding data when creating object
 
 # 3 inputs, 2 matter, interaction
-h1 <- hype$new(eval_func = f1,
-               par_unif("a", -1, 1),
-               par_unif("b", -3, 4),
-               par_unif("c", 1,2),
-               X0=x0)
+h1 <- hype(eval_func = f1,
+           par_unif("a", -1, 1),
+           par_unif("b", -3, 4),
+           par_unif("c", 1,2),
+           X0=x0)
 h1
 
-h1 <- hype$new(eval_func = f1,
-               par_unif("a", -1, 1),
-               par_unif("b", -3, 4),
-               par_unif("c", 1,2),
-               X0=x0, Z0=y0)
+h1 <- hype(eval_func = f1,
+           par_unif("a", -1, 1),
+           par_unif("b", -3, 4),
+           par_unif("c", 1,2),
+           X0=x0, Z0=y0)
 h1
 h1$plotX()
 
 # Test changing parameter bounds
 
-h1 <- hype$new(eval_func = f1,
-               par_unif("a", -1, 1),
-               par_unif("b", -3, 4),
-               par_log10("c", 1,100),
-               n_lhs=6)
+h1 <- hype(eval_func = f1,
+           par_unif("a", -1, 1),
+           par_unif("b", -3, 4),
+           par_log10("c", 1,100),
+           n_lhs=6)
 h1$run_all()
 h1$plotX()
 h1$parlist
@@ -78,12 +78,12 @@ h1$plotX()
 
 
 # 3 inputs, 2 matter, interaction
-h1 <- hype$new(eval_func = f1,
-               par_unif("a", -1, 1),
-               par_unif("b", -3, 4),
-               par_log10("c", 1,1e8),
-               n_lhs=6,
-               X0=data.frame(a=runif(10, -1,1),
-                        b=runif(10,-3,4),
-                        c=10^runif(10,0,8)))
+h1 <- hype(eval_func = f1,
+           par_unif("a", -1, 1),
+           par_unif("b", -3, 4),
+           par_log10("c", 1,1e8),
+           n_lhs=6,
+           X0=data.frame(a=runif(10, -1,1),
+                         b=runif(10,-3,4),
+                         c=10^runif(10,0,8)))
 

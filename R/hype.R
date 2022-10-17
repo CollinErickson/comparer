@@ -2,7 +2,74 @@
 
 
 # hype ----
+
 #' Hyperparameter optimization
+#'
+#' @export
+# @field X Data frame of inputs that have been evaluated or will be evaluated
+# next.
+# @field Z Output at X
+# @field runtime The time it took to evaluate each row of X
+# @field mod Gaussian process model used to predict what the output will be.
+# @field parnames Names of the parameters
+# @field parlowerraw Lower bounds for each parameter on raw scale
+# @field parupperraw Upper bounds for each parameter on raw scale
+# @field parlowertrans Lower bounds for each parameter on transformed scale
+# @field paruppertrans Upper bounds for each parameter on transformed scale
+# @field parlist List of all parameters
+# @field partrans Transformation for each parameter
+# @field modlist A list with details about the model. The user shouldn't
+# ever edit this directly.
+# @field ffexp An ffexp R6 object used to run the experiment and store
+# the results.
+#' @param eval_func The function we evaluate.
+#' @param extract_output_func A function that takes in the output from
+#' `eval_func` and returns the value we are trying to minimize.
+# @field par_all_cts Are all the parameters continuous?
+#' @param verbose How much should be printed? 0 is none, 1 is standard,
+#' 2 is more, 5+ is a lot
+#' @examples
+#'
+#' # Have df output, but only use one value from it
+#' h1 <- hype(
+#'   eval_func = function(a, b) {data.frame(c=a^2+b^2, d=1:2)},
+#'   extract_output_func = function(odf) {odf$c[1]},
+#'   a = par_unif('a', -1, 2),
+#'   b = par_unif('b', -10, 10),
+#'   n_lhs = 10
+#' )
+#' h1$run_all()
+#' h1$add_EI(n = 1)
+#' h1$run_all()
+#' #system.time(h1$run_EI_for_time(sec=3, batch_size = 1))
+#' #system.time(h1$run_EI_for_time(sec=3, batch_size = 3))
+#' h1$plotorder()
+#' h1$plotX()
+hype <- function(eval_func,
+                 ..., # ... is params
+                 X0=NULL, Z0=NULL,
+                 n_lhs,
+                 extract_output_func,
+                 verbose=1,
+                 model="GauPro",
+                 covtype="matern5_2",
+                 nugget.estim=TRUE
+) {
+  R6_hype$new(
+    eval_func=eval_func,
+    ...,
+    X0=X0, Z0=Z0,
+    n_lhs=n_lhs,
+    extract_output_func=extract_output_func,
+    verbose=verbose,
+    model=model,
+    covtype=covtype,
+    nugget.estim=nugget.estim
+  )
+}
+
+#' Hyperparameter optimization
+#'
 #' @export
 #' @field X Data frame of inputs that have been evaluated or will be evaluated
 #' next.
@@ -29,7 +96,7 @@
 #' @examples
 #'
 #' # Have df output, but only use one value from it
-#' h1 <- hype$new(
+#' h1 <- hype(
 #'   eval_func = function(a, b) {data.frame(c=a^2+b^2, d=1:2)},
 #'   extract_output_func = function(odf) {odf$c[1]},
 #'   a = par_unif('a', -1, 2),
@@ -43,8 +110,8 @@
 #' #system.time(h1$run_EI_for_time(sec=3, batch_size = 3))
 #' h1$plotorder()
 #' h1$plotX()
-hype <- R6::R6Class(
-  # hype ----
+R6_hype <- R6::R6Class(
+  # R6_hype ----
   classname="hype",
   # inherit=ffexp,
   # active=list(
@@ -168,18 +235,22 @@ hype <- R6::R6Class(
       } else {
         X0raw <- NULL
       }
-      if (!missing(n_lhs) && n_lhs > .5) {
-        # Use add_LHS here?
-        # Xlhstrans <- lhs::maximinLHS(n=n_lhs, k=length(self$parnames))
-        # Xlhstrans <- sweep(sweep(Xlhstrans,
-        #                          2, self$paruppertrans - self$parlowertrans, "*"
-        # ), 2, self$parlowertrans, "+")
-        # Xlhstrans <- as.data.frame(Xlhstrans)
-        # names(Xlhstrans) <- self$parnames
-        # X0trans <- rbind(X0trans, Xlhstrans)
-        # Just get the X from add_LHS since ffexp not created yet
-        Xlhsraw <- self$add_LHS(n_lhs, just_return_df = TRUE)
-        X0raw <- rbind(X0raw, Xlhsraw)
+      if (!missing(n_lhs) && !is.null(n_lhs)) {
+        stopifnot(length(n_lhs) == 1)
+        stopifnot(is.numeric(n_lhs))
+        if (n_lhs > .5) {
+          # Use add_LHS here?
+          # Xlhstrans <- lhs::maximinLHS(n=n_lhs, k=length(self$parnames))
+          # Xlhstrans <- sweep(sweep(Xlhstrans,
+          #                          2, self$paruppertrans - self$parlowertrans, "*"
+          # ), 2, self$parlowertrans, "+")
+          # Xlhstrans <- as.data.frame(Xlhstrans)
+          # names(Xlhstrans) <- self$parnames
+          # X0trans <- rbind(X0trans, Xlhstrans)
+          # Just get the X from add_LHS since ffexp not created yet
+          Xlhsraw <- self$add_LHS(n_lhs, just_return_df = TRUE)
+          X0raw <- rbind(X0raw, Xlhsraw)
+        }
       }
       if (is.null(X0raw)) {
         stop(paste('Give in n_lhs, the number of initial points to evaluate.',
@@ -392,10 +463,9 @@ hype <- R6::R6Class(
       # )
       # warning('covtype and nugest here')
       self$update_mod_userspeclist(model=model,
-                                  nugget.estim=nugget.estim,
-                                  covtype=covtype)
+                                   nugget.estim=nugget.estim,
+                                   covtype=covtype)
 
-      # browser()
       if ("km" %in% class(self$mod)) {
         if (!self$par_all_cts) {
           stop(paste0("Can only add EI with DiceKriging if all",
@@ -485,7 +555,6 @@ hype <- R6::R6Class(
                                     eps=eps)
           } else {
             # Select multiple points to be evaluated, useful when running in parallel
-            # browser()
             EIout <- self$mod$maxqEI(npoints=n, method="CL",
                                      lower=self$parlowertrans,
                                      upper=self$paruppertrans,
@@ -550,7 +619,6 @@ hype <- R6::R6Class(
         message("Unevaluated points already exist, using constant liar")
       }
 
-      # browser()
       self$update_mod_userspeclist(model=model, covtype=covtype,
                                    nugget.estim=nugget.estim)
       model <- self$modlist$userspeclist$model
@@ -591,7 +659,6 @@ hype <- R6::R6Class(
           } else {stop("bad covtype for GauPro with discrete par")}
           kern <- GauPro::IgnoreIndsKernel$new(k=kern1inner,
                                                ignoreinds = factorinds)
-          # browser()
           # kern2 <- GauPro::LatentFactorKernel$new(
           #   D=length(self$parlist),
           #   nlevels=length(self$parlist[[factorinds]]$values),
@@ -760,7 +827,6 @@ hype <- R6::R6Class(
     plotX = function(addlines=TRUE, addEIlines=TRUE,
                      covtype=NULL, nugget.estim=NULL,
                      model=NULL) {
-      # browser()
       if (is.null(self$X) || is.null(self$Z)) {
         stop("Nothing has been evaluated yet. Call $run_all() first.")
       }
@@ -789,7 +855,6 @@ hype <- R6::R6Class(
           preddf <- list()
           npts <- 30
           for (i in 1:ncol(self$X)) {
-            # browser()
             # Get sequence of points for par
             parseq <- self$parlist[[i]]$getseq(n=npts)
             # Predict at points that are the same for all other components
@@ -804,7 +869,6 @@ hype <- R6::R6Class(
             if ("km" %in% class(self$mod)) {
               predout <- DiceKriging::predict.km(self$mod, predXtransdf, type="SK", light.return = T)
             } else if ("GauPro" %in% class(self$mod)) {
-              # browser()
               predout <- suppressWarnings({
                 self$mod$pred(as.matrix(predXtransdf), se.fit=TRUE)
               })
@@ -842,7 +906,6 @@ hype <- R6::R6Class(
             #                                type="SK")
             #                }
             # )
-            # browser()
             EIout <- self$add_EI(calculate_at = EIXtransdf)
             df_i <- data.frame(valuetrans=parseq$trans,
                                valueraw=parseq$raw,
@@ -854,7 +917,6 @@ hype <- R6::R6Class(
           # Scale EI to find on same axes as Z
           # EIdf$EIrescaled <- ((EIdf$EI - min(EIdf$EI)) / (max(EIdf$EI) - min(EIdf$EI))
           # ) * (max(self$Z) - min(self$Z)) + min(self$Z)
-          # browser()
           minEI <- min(sapply(EIdf, function(ll) {min(ll$EI)}))
           maxEI <- max(sapply(EIdf, function(ll) {max(ll$EI)}))
           for (i in 1:ncol(self$X)) {
@@ -880,7 +942,6 @@ hype <- R6::R6Class(
 
       # New with transformations on x axis
 
-      # browser()
       ggs <- list()
       for (i in 1:ncol(Xtrans)) {
         dfi <- data.frame(value=self$X[, i], Z=self$Z, Rank=order(order(self$Z)))
@@ -907,7 +968,6 @@ hype <- R6::R6Class(
               ggplot2::geom_line(data=preddfi, ggplot2::aes(valueraw, lower95,color=NULL), alpha=.2) +
               ggplot2::geom_line(data=preddfi, ggplot2::aes(valueraw, upper95,color=NULL), alpha=.2)
           } else {
-            # browser()
             ggi <- ggi +
               ggplot2::geom_point(data=preddfi, ggplot2::aes(valueraw,    mean,color=NULL), shape=18, size=3) +
               ggplot2::geom_point(data=preddfi, ggplot2::aes(valueraw, lower95,color=NULL), shape=18, size=3) +
@@ -934,10 +994,8 @@ hype <- R6::R6Class(
       }
       # ggpubr::ggarrange(ggs[[1]], ggs[[2]], common.legend=T, legend="right")
 
-      # browser()
       ggs$common.legend <- T
       ggs$legend <- "right"
-      # browser()
       # Gave a warning for a sampler, doesn't seem important
       suppressWarnings({
         do.call(ggpubr::ggarrange, ggs) + ggplot2::ylab("Outer ylab")
@@ -968,7 +1026,6 @@ hype <- R6::R6Class(
           ggi <- ggi + ggplot2::geom_point() #jitter(width=.15)
         } else {
           # Add horizontal lines at lower and upper
-          # browser()
           ggi <- ggi +
             ggplot2::geom_hline(yintercept=self$parlist[[i]]$lower, alpha=.2) +
             ggplot2::geom_hline(yintercept=self$parlist[[i]]$upper, alpha=.2)
@@ -1087,7 +1144,6 @@ hype <- R6::R6Class(
     #' the GP model?
     update_mod_userspeclist = function(model=NULL, covtype=NULL,
                                        nugget.estim=NULL) {
-      # browser()
       if (!is.null(model)) {
         stopifnot(is.character(model), length(model) == 1)
         if (tolower(model) %in% c("dk", "dicekriging", "dice")) {
@@ -1147,7 +1203,6 @@ hype <- R6::R6Class(
         if (self$verbose>=2) {
           cat("Updating model...\n")
         }
-        # browser()
         self$fit_mod()
       } else {
         if (self$verbose>=5) {
@@ -1162,7 +1217,7 @@ hype <- R6::R6Class(
 
 # Examples ----
 if (F) {
-  h1 <- hype$new(
+  h1 <- hype(
     eval_func = function(a, b) {a^2+b^2},
     a = par_unif('a', -1, 2),
     b = par_unif('b', -10, 10),
@@ -1189,7 +1244,7 @@ if (F) {
 }
 if (F) {
   # Have df output, but only use one value from it
-  h1 <- hype$new(
+  h1 <- hype(
     eval_func = function(a, b) {data.frame(c=a^2+b^2, d=1:2)},
     extract_output_func = function(odf) {odf$c[1]},
     a = par_unif('a', -1, 2),
@@ -1204,7 +1259,7 @@ if (F) {
   h1$plotX()
 }
 if (F) { # Error when no par given
-  h1 <- hype$new(
+  h1 <- hype(
     eval_func = function(a, b) {data.frame(c=a^2+b^2, d=1:2)},
     extract_output_func = function(odf) {odf$c[1]},
     n_lhs = 10
@@ -1212,7 +1267,7 @@ if (F) { # Error when no par given
 }
 
 if (F) {
-  h1 <- hype$new(
+  h1 <- hype(
     eval_func = function(a) {print(a); (log(a) - log(1e-4))^2},
     n_lhs = 10,
     par_log$new("a", 1e-8, 1e-1)

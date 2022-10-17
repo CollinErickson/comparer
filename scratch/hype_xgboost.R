@@ -36,7 +36,7 @@ xgb_rmse <- function(eta, nrounds, gamma, max_depth, min_child_weight,
   sqrt(mean((predte - yte)^2))
 }
 
-h1 <- hype$new(
+h1 <- hype(
   eval_func=xgb_rmse,
   n_lhs=20,
   eta=par_log10('eta', 1e-4, 1e-1),
