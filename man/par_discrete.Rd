@@ -3,183 +3,19 @@
 \name{par_discrete}
 \alias{par_discrete}
 \title{Hyperparameter of discrete (factor) variable}
-\description{
-Hyperparameter of discrete (factor) variable
+\usage{
+par_discrete(name, values)
+}
+\arguments{
+\item{name}{Name of the parameter, must match the input to `eval_func`.}
 
+\item{values}{Vector of values}
+}
+\description{
 Hyperparameter of discrete (factor) variable
 }
 \examples{
-p1 <- par_discrete$new('x1', c('a', 'b', 'c'))
+p1 <- par_discrete('x1', c('a', 'b', 'c'))
 class(p1)
 print(p1)
-}
-\section{Super class}{
-\code{\link[comparer:par_hype]{comparer::par_hype}} -> \code{par_discrete}
-}
-\section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
-\describe{
-\item{\code{name}}{Name of the parameter, must match the input to `eval_func`.}
-
-\item{\code{values}}{Vector of values}
-
-\item{\code{ggtrans}}{Transformation for ggplot, see ggplot2::scale_x_continuous()}
-
-\item{\code{lower}}{Lower bound of the parameter}
-
-\item{\code{upper}}{Upper bound of the parameter}
-}
-\if{html}{\out{</div>}}
-}
-\section{Methods}{
-\subsection{Public methods}{
-\itemize{
-\item \href{#method-par_discrete-fromraw}{\code{par_discrete$fromraw()}}
-\item \href{#method-par_discrete-toraw}{\code{par_discrete$toraw()}}
-\item \href{#method-par_discrete-fromint}{\code{par_discrete$fromint()}}
-\item \href{#method-par_discrete-toint}{\code{par_discrete$toint()}}
-\item \href{#method-par_discrete-generate}{\code{par_discrete$generate()}}
-\item \href{#method-par_discrete-getseq}{\code{par_discrete$getseq()}}
-\item \href{#method-par_discrete-new}{\code{par_discrete$new()}}
-\item \href{#method-par_discrete-clone}{\code{par_discrete$clone()}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-par_discrete-fromraw"></a>}}
-\if{latex}{\out{\hypertarget{method-par_discrete-fromraw}{}}}
-\subsection{Method \code{fromraw()}}{
-Function to convert from raw scale to transformed scale
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{par_discrete$fromraw(x)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{x}}{Value of raw scale}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-par_discrete-toraw"></a>}}
-\if{latex}{\out{\hypertarget{method-par_discrete-toraw}{}}}
-\subsection{Method \code{toraw()}}{
-Function to convert from transformed scale to raw scale
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{par_discrete$toraw(x)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{x}}{Value of transformed scale}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-par_discrete-fromint"></a>}}
-\if{latex}{\out{\hypertarget{method-par_discrete-fromint}{}}}
-\subsection{Method \code{fromint()}}{
-Convert from integer index to actual value
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{par_discrete$fromint(x)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{x}}{Integer index}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-par_discrete-toint"></a>}}
-\if{latex}{\out{\hypertarget{method-par_discrete-toint}{}}}
-\subsection{Method \code{toint()}}{
-Convert from value to integer index
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{par_discrete$toint(x)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{x}}{Value}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-par_discrete-generate"></a>}}
-\if{latex}{\out{\hypertarget{method-par_discrete-generate}{}}}
-\subsection{Method \code{generate()}}{
-Generate values in the raw space based on quantiles.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{par_discrete$generate(q)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{q}}{In [0,1].}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-par_discrete-getseq"></a>}}
-\if{latex}{\out{\hypertarget{method-par_discrete-getseq}{}}}
-\subsection{Method \code{getseq()}}{
-Get a sequence, uniform on the transformed scale
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{par_discrete$getseq(n)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{n}}{Number of points. Ignored for discrete.}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-par_discrete-new"></a>}}
-\if{latex}{\out{\hypertarget{method-par_discrete-new}{}}}
-\subsection{Method \code{new()}}{
-Create a hyperparameter with uniform distribution
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{par_discrete$new(name, values)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{name}}{Name of the parameter, must match the input to `eval_func`.}
-
-\item{\code{values}}{The values the variable can take on.}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-par_discrete-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-par_discrete-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{par_discrete$clone(deep = FALSE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

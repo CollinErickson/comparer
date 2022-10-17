@@ -158,7 +158,7 @@ h1$plotinteractions()
 h1 <- hype$new(eval_func = function(a, b, c) {-a^2*b^2*ifelse(c=='a', 1, 2)},
                par_unif("a", 6, 8),
                par_log10("b", 1e-8, 1e-2),
-               par_discrete$new("c", c('a', 'b')),
+               par_discrete("c", c('a', 'b')),
                n_lhs=6)
 
 

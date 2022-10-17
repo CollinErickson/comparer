@@ -1,5 +1,21 @@
 #' Hyperparameter of discrete (factor) variable
 #' @export
+#' @param name Name of the parameter, must match the input to `eval_func`.
+#' @param values Vector of values
+#' @examples
+#' p1 <- par_discrete('x1', c('a', 'b', 'c'))
+#' class(p1)
+#' print(p1)
+# par_discrete ----
+par_discrete <- function(name, values) {
+  R6_par_discrete$new(
+    name=name,
+    values=values
+  )
+}
+
+#' R6 class for hyperparameter of discrete (factor) variable
+#' @export
 #' @field name Name of the parameter, must match the input to `eval_func`.
 #' @field values Vector of values
 # @field fromraw Function to convert from raw scale to transformed scale
@@ -8,11 +24,10 @@
 #' @field lower Lower bound of the parameter
 #' @field upper Upper bound of the parameter
 #' @examples
-#' p1 <- par_discrete$new('x1', c('a', 'b', 'c'))
+#' p1 <- par_discrete('x1', c('a', 'b', 'c'))
 #' class(p1)
 #' print(p1)
-# par_discrete ----
-par_discrete <- R6::R6Class(
+R6_par_discrete <- R6::R6Class(
   classname="par_discrete",
   inherit = par_hype,
   public=list(
@@ -73,7 +88,7 @@ par_discrete <- R6::R6Class(
   )
 )
 if (F) {
-  pd <- par_discrete$new('disc', letters[1:4])
+  pd <- par_discrete('disc', letters[1:4])
   pd
   pd$generate((0:10)/10)
   pd$generate(runif(10))
@@ -81,6 +96,6 @@ if (F) {
   pd$toint(letters[4:1])
   pd$fromint(3)
   pd$fromint(5:1)
-  par_discrete$new('a', c('a','b','b'))
+  par_discrete('a', c('a','b','b'))
 }
 

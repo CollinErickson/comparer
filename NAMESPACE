@@ -2,6 +2,7 @@
 
 S3method(plot,mbc)
 S3method(print,mbc)
+export(R6_par_discrete)
 export(R6_par_log10)
 export(R6_par_unif)
 export(ffexp)
