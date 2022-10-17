@@ -521,8 +521,9 @@ test_that('parallel can be run even if initially set to false', {
 
   # Delete at end
   for (tmpfile in list.files(f1$folder_path)) {
-    unlink(paste0(f1$folder_path, tmpfile))
+    unlink(paste0(f1$folder_path, "//", tmpfile))
   }
+  # Delete folder
   unlink(f1$folder_path, recursive=T)
 })
 test_that('remake cluster if connection doesn\'t work anymore', {
@@ -543,7 +544,7 @@ test_that('remake cluster if connection doesn\'t work anymore', {
 
   # Delete at end
   for (tmpfile in list.files(f1$folder_path)) {
-    unlink(paste0(f1$folder_path, tmpfile))
+    unlink(paste0(f1$folder_path, "//", tmpfile))
   }
   unlink(f1$folder_path, recursive=T)
 })
