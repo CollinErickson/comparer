@@ -2,7 +2,6 @@
 
 
 # hype ----
-
 #' Hyperparameter optimization
 #'
 #' @export
@@ -23,11 +22,26 @@
 # @field ffexp An ffexp R6 object used to run the experiment and store
 # the results.
 #' @param eval_func The function we evaluate.
+#' @param ... Pass in hyperparameters, such as par_unif()
+#' as unnamed arguments.
+#' @param X0 A data frame of initial points to include. They must
+#' have the same names as the hyperparameters. If Z0 is also passed,
+#' it should match the points in X0. If Z0 is not passed,
+#' then X0 will be the first points evaluated.
+#' @param Z0 A vector whose values are the result of applying `eval_func`
+#' to each row of X0.
+#' @param n_lhs The number of random points to start with. They are
+#' selected using a Latin hypercube sample.
 #' @param extract_output_func A function that takes in the output from
 #' `eval_func` and returns the value we are trying to minimize.
 # @field par_all_cts Are all the parameters continuous?
 #' @param verbose How much should be printed? 0 is none, 1 is standard,
 #' 2 is more, 5+ is a lot
+#' @param model What kind of model to use.
+#' @param covtype The covariance function to use for the Gaussian
+#' process model.
+#' @param nugget.estim Whether a nugget should be estimated when
+#' fitting the Gaussian process model.
 #' @examples
 #'
 #' # Have df output, but only use one value from it

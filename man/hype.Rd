@@ -20,11 +20,33 @@ hype(
 \arguments{
 \item{eval_func}{The function we evaluate.}
 
+\item{...}{Pass in hyperparameters, such as par_unif()
+as unnamed arguments.}
+
+\item{X0}{A data frame of initial points to include. They must
+have the same names as the hyperparameters. If Z0 is also passed,
+it should match the points in X0. If Z0 is not passed,
+then X0 will be the first points evaluated.}
+
+\item{Z0}{A vector whose values are the result of applying `eval_func`
+to each row of X0.}
+
+\item{n_lhs}{The number of random points to start with. They are
+selected using a Latin hypercube sample.}
+
 \item{extract_output_func}{A function that takes in the output from
 `eval_func` and returns the value we are trying to minimize.}
 
 \item{verbose}{How much should be printed? 0 is none, 1 is standard,
 2 is more, 5+ is a lot}
+
+\item{model}{What kind of model to use.}
+
+\item{covtype}{The covariance function to use for the Gaussian
+process model.}
+
+\item{nugget.estim}{Whether a nugget should be estimated when
+fitting the Gaussian process model.}
 }
 \description{
 Hyperparameter optimization
