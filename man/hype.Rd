@@ -76,32 +76,32 @@ the results.}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{hype$new()}}
-\item \href{#method-add_data}{\code{hype$add_data()}}
-\item \href{#method-add_X}{\code{hype$add_X()}}
-\item \href{#method-add_LHS}{\code{hype$add_LHS()}}
-\item \href{#method-convert_trans_to_raw}{\code{hype$convert_trans_to_raw()}}
-\item \href{#method-convert_raw_to_trans}{\code{hype$convert_raw_to_trans()}}
-\item \href{#method-change_par_bounds}{\code{hype$change_par_bounds()}}
-\item \href{#method-add_EI}{\code{hype$add_EI()}}
-\item \href{#method-fit_mod}{\code{hype$fit_mod()}}
-\item \href{#method-run_all}{\code{hype$run_all()}}
-\item \href{#method-run_EI_for_time}{\code{hype$run_EI_for_time()}}
-\item \href{#method-plot}{\code{hype$plot()}}
-\item \href{#method-pairs}{\code{hype$pairs()}}
-\item \href{#method-plotorder}{\code{hype$plotorder()}}
-\item \href{#method-plotX}{\code{hype$plotX()}}
-\item \href{#method-plotXorder}{\code{hype$plotXorder()}}
-\item \href{#method-plotinteractions}{\code{hype$plotinteractions()}}
-\item \href{#method-print}{\code{hype$print()}}
-\item \href{#method-best_params}{\code{hype$best_params()}}
-\item \href{#method-update_mod_userspeclist}{\code{hype$update_mod_userspeclist()}}
-\item \href{#method-clone}{\code{hype$clone()}}
+\item \href{#method-hype-new}{\code{hype$new()}}
+\item \href{#method-hype-add_data}{\code{hype$add_data()}}
+\item \href{#method-hype-add_X}{\code{hype$add_X()}}
+\item \href{#method-hype-add_LHS}{\code{hype$add_LHS()}}
+\item \href{#method-hype-convert_trans_to_raw}{\code{hype$convert_trans_to_raw()}}
+\item \href{#method-hype-convert_raw_to_trans}{\code{hype$convert_raw_to_trans()}}
+\item \href{#method-hype-change_par_bounds}{\code{hype$change_par_bounds()}}
+\item \href{#method-hype-add_EI}{\code{hype$add_EI()}}
+\item \href{#method-hype-fit_mod}{\code{hype$fit_mod()}}
+\item \href{#method-hype-run_all}{\code{hype$run_all()}}
+\item \href{#method-hype-run_EI_for_time}{\code{hype$run_EI_for_time()}}
+\item \href{#method-hype-plot}{\code{hype$plot()}}
+\item \href{#method-hype-pairs}{\code{hype$pairs()}}
+\item \href{#method-hype-plotorder}{\code{hype$plotorder()}}
+\item \href{#method-hype-plotX}{\code{hype$plotX()}}
+\item \href{#method-hype-plotXorder}{\code{hype$plotXorder()}}
+\item \href{#method-hype-plotinteractions}{\code{hype$plotinteractions()}}
+\item \href{#method-hype-print}{\code{hype$print()}}
+\item \href{#method-hype-best_params}{\code{hype$best_params()}}
+\item \href{#method-hype-update_mod_userspeclist}{\code{hype$update_mod_userspeclist()}}
+\item \href{#method-hype-clone}{\code{hype$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-hype-new"></a>}}
+\if{latex}{\out{\hypertarget{method-hype-new}{}}}
 \subsection{Method \code{new()}}{
 Create hype R6 object.
 \subsection{Usage}{
@@ -152,8 +152,8 @@ the GP model?}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-add_data"></a>}}
-\if{latex}{\out{\hypertarget{method-add_data}{}}}
+\if{html}{\out{<a id="method-hype-add_data"></a>}}
+\if{latex}{\out{\hypertarget{method-hype-add_data}{}}}
 \subsection{Method \code{add_data()}}{
 Add data to the experiment results.
 \subsection{Usage}{
@@ -171,8 +171,8 @@ Add data to the experiment results.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-add_X"></a>}}
-\if{latex}{\out{\hypertarget{method-add_X}{}}}
+\if{html}{\out{<a id="method-hype-add_X"></a>}}
+\if{latex}{\out{\hypertarget{method-hype-add_X}{}}}
 \subsection{Method \code{add_X()}}{
 Add new inputs to run. This allows the user to specify
 what they want run next.
@@ -189,8 +189,8 @@ what they want run next.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-add_LHS"></a>}}
-\if{latex}{\out{\hypertarget{method-add_LHS}{}}}
+\if{html}{\out{<a id="method-hype-add_LHS"></a>}}
+\if{latex}{\out{\hypertarget{method-hype-add_LHS}{}}}
 \subsection{Method \code{add_LHS()}}{
 Add new input points using a maximin
 Latin hypercube.
@@ -211,8 +211,8 @@ it just return the new set of values?}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-convert_trans_to_raw"></a>}}
-\if{latex}{\out{\hypertarget{method-convert_trans_to_raw}{}}}
+\if{html}{\out{<a id="method-hype-convert_trans_to_raw"></a>}}
+\if{latex}{\out{\hypertarget{method-hype-convert_trans_to_raw}{}}}
 \subsection{Method \code{convert_trans_to_raw()}}{
 Convert parameters from transformed scale to raw scale.
 \subsection{Usage}{
@@ -228,8 +228,8 @@ Convert parameters from transformed scale to raw scale.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-convert_raw_to_trans"></a>}}
-\if{latex}{\out{\hypertarget{method-convert_raw_to_trans}{}}}
+\if{html}{\out{<a id="method-hype-convert_raw_to_trans"></a>}}
+\if{latex}{\out{\hypertarget{method-hype-convert_raw_to_trans}{}}}
 \subsection{Method \code{convert_raw_to_trans()}}{
 Convert parameters from raw scale to transformed scale.
 \subsection{Usage}{
@@ -245,8 +245,8 @@ Convert parameters from raw scale to transformed scale.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-change_par_bounds"></a>}}
-\if{latex}{\out{\hypertarget{method-change_par_bounds}{}}}
+\if{html}{\out{<a id="method-hype-change_par_bounds"></a>}}
+\if{latex}{\out{\hypertarget{method-hype-change_par_bounds}{}}}
 \subsection{Method \code{change_par_bounds()}}{
 Change lower/upper bounds of a parameter
 \subsection{Usage}{
@@ -266,8 +266,8 @@ Change lower/upper bounds of a parameter
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-add_EI"></a>}}
-\if{latex}{\out{\hypertarget{method-add_EI}{}}}
+\if{html}{\out{<a id="method-hype-add_EI"></a>}}
+\if{latex}{\out{\hypertarget{method-hype-add_EI}{}}}
 \subsection{Method \code{add_EI()}}{
 Add new inputs to run using the expected information
 criteria
@@ -308,8 +308,8 @@ points to the design.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-fit_mod"></a>}}
-\if{latex}{\out{\hypertarget{method-fit_mod}{}}}
+\if{html}{\out{<a id="method-hype-fit_mod"></a>}}
+\if{latex}{\out{\hypertarget{method-hype-fit_mod}{}}}
 \subsection{Method \code{fit_mod()}}{
 Fit model to the data collected so far
 \subsection{Usage}{
@@ -331,8 +331,8 @@ calculate the EI? Use "DK" for DiceKriging or "GauPro" for GauPro.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-run_all"></a>}}
-\if{latex}{\out{\hypertarget{method-run_all}{}}}
+\if{html}{\out{<a id="method-hype-run_all"></a>}}
+\if{latex}{\out{\hypertarget{method-hype-run_all}{}}}
 \subsection{Method \code{run_all()}}{
 Run all unevaluated input points.
 \subsection{Usage}{
@@ -350,8 +350,8 @@ variables have been passed to 'varlist'}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-run_EI_for_time"></a>}}
-\if{latex}{\out{\hypertarget{method-run_EI_for_time}{}}}
+\if{html}{\out{<a id="method-hype-run_EI_for_time"></a>}}
+\if{latex}{\out{\hypertarget{method-hype-run_EI_for_time}{}}}
 \subsection{Method \code{run_EI_for_time()}}{
 Add points using the expected information criteria,
 evaluate them, and repeat until a specified amount of time has passed.
@@ -395,8 +395,8 @@ you care about.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-plot"></a>}}
-\if{latex}{\out{\hypertarget{method-plot}{}}}
+\if{html}{\out{<a id="method-hype-plot"></a>}}
+\if{latex}{\out{\hypertarget{method-hype-plot}{}}}
 \subsection{Method \code{plot()}}{
 Make a plot to summarize the experiment.
 \subsection{Usage}{
@@ -405,8 +405,8 @@ Make a plot to summarize the experiment.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-pairs"></a>}}
-\if{latex}{\out{\hypertarget{method-pairs}{}}}
+\if{html}{\out{<a id="method-hype-pairs"></a>}}
+\if{latex}{\out{\hypertarget{method-hype-pairs}{}}}
 \subsection{Method \code{pairs()}}{
 Plot pairs of inputs and output
 \subsection{Usage}{
@@ -415,8 +415,8 @@ Plot pairs of inputs and output
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-plotorder"></a>}}
-\if{latex}{\out{\hypertarget{method-plotorder}{}}}
+\if{html}{\out{<a id="method-hype-plotorder"></a>}}
+\if{latex}{\out{\hypertarget{method-hype-plotorder}{}}}
 \subsection{Method \code{plotorder()}}{
 Plot the output of the points evaluated in order.
 \subsection{Usage}{
@@ -425,8 +425,8 @@ Plot the output of the points evaluated in order.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-plotX"></a>}}
-\if{latex}{\out{\hypertarget{method-plotX}{}}}
+\if{html}{\out{<a id="method-hype-plotX"></a>}}
+\if{latex}{\out{\hypertarget{method-hype-plotX}{}}}
 \subsection{Method \code{plotX()}}{
 Plot the output as a function of each input.
 \subsection{Usage}{
@@ -458,8 +458,8 @@ calculate the EI? Use "DK" for DiceKriging or "GauPro" for GauPro.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-plotXorder"></a>}}
-\if{latex}{\out{\hypertarget{method-plotXorder}{}}}
+\if{html}{\out{<a id="method-hype-plotXorder"></a>}}
+\if{latex}{\out{\hypertarget{method-hype-plotXorder}{}}}
 \subsection{Method \code{plotXorder()}}{
 Plot each input in the order they were chosen.
 Colored by quality.
@@ -469,8 +469,8 @@ Colored by quality.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-plotinteractions"></a>}}
-\if{latex}{\out{\hypertarget{method-plotinteractions}{}}}
+\if{html}{\out{<a id="method-hype-plotinteractions"></a>}}
+\if{latex}{\out{\hypertarget{method-hype-plotinteractions}{}}}
 \subsection{Method \code{plotinteractions()}}{
 Plot the 2D plots from inputs to the output.
 All other variables are held at their values for the best input.
@@ -490,8 +490,8 @@ model.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
+\if{html}{\out{<a id="method-hype-print"></a>}}
+\if{latex}{\out{\hypertarget{method-hype-print}{}}}
 \subsection{Method \code{print()}}{
 Print details of the object.
 \subsection{Usage}{
@@ -507,8 +507,8 @@ Print details of the object.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-best_params"></a>}}
-\if{latex}{\out{\hypertarget{method-best_params}{}}}
+\if{html}{\out{<a id="method-hype-best_params"></a>}}
+\if{latex}{\out{\hypertarget{method-hype-best_params}{}}}
 \subsection{Method \code{best_params()}}{
 Returns the best parameters
 evaluated so far.
@@ -518,8 +518,8 @@ evaluated so far.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-update_mod_userspeclist"></a>}}
-\if{latex}{\out{\hypertarget{method-update_mod_userspeclist}{}}}
+\if{html}{\out{<a id="method-hype-update_mod_userspeclist"></a>}}
+\if{latex}{\out{\hypertarget{method-hype-update_mod_userspeclist}{}}}
 \subsection{Method \code{update_mod_userspeclist()}}{
 Updates the specifications for the GP model.
 \subsection{Usage}{
@@ -541,8 +541,8 @@ the GP model?}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-hype-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-hype-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

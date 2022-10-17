@@ -23,13 +23,13 @@ print(p1)
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-getseq}{\code{par_hype$getseq()}}
-\item \href{#method-clone}{\code{par_hype$clone()}}
+\item \href{#method-par_hype-getseq}{\code{par_hype$getseq()}}
+\item \href{#method-par_hype-clone}{\code{par_hype$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getseq"></a>}}
-\if{latex}{\out{\hypertarget{method-getseq}{}}}
+\if{html}{\out{<a id="method-par_hype-getseq"></a>}}
+\if{latex}{\out{\hypertarget{method-par_hype-getseq}{}}}
 \subsection{Method \code{getseq()}}{
 Get a sequence, uniform on the transformed scale
 \subsection{Usage}{
@@ -45,8 +45,8 @@ Get a sequence, uniform on the transformed scale
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-par_hype-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-par_hype-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

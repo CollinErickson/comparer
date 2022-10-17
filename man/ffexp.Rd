@@ -128,36 +128,36 @@ item to show up in the output data frame.}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{ffexp$new()}}
-\item \href{#method-run_all}{\code{ffexp$run_all()}}
-\item \href{#method-run_for_time}{\code{ffexp$run_for_time()}}
-\item \href{#method-run_superbatch}{\code{ffexp$run_superbatch()}}
-\item \href{#method-run_one}{\code{ffexp$run_one()}}
-\item \href{#method-add_result_of_one}{\code{ffexp$add_result_of_one()}}
-\item \href{#method-plot_run_times}{\code{ffexp$plot_run_times()}}
-\item \href{#method-plot_pairs}{\code{ffexp$plot_pairs()}}
-\item \href{#method-plot}{\code{ffexp$plot()}}
-\item \href{#method-calculate_effects}{\code{ffexp$calculate_effects()}}
-\item \href{#method-calculate_effects2}{\code{ffexp$calculate_effects2()}}
-\item \href{#method-save_self}{\code{ffexp$save_self()}}
-\item \href{#method-create_save_folder_if_nonexistent}{\code{ffexp$create_save_folder_if_nonexistent()}}
-\item \href{#method-rename_save_folder}{\code{ffexp$rename_save_folder()}}
-\item \href{#method-delete_save_folder_if_empty}{\code{ffexp$delete_save_folder_if_empty()}}
-\item \href{#method-recover_parallel_temp_save}{\code{ffexp$recover_parallel_temp_save()}}
-\item \href{#method-rungrid2}{\code{ffexp$rungrid2()}}
-\item \href{#method-add_variable}{\code{ffexp$add_variable()}}
-\item \href{#method-add_level}{\code{ffexp$add_level()}}
-\item \href{#method-remove_results}{\code{ffexp$remove_results()}}
-\item \href{#method-print}{\code{ffexp$print()}}
-\item \href{#method-set_parallel_cores}{\code{ffexp$set_parallel_cores()}}
-\item \href{#method-stop_cluster}{\code{ffexp$stop_cluster()}}
-\item \href{#method-finalize}{\code{ffexp$finalize()}}
-\item \href{#method-clone}{\code{ffexp$clone()}}
+\item \href{#method-ffexp-new}{\code{ffexp$new()}}
+\item \href{#method-ffexp-run_all}{\code{ffexp$run_all()}}
+\item \href{#method-ffexp-run_for_time}{\code{ffexp$run_for_time()}}
+\item \href{#method-ffexp-run_superbatch}{\code{ffexp$run_superbatch()}}
+\item \href{#method-ffexp-run_one}{\code{ffexp$run_one()}}
+\item \href{#method-ffexp-add_result_of_one}{\code{ffexp$add_result_of_one()}}
+\item \href{#method-ffexp-plot_run_times}{\code{ffexp$plot_run_times()}}
+\item \href{#method-ffexp-plot_pairs}{\code{ffexp$plot_pairs()}}
+\item \href{#method-ffexp-plot}{\code{ffexp$plot()}}
+\item \href{#method-ffexp-calculate_effects}{\code{ffexp$calculate_effects()}}
+\item \href{#method-ffexp-calculate_effects2}{\code{ffexp$calculate_effects2()}}
+\item \href{#method-ffexp-save_self}{\code{ffexp$save_self()}}
+\item \href{#method-ffexp-create_save_folder_if_nonexistent}{\code{ffexp$create_save_folder_if_nonexistent()}}
+\item \href{#method-ffexp-rename_save_folder}{\code{ffexp$rename_save_folder()}}
+\item \href{#method-ffexp-delete_save_folder_if_empty}{\code{ffexp$delete_save_folder_if_empty()}}
+\item \href{#method-ffexp-recover_parallel_temp_save}{\code{ffexp$recover_parallel_temp_save()}}
+\item \href{#method-ffexp-rungrid2}{\code{ffexp$rungrid2()}}
+\item \href{#method-ffexp-add_variable}{\code{ffexp$add_variable()}}
+\item \href{#method-ffexp-add_level}{\code{ffexp$add_level()}}
+\item \href{#method-ffexp-remove_results}{\code{ffexp$remove_results()}}
+\item \href{#method-ffexp-print}{\code{ffexp$print()}}
+\item \href{#method-ffexp-set_parallel_cores}{\code{ffexp$set_parallel_cores()}}
+\item \href{#method-ffexp-stop_cluster}{\code{ffexp$stop_cluster()}}
+\item \href{#method-ffexp-finalize}{\code{ffexp$finalize()}}
+\item \href{#method-ffexp-clone}{\code{ffexp$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-ffexp-new"></a>}}
+\if{latex}{\out{\hypertarget{method-ffexp-new}{}}}
 \subsection{Method \code{new()}}{
 Create an `ffexp` object.
 \subsection{Usage}{
@@ -210,8 +210,8 @@ item to show up in the output data frame.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-run_all"></a>}}
-\if{latex}{\out{\hypertarget{method-run_all}{}}}
+\if{html}{\out{<a id="method-ffexp-run_all"></a>}}
+\if{latex}{\out{\hypertarget{method-ffexp-run_all}{}}}
 \subsection{Method \code{run_all()}}{
 Run an experiment. The user can choose
 to run all rows, or just specified ones, if it should
@@ -288,8 +288,8 @@ completed rows?}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-run_for_time"></a>}}
-\if{latex}{\out{\hypertarget{method-run_for_time}{}}}
+\if{html}{\out{<a id="method-ffexp-run_for_time"></a>}}
+\if{latex}{\out{\hypertarget{method-ffexp-run_for_time}{}}}
 \subsection{Method \code{run_for_time()}}{
 Run the experiment for a given time, not for a specified
 number of trials. Runs `batch_size` trials between checking the time
@@ -361,8 +361,8 @@ completed rows?}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-run_superbatch"></a>}}
-\if{latex}{\out{\hypertarget{method-run_superbatch}{}}}
+\if{html}{\out{<a id="method-ffexp-run_superbatch"></a>}}
+\if{latex}{\out{\hypertarget{method-ffexp-run_superbatch}{}}}
 \subsection{Method \code{run_superbatch()}}{
 Run batches. Allows for better progress visualization
 and saving when running in parallel
@@ -432,8 +432,8 @@ in parallel?}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-run_one"></a>}}
-\if{latex}{\out{\hypertarget{method-run_one}{}}}
+\if{html}{\out{<a id="method-ffexp-run_one"></a>}}
+\if{latex}{\out{\hypertarget{method-ffexp-run_one}{}}}
 \subsection{Method \code{run_one()}}{
 Run a single row of the experiment.
 You can specify which one to run.
@@ -483,8 +483,8 @@ function.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-add_result_of_one"></a>}}
-\if{latex}{\out{\hypertarget{method-add_result_of_one}{}}}
+\if{html}{\out{<a id="method-ffexp-add_result_of_one"></a>}}
+\if{latex}{\out{\hypertarget{method-ffexp-add_result_of_one}{}}}
 \subsection{Method \code{add_result_of_one()}}{
 Add the result of a single experiment to the object.
 This shouldn't be used by users.
@@ -527,8 +527,8 @@ This shouldn't be used by users.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-plot_run_times"></a>}}
-\if{latex}{\out{\hypertarget{method-plot_run_times}{}}}
+\if{html}{\out{<a id="method-ffexp-plot_run_times"></a>}}
+\if{latex}{\out{\hypertarget{method-ffexp-plot_run_times}{}}}
 \subsection{Method \code{plot_run_times()}}{
 Plot the run times of each trial.
 \subsection{Usage}{
@@ -537,8 +537,8 @@ Plot the run times of each trial.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-plot_pairs"></a>}}
-\if{latex}{\out{\hypertarget{method-plot_pairs}{}}}
+\if{html}{\out{<a id="method-ffexp-plot_pairs"></a>}}
+\if{latex}{\out{\hypertarget{method-ffexp-plot_pairs}{}}}
 \subsection{Method \code{plot_pairs()}}{
 Plot pairs of inputs and outputs.
 Helps see correlations and distributions.
@@ -548,8 +548,8 @@ Helps see correlations and distributions.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-plot"></a>}}
-\if{latex}{\out{\hypertarget{method-plot}{}}}
+\if{html}{\out{<a id="method-ffexp-plot"></a>}}
+\if{latex}{\out{\hypertarget{method-ffexp-plot}{}}}
 \subsection{Method \code{plot()}}{
 Calling `plot` on an `ffexp` object calls `plot_pairs()`
 \subsection{Usage}{
@@ -558,8 +558,8 @@ Calling `plot` on an `ffexp` object calls `plot_pairs()`
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-calculate_effects"></a>}}
-\if{latex}{\out{\hypertarget{method-calculate_effects}{}}}
+\if{html}{\out{<a id="method-ffexp-calculate_effects"></a>}}
+\if{latex}{\out{\hypertarget{method-ffexp-calculate_effects}{}}}
 \subsection{Method \code{calculate_effects()}}{
 Calculate the effects of each variable as if this
 was an experiment using a linear model.
@@ -569,8 +569,8 @@ was an experiment using a linear model.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-calculate_effects2"></a>}}
-\if{latex}{\out{\hypertarget{method-calculate_effects2}{}}}
+\if{html}{\out{<a id="method-ffexp-calculate_effects2"></a>}}
+\if{latex}{\out{\hypertarget{method-ffexp-calculate_effects2}{}}}
 \subsection{Method \code{calculate_effects2()}}{
 Calculate the effects of each variable as if this
 was an experiment using a linear model.
@@ -580,8 +580,8 @@ was an experiment using a linear model.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-save_self"></a>}}
-\if{latex}{\out{\hypertarget{method-save_self}{}}}
+\if{html}{\out{<a id="method-ffexp-save_self"></a>}}
+\if{latex}{\out{\hypertarget{method-ffexp-save_self}{}}}
 \subsection{Method \code{save_self()}}{
 Save this R6 object
 \subsection{Usage}{
@@ -598,8 +598,8 @@ Save this R6 object
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-create_save_folder_if_nonexistent"></a>}}
-\if{latex}{\out{\hypertarget{method-create_save_folder_if_nonexistent}{}}}
+\if{html}{\out{<a id="method-ffexp-create_save_folder_if_nonexistent"></a>}}
+\if{latex}{\out{\hypertarget{method-ffexp-create_save_folder_if_nonexistent}{}}}
 \subsection{Method \code{create_save_folder_if_nonexistent()}}{
 Create the save folder if it doesn't already exist.
 \subsection{Usage}{
@@ -608,8 +608,8 @@ Create the save folder if it doesn't already exist.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-rename_save_folder"></a>}}
-\if{latex}{\out{\hypertarget{method-rename_save_folder}{}}}
+\if{html}{\out{<a id="method-ffexp-rename_save_folder"></a>}}
+\if{latex}{\out{\hypertarget{method-ffexp-rename_save_folder}{}}}
 \subsection{Method \code{rename_save_folder()}}{
 Rename the save folder
 \subsection{Usage}{
@@ -629,8 +629,8 @@ just give the folder name.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-delete_save_folder_if_empty"></a>}}
-\if{latex}{\out{\hypertarget{method-delete_save_folder_if_empty}{}}}
+\if{html}{\out{<a id="method-ffexp-delete_save_folder_if_empty"></a>}}
+\if{latex}{\out{\hypertarget{method-ffexp-delete_save_folder_if_empty}{}}}
 \subsection{Method \code{delete_save_folder_if_empty()}}{
 Delete the save folder if it is empty.
 Used to prevent leaving behind empty folders.
@@ -648,8 +648,8 @@ Used to prevent leaving behind empty folders.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-recover_parallel_temp_save"></a>}}
-\if{latex}{\out{\hypertarget{method-recover_parallel_temp_save}{}}}
+\if{html}{\out{<a id="method-ffexp-recover_parallel_temp_save"></a>}}
+\if{latex}{\out{\hypertarget{method-ffexp-recover_parallel_temp_save}{}}}
 \subsection{Method \code{recover_parallel_temp_save()}}{
 Running this loads the information saved to files
 if `save_parallel_temp_save=TRUE` was used when running.
@@ -675,8 +675,8 @@ most have already been loaded to this object.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-rungrid2"></a>}}
-\if{latex}{\out{\hypertarget{method-rungrid2}{}}}
+\if{html}{\out{<a id="method-ffexp-rungrid2"></a>}}
+\if{latex}{\out{\hypertarget{method-ffexp-rungrid2}{}}}
 \subsection{Method \code{rungrid2()}}{
 Display the input rows of the experiment.
 rungrid just gives integers, this gives the actual values.
@@ -694,8 +694,8 @@ experiments, specifying the rows can be much faster.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-add_variable"></a>}}
-\if{latex}{\out{\hypertarget{method-add_variable}{}}}
+\if{html}{\out{<a id="method-ffexp-add_variable"></a>}}
+\if{latex}{\out{\hypertarget{method-ffexp-add_variable}{}}}
 \subsection{Method \code{add_variable()}}{
 Add a variable to the experiment. You must specify the
 value of the variable for all existing rows, and then also the values
@@ -723,8 +723,8 @@ object. Default FALSE.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-add_level"></a>}}
-\if{latex}{\out{\hypertarget{method-add_level}{}}}
+\if{html}{\out{<a id="method-ffexp-add_level"></a>}}
+\if{latex}{\out{\hypertarget{method-ffexp-add_level}{}}}
 \subsection{Method \code{add_level()}}{
 Add a level to one of the arguments. This returns a new
 object. The existing object is not changed.
@@ -747,8 +747,8 @@ object. Default FALSE.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-remove_results"></a>}}
-\if{latex}{\out{\hypertarget{method-remove_results}{}}}
+\if{html}{\out{<a id="method-ffexp-remove_results"></a>}}
+\if{latex}{\out{\hypertarget{method-ffexp-remove_results}{}}}
 \subsection{Method \code{remove_results()}}{
 Remove results of completed trials. They will be rerun
 next time $run_all() is called.
@@ -765,8 +765,8 @@ next time $run_all() is called.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
+\if{html}{\out{<a id="method-ffexp-print"></a>}}
+\if{latex}{\out{\hypertarget{method-ffexp-print}{}}}
 \subsection{Method \code{print()}}{
 Printing the object shows some
 summary information.
@@ -776,8 +776,8 @@ summary information.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-set_parallel_cores"></a>}}
-\if{latex}{\out{\hypertarget{method-set_parallel_cores}{}}}
+\if{html}{\out{<a id="method-ffexp-set_parallel_cores"></a>}}
+\if{latex}{\out{\hypertarget{method-ffexp-set_parallel_cores}{}}}
 \subsection{Method \code{set_parallel_cores()}}{
 Set the number of parallel cores to be used when
 running in parallel. Needed in case user sets "detect"
@@ -799,8 +799,8 @@ one fewer than there are.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-stop_cluster"></a>}}
-\if{latex}{\out{\hypertarget{method-stop_cluster}{}}}
+\if{html}{\out{<a id="method-ffexp-stop_cluster"></a>}}
+\if{latex}{\out{\hypertarget{method-ffexp-stop_cluster}{}}}
 \subsection{Method \code{stop_cluster()}}{
 Stop the parallel cluster.
 \subsection{Usage}{
@@ -809,8 +809,8 @@ Stop the parallel cluster.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-finalize"></a>}}
-\if{latex}{\out{\hypertarget{method-finalize}{}}}
+\if{html}{\out{<a id="method-ffexp-finalize"></a>}}
+\if{latex}{\out{\hypertarget{method-ffexp-finalize}{}}}
 \subsection{Method \code{finalize()}}{
 Cleanup after deleting object.
 \subsection{Usage}{
@@ -819,8 +819,8 @@ Cleanup after deleting object.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-ffexp-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-ffexp-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

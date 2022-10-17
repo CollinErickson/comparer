@@ -32,23 +32,23 @@ print(p1)
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-fromraw}{\code{par_log10$fromraw()}}
-\item \href{#method-toraw}{\code{par_log10$toraw()}}
-\item \href{#method-generate}{\code{par_log10$generate()}}
-\item \href{#method-new}{\code{par_log10$new()}}
-\item \href{#method-clone}{\code{par_log10$clone()}}
+\item \href{#method-par_log10-fromraw}{\code{par_log10$fromraw()}}
+\item \href{#method-par_log10-toraw}{\code{par_log10$toraw()}}
+\item \href{#method-par_log10-generate}{\code{par_log10$generate()}}
+\item \href{#method-par_log10-new}{\code{par_log10$new()}}
+\item \href{#method-par_log10-clone}{\code{par_log10$clone()}}
 }
 }
-\if{html}{
-\out{<details open ><summary>Inherited methods</summary>}
-\itemize{
-\item \out{<span class="pkg-link" data-pkg="comparer" data-topic="par_hype" data-id="getseq">}\href{../../comparer/html/par_hype.html#method-getseq}{\code{comparer::par_hype$getseq()}}\out{</span>}
-}
-\out{</details>}
-}
+\if{html}{\out{
+<details open><summary>Inherited methods</summary>
+<ul>
+<li><span class="pkg-link" data-pkg="comparer" data-topic="par_hype" data-id="getseq"><a href='../../comparer/html/par_hype.html#method-par_hype-getseq'><code>comparer::par_hype$getseq()</code></a></span></li>
+</ul>
+</details>
+}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-fromraw"></a>}}
-\if{latex}{\out{\hypertarget{method-fromraw}{}}}
+\if{html}{\out{<a id="method-par_log10-fromraw"></a>}}
+\if{latex}{\out{\hypertarget{method-par_log10-fromraw}{}}}
 \subsection{Method \code{fromraw()}}{
 Function to convert from raw scale to transformed scale
 \subsection{Usage}{
@@ -64,8 +64,8 @@ Function to convert from raw scale to transformed scale
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-toraw"></a>}}
-\if{latex}{\out{\hypertarget{method-toraw}{}}}
+\if{html}{\out{<a id="method-par_log10-toraw"></a>}}
+\if{latex}{\out{\hypertarget{method-par_log10-toraw}{}}}
 \subsection{Method \code{toraw()}}{
 Function to convert from transformed scale to raw scale
 \subsection{Usage}{
@@ -81,8 +81,8 @@ Function to convert from transformed scale to raw scale
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-generate"></a>}}
-\if{latex}{\out{\hypertarget{method-generate}{}}}
+\if{html}{\out{<a id="method-par_log10-generate"></a>}}
+\if{latex}{\out{\hypertarget{method-par_log10-generate}{}}}
 \subsection{Method \code{generate()}}{
 Generate values in the raw space based on quantiles.
 \subsection{Usage}{
@@ -98,8 +98,8 @@ Generate values in the raw space based on quantiles.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-par_log10-new"></a>}}
+\if{latex}{\out{\hypertarget{method-par_log10-new}{}}}
 \subsection{Method \code{new()}}{
 Create a hyperparameter with uniform distribution
 \subsection{Usage}{
@@ -119,8 +119,8 @@ Create a hyperparameter with uniform distribution
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-par_log10-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-par_log10-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

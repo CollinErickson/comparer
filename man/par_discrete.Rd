@@ -34,25 +34,19 @@ print(p1)
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-fromraw}{\code{par_discrete$fromraw()}}
-\item \href{#method-toraw}{\code{par_discrete$toraw()}}
-\item \href{#method-fromint}{\code{par_discrete$fromint()}}
-\item \href{#method-toint}{\code{par_discrete$toint()}}
-\item \href{#method-generate}{\code{par_discrete$generate()}}
-\item \href{#method-getseq}{\code{par_discrete$getseq()}}
-\item \href{#method-new}{\code{par_discrete$new()}}
-\item \href{#method-clone}{\code{par_discrete$clone()}}
+\item \href{#method-par_discrete-fromraw}{\code{par_discrete$fromraw()}}
+\item \href{#method-par_discrete-toraw}{\code{par_discrete$toraw()}}
+\item \href{#method-par_discrete-fromint}{\code{par_discrete$fromint()}}
+\item \href{#method-par_discrete-toint}{\code{par_discrete$toint()}}
+\item \href{#method-par_discrete-generate}{\code{par_discrete$generate()}}
+\item \href{#method-par_discrete-getseq}{\code{par_discrete$getseq()}}
+\item \href{#method-par_discrete-new}{\code{par_discrete$new()}}
+\item \href{#method-par_discrete-clone}{\code{par_discrete$clone()}}
 }
-}
-\if{html}{
-\out{<details open ><summary>Inherited methods</summary>}
-\itemize{
-}
-\out{</details>}
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-fromraw"></a>}}
-\if{latex}{\out{\hypertarget{method-fromraw}{}}}
+\if{html}{\out{<a id="method-par_discrete-fromraw"></a>}}
+\if{latex}{\out{\hypertarget{method-par_discrete-fromraw}{}}}
 \subsection{Method \code{fromraw()}}{
 Function to convert from raw scale to transformed scale
 \subsection{Usage}{
@@ -68,8 +62,8 @@ Function to convert from raw scale to transformed scale
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-toraw"></a>}}
-\if{latex}{\out{\hypertarget{method-toraw}{}}}
+\if{html}{\out{<a id="method-par_discrete-toraw"></a>}}
+\if{latex}{\out{\hypertarget{method-par_discrete-toraw}{}}}
 \subsection{Method \code{toraw()}}{
 Function to convert from transformed scale to raw scale
 \subsection{Usage}{
@@ -85,8 +79,8 @@ Function to convert from transformed scale to raw scale
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-fromint"></a>}}
-\if{latex}{\out{\hypertarget{method-fromint}{}}}
+\if{html}{\out{<a id="method-par_discrete-fromint"></a>}}
+\if{latex}{\out{\hypertarget{method-par_discrete-fromint}{}}}
 \subsection{Method \code{fromint()}}{
 Convert from integer index to actual value
 \subsection{Usage}{
@@ -102,8 +96,8 @@ Convert from integer index to actual value
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-toint"></a>}}
-\if{latex}{\out{\hypertarget{method-toint}{}}}
+\if{html}{\out{<a id="method-par_discrete-toint"></a>}}
+\if{latex}{\out{\hypertarget{method-par_discrete-toint}{}}}
 \subsection{Method \code{toint()}}{
 Convert from value to integer index
 \subsection{Usage}{
@@ -119,8 +113,8 @@ Convert from value to integer index
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-generate"></a>}}
-\if{latex}{\out{\hypertarget{method-generate}{}}}
+\if{html}{\out{<a id="method-par_discrete-generate"></a>}}
+\if{latex}{\out{\hypertarget{method-par_discrete-generate}{}}}
 \subsection{Method \code{generate()}}{
 Generate values in the raw space based on quantiles.
 \subsection{Usage}{
@@ -136,8 +130,8 @@ Generate values in the raw space based on quantiles.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getseq"></a>}}
-\if{latex}{\out{\hypertarget{method-getseq}{}}}
+\if{html}{\out{<a id="method-par_discrete-getseq"></a>}}
+\if{latex}{\out{\hypertarget{method-par_discrete-getseq}{}}}
 \subsection{Method \code{getseq()}}{
 Get a sequence, uniform on the transformed scale
 \subsection{Usage}{
@@ -153,8 +147,8 @@ Get a sequence, uniform on the transformed scale
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-par_discrete-new"></a>}}
+\if{latex}{\out{\hypertarget{method-par_discrete-new}{}}}
 \subsection{Method \code{new()}}{
 Create a hyperparameter with uniform distribution
 \subsection{Usage}{
@@ -172,8 +166,8 @@ Create a hyperparameter with uniform distribution
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-par_discrete-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-par_discrete-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

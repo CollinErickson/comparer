@@ -40,7 +40,7 @@ Suggests:
     reshape2,
     microbenchmark
 Remotes: CollinErickson/GauPro
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.1
 URL: https://github.com/CollinErickson/comparer
 BugReports: https://github.com/CollinErickson/comparer/issues
 VignetteBuilder: knitr
