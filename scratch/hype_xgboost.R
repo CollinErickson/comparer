@@ -40,13 +40,13 @@ h1 <- hype$new(
   eval_func=xgb_rmse,
   n_lhs=20,
   eta=par_log10$new('eta', 1e-4, 1e-1),
-  nrounds=par_unif$new('nrounds', 5, 100),
-  gamma=par_unif$new('gamma', 0, 1),
-  max_depth=par_unif$new('max_depth', 2, 12),
-  min_child_weight=par_unif$new('min_child_weight', 1, 10),
-  subsample=par_unif$new('subsample', .4, 1),
-  colsample_bytree=par_unif$new('colsample_bytree', .2, 1),
-  lambda=par_unif$new('lambda', 0, 3)
+  nrounds=par_unif('nrounds', 5, 100),
+  gamma=par_unif('gamma', 0, 1),
+  max_depth=par_unif('max_depth', 2, 12),
+  min_child_weight=par_unif('min_child_weight', 1, 10),
+  subsample=par_unif('subsample', .4, 1),
+  colsample_bytree=par_unif('colsample_bytree', .2, 1),
+  lambda=par_unif('lambda', 0, 3)
 )
 h1
 h1$run_all()

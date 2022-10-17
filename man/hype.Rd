@@ -14,8 +14,8 @@ Hyperparameter optimization
 h1 <- hype$new(
   eval_func = function(a, b) {data.frame(c=a^2+b^2, d=1:2)},
   extract_output_func = function(odf) {odf$c[1]},
-  a = par_unif$new('a', -1, 2),
-  b = par_unif$new('b', -10, 10),
+  a = par_unif('a', -1, 2),
+  b = par_unif('b', -10, 10),
   n_lhs = 10
 )
 h1$run_all()

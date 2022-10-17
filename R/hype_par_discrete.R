@@ -11,7 +11,7 @@
 #' p1 <- par_discrete$new('x1', c('a', 'b', 'c'))
 #' class(p1)
 #' print(p1)
-# par_log ----
+# par_discrete ----
 par_discrete <- R6::R6Class(
   classname="par_discrete",
   inherit = par_hype,

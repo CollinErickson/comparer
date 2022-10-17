@@ -7,10 +7,18 @@
 # @field toraw Function to convert from transformed scale to raw scale
 #' @field ggtrans Transformation for ggplot, see ggplot2::scale_x_continuous()
 #' @examples
-#' p1 <- par_unif$new('x1', 0, 2)
+#' p1 <- par_integer$new('x1', 0, 2)
 #' class(p1)
 #' print(p1)
-par_integer <- R6::R6Class(
+par_integer <- function(name, lower, upper) {
+  R6_par_integer$new(
+    name=name,
+    lower=lower,
+    upper=upper
+  )
+}
+
+R6_par_integer <- R6::R6Class(
   # par_unif ----
   classname="par_integer",
   inherit = par_hype,

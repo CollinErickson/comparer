@@ -5,7 +5,7 @@ test_that("hype works", {
   # Create params
   p1 <- par_hype$new()
   expect_true("par_hype" %in% class(p1))
-  p1 <- par_unif$new("a", -1, 1)
+  p1 <- par_unif("a", -1, 1)
   expect_true("par_unif" %in% class(p1))
   plog <- par_log10$new("a", 1e-8, 1)
   expect_true("par_log10" %in% class(plog))
@@ -42,7 +42,7 @@ test_that("hype works", {
   expect_error({
     h2 <- hype$new(eval_func = function(a, b) {a^2 - sin(2*pi*b)},
                    p1,
-                   par_unif$new("b", -1,1),
+                   par_unif("b", -1,1),
                    n_lhs=3)
   }, NA)
   expect_error(h2$run_all(), NA)
@@ -67,9 +67,9 @@ test_that("hype works", {
   # Break if not a param
   expect_error(hype$new(eval_func = function(a) {a^2}, sin, n_lhs=3))
   # Break if X0 given
-  expect_error(hype$new(eval_func = function(a) {a^2}, par_unif$new('a',1,3), X0=matrix(1:3, ncol=1), n_lhs=3))
+  expect_error(hype$new(eval_func = function(a) {a^2}, par_unif('a',1,3), X0=matrix(1:3, ncol=1), n_lhs=3))
   # Break if n_lhs not given
-  expect_error(hype$new(eval_func = function(a) {a^2}, par_unif$new('a',1,3)))
+  expect_error(hype$new(eval_func = function(a) {a^2}, par_unif('a',1,3)))
 
 })
 
@@ -93,9 +93,9 @@ test_that("Hype add data", {
   # 3 inputs, 2 matter, interaction
   expect_error({
     x9 <- hype$new(eval_func = f1,
-                   par_unif$new("a", -1, 1),
+                   par_unif("a", -1, 1),
                    par_log10$new("b", 10^-3, 10^4),
-                   par_unif$new("c", 1,2),
+                   par_unif("c", 1,2),
                    n_lhs=6)
     x9$run_all()
   }, NA)
@@ -122,9 +122,9 @@ test_that("Hype add data", {
   # Give in X0, but not Z0
   expect_error({
     r5 <- hype$new(eval_func = f1,
-                   par_unif$new("a", -1, 1),
+                   par_unif("a", -1, 1),
                    par_log10$new("b", 10^-3, 10^4),
-                   par_unif$new("c", 1,2),
+                   par_unif("c", 1,2),
                    X0=x0)
   }, NA)
   expect_true(length(r5$ffexp$completed_runs) == 10,
@@ -135,9 +135,9 @@ test_that("Hype add data", {
   # Give in X0 and Z0
   expect_error({
     r8 <- hype$new(eval_func = f1,
-                   par_unif$new("a", -1, 1),
+                   par_unif("a", -1, 1),
                    par_log10$new("b", 10^-3, 10^4),
-                   par_unif$new("c", 1,2),
+                   par_unif("c", 1,2),
                    X0=x0, Z0=y0)
   }, NA)
   # r8
@@ -146,7 +146,7 @@ test_that("Hype add data", {
   # Test changing parameter bounds
 
   n2 <- hype$new(eval_func = f1,
-                 par_unif$new("a", -1, 1),
+                 par_unif("a", -1, 1),
                  par_log10$new("b", 10^-3, 10^4),
                  par_log10$new("c", 1,100),
                  n_lhs=6)
@@ -177,9 +177,9 @@ test_that("Hype add data", {
 
   expect_error({
     hype$new(eval_func = f1,
-             par_unif$new("a", -1, 1),
+             par_unif("a", -1, 1),
              par_log10$new("b", 10^-3, 10^4),
-             par_unif$new("c", 1,2),
+             par_unif("c", 1,2),
              X0=list(a=runif(5)))
   })
 })
@@ -189,7 +189,7 @@ test_that("discrete params", {
   # Test discrete par
   expect_error({
   hp <- hype$new(eval_func = function(a, b, c) {-1e-3*a^2*log(b,10)^2*ifelse(c=='a', 1, 2) + rnorm(length(a),0,1e-1)},
-                 par_unif$new("a", 6, 8),
+                 par_unif("a", 6, 8),
                  par_log10$new("b", 1e-8, 1e-2),
                  par_discrete$new("c", c('a', 'b')),
                  n_lhs=21)

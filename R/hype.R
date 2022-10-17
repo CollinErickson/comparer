@@ -32,8 +32,8 @@
 #' h1 <- hype$new(
 #'   eval_func = function(a, b) {data.frame(c=a^2+b^2, d=1:2)},
 #'   extract_output_func = function(odf) {odf$c[1]},
-#'   a = par_unif$new('a', -1, 2),
-#'   b = par_unif$new('b', -10, 10),
+#'   a = par_unif('a', -1, 2),
+#'   b = par_unif('b', -10, 10),
 #'   n_lhs = 10
 #' )
 #' h1$run_all()
@@ -107,7 +107,7 @@ hype <- R6::R6Class(
       }
       dots <- list(...)
       if (length(dots) == 0) {
-        stop("No hyperparameters given. Give a par_unif$new to hype$new.")
+        stop("No hyperparameters given. Give a par_unif to hype$new.")
       }
       stopifnot(length(verbose) == 1, is.numeric(verbose))
       self$verbose <- verbose
@@ -1164,8 +1164,8 @@ hype <- R6::R6Class(
 if (F) {
   h1 <- hype$new(
     eval_func = function(a, b) {a^2+b^2},
-    a = par_unif$new('a', -1, 2),
-    b = par_unif$new('b', -10, 10),
+    a = par_unif('a', -1, 2),
+    b = par_unif('b', -10, 10),
     n_lhs = 10
   )
   h1
@@ -1192,8 +1192,8 @@ if (F) {
   h1 <- hype$new(
     eval_func = function(a, b) {data.frame(c=a^2+b^2, d=1:2)},
     extract_output_func = function(odf) {odf$c[1]},
-    a = par_unif$new('a', -1, 2),
-    b = par_unif$new('b', -10, 10),
+    a = par_unif('a', -1, 2),
+    b = par_unif('b', -10, 10),
     n_lhs = 10
   )
   h1$run_all()
