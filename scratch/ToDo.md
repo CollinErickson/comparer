@@ -43,12 +43,6 @@
 
 ## hype
 
-- Remove R6, so hype() instead of hype$new()
-
-- print for hype pars
-
--   move to new hype package?
-
 -   add hype to descr, readme, vignette
 
 -   tests
@@ -92,6 +86,9 @@
 - Add in verbose printouts
 
 - Only update GauPro model, instead of refit, when no change to spec
+
+- discrete should be unordered (latent). Add par_ordered (OrdredFactorKernel)
+and par_orderednum (numeric)
 
 ## MAB: multi-armed bandit
 

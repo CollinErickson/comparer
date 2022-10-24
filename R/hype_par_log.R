@@ -58,6 +58,15 @@ R6_par_log10 <- R6::R6Class(
       self$lower <- lower #log(lower, 10)
       self$upper <- upper #log(upper, 10)
       stopifnot(lower>0, upper>lower)
+    },
+    #' @description Print details of the object.
+    #' @param ... not used
+    print = function(...) {
+      s <- paste0("hype par_log(name = ", self$name,
+                  ", lower = ", self$lower,
+                  ", upper = ", self$upper, ")")
+      cat(s)
+      invisible(self)
     }
   )
 )

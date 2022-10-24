@@ -41,6 +41,7 @@ print(p1)
 \item \href{#method-par_discrete-generate}{\code{R6_par_discrete$generate()}}
 \item \href{#method-par_discrete-getseq}{\code{R6_par_discrete$getseq()}}
 \item \href{#method-par_discrete-new}{\code{R6_par_discrete$new()}}
+\item \href{#method-par_discrete-print}{\code{R6_par_discrete$print()}}
 \item \href{#method-par_discrete-clone}{\code{R6_par_discrete$clone()}}
 }
 }
@@ -161,6 +162,23 @@ Create a hyperparameter with uniform distribution
 \item{\code{name}}{Name of the parameter, must match the input to `eval_func`.}
 
 \item{\code{values}}{The values the variable can take on.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-par_discrete-print"></a>}}
+\if{latex}{\out{\hypertarget{method-par_discrete-print}{}}}
+\subsection{Method \code{print()}}{
+Print details of the object.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{R6_par_discrete$print(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{not used}
 }
 \if{html}{\out{</div>}}
 }

@@ -34,6 +34,7 @@ Parameter with uniform distribution for hyperparameter optimization
 \item \href{#method-par_unif-toraw}{\code{R6_par_unif$toraw()}}
 \item \href{#method-par_unif-generate}{\code{R6_par_unif$generate()}}
 \item \href{#method-par_unif-new}{\code{R6_par_unif$new()}}
+\item \href{#method-par_unif-print}{\code{R6_par_unif$print()}}
 \item \href{#method-par_unif-clone}{\code{R6_par_unif$clone()}}
 }
 }
@@ -112,6 +113,23 @@ Create a hyperparameter with uniform distribution
 \item{\code{lower}}{Lower bound of the parameter}
 
 \item{\code{upper}}{Upper bound of the parameter}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-par_unif-print"></a>}}
+\if{latex}{\out{\hypertarget{method-par_unif-print}{}}}
+\subsection{Method \code{print()}}{
+Print details of the object.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{R6_par_unif$print(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{not used,}
 }
 \if{html}{\out{</div>}}
 }

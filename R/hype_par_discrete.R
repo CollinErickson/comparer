@@ -84,6 +84,15 @@ R6_par_discrete <- R6::R6Class(
       self$values <- values
       self$lower <- values[1]
       self$upper <- values[length(values)]
+    },
+    #' @description Print details of the object.
+    #' @param ... not used
+    print = function(...) {
+      s <- paste0("hype par_discrete(name = ", self$name,
+                  ", values = ", paste(self$values, collapse=" "),
+                  ")")
+      cat(s)
+      invisible(self)
     }
   )
 )

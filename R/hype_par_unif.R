@@ -66,6 +66,14 @@ R6_par_unif <- R6::R6Class(
       # self$fromraw <- identity
       # self$toraw <- identity
       # self$ggtrans <- "identity" # ggplot trans to give to scale_x_continuous
+    },
+    #' @description Print details of the object.
+    #' @param ... not used,
+    print = function(...) {
+      s <- paste0("hype par_unif(name = ", self$name, ", lower = ", self$lower,
+                  ", upper = ", self$upper, ")")
+      cat(s)
+      invisible(self)
     }
   )
 )

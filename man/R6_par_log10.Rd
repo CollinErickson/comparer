@@ -36,6 +36,7 @@ print(p1)
 \item \href{#method-par_log10-toraw}{\code{R6_par_log10$toraw()}}
 \item \href{#method-par_log10-generate}{\code{R6_par_log10$generate()}}
 \item \href{#method-par_log10-new}{\code{R6_par_log10$new()}}
+\item \href{#method-par_log10-print}{\code{R6_par_log10$print()}}
 \item \href{#method-par_log10-clone}{\code{R6_par_log10$clone()}}
 }
 }
@@ -114,6 +115,23 @@ Create a hyperparameter with uniform distribution
 \item{\code{lower}}{Lower bound of the parameter}
 
 \item{\code{upper}}{Upper bound of the parameter}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-par_log10-print"></a>}}
+\if{latex}{\out{\hypertarget{method-par_log10-print}{}}}
+\subsection{Method \code{print()}}{
+Print details of the object.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{R6_par_log10$print(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{not used}
 }
 \if{html}{\out{</div>}}
 }
