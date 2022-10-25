@@ -67,7 +67,7 @@
 
 -   Don't print out all from ffexp, do progress
 
--   par_discrete: fix add LHS, EI search, plot, ...
+-   par_unordered: fix add LHS, EI search, plot, ...
 
 -   Make xgboost param tuning example
 
@@ -88,7 +88,8 @@
 - Only update GauPro model, instead of refit, when no change to spec
 
 - discrete should be unordered (latent). Add par_ordered (OrdredFactorKernel)
-and par_orderednum (numeric)
+and par_orderednum (numeric).
+discrete: unordered, ordered, discretenum
 
 ## MAB: multi-armed bandit
 

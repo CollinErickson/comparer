@@ -521,7 +521,7 @@ R6_hype <- R6::R6Class(
         # if (self$par_all_cts) {
         #   kern <- covtype
         # } else {
-        #   factorindsTF <- sapply(self$parlist, function(p) {"par_discrete" %in% class(p)})
+        #   factorindsTF <- sapply(self$parlist, function(p) {"par_unordered" %in% class(p)})
         #   factorinds <- which(factorindsTF)
         #   stopifnot(length(factorinds) == 1)
         #   kern1inner <-  if (covtype=="gauss") {
@@ -661,9 +661,11 @@ R6_hype <- R6::R6Class(
         self$modlist$type <-  "DK"
       } else if (tolower(model) %in% c("gaupro")) {
         if (self$par_all_cts) {
+          # All are continuous, so just give name of kernel
           kern <- covtype
         } else {
-          factorindsTF <- sapply(self$parlist, function(p) {"par_discrete" %in% class(p)})
+          # Not all are continuous, so set up kernel to match types
+          factorindsTF <- sapply(self$parlist, function(p) {"par_unordered" %in% class(p)})
           factorinds <- which(factorindsTF)
           stopifnot(length(factorinds) > 0.5)
           kern1inner <-  if (covtype=="gauss") {
@@ -989,7 +991,7 @@ R6_hype <- R6::R6Class(
           }
         }
         # Add points
-        if (any(c("par_discrete") %in% class(self$parlist[[i]]))) {
+        if (any(c("par_unordered") %in% class(self$parlist[[i]]))) {
           ggi <- ggi + ggplot2::geom_jitter(width=.15)
         } else {
           ggi <- ggi + ggplot2::geom_point()
@@ -1036,7 +1038,7 @@ R6_hype <- R6::R6Class(
         #   #ggplot2::facet_wrap(. ~ variable, scales='free_x') +
         #   ggplot2::scale_color_gradientn(colors=c('green', 'purple'))
         # ggi <- ggi + ggplot2::scale_y_continuous(trans=self$parlist[[i]]$ggtrans)
-        if (any(c("par_discrete") %in% class(self$parlist[[i]]))) {
+        if (any(c("par_unordered") %in% class(self$parlist[[i]]))) {
           ggi <- ggi + ggplot2::geom_point() #jitter(width=.15)
         } else {
           # Add horizontal lines at lower and upper

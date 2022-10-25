@@ -192,7 +192,7 @@ test_that("discrete params", {
     hp <- hype(eval_func = function(a, b, c) {-1e-3*a^2*log(b,10)^2*ifelse(c=='a', 1, 2) + rnorm(length(a),0,1e-1)},
                par_unif("a", 6, 8),
                par_log10("b", 1e-8, 1e-2),
-               par_discrete("c", c('a', 'b')),
+               par_unordered("c", c('a', 'b')),
                n_lhs=21)
   }, NA)
   expect_true(!hp$par_all_cts)
