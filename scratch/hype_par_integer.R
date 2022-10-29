@@ -1,4 +1,5 @@
-#' Parameter with uniform distribution for hyperparameter optimization
+#' Parameter with uniform distribution over integer range
+#' for hyperparameter optimization
 #' @export
 #' @field name Name of the parameter, must match the input to `eval_func`.
 #' @field lower Lower bound of the parameter
@@ -19,7 +20,7 @@ par_integer <- function(name, lower, upper) {
 }
 
 R6_par_integer <- R6::R6Class(
-  # par_unif ----
+  # R6_par_integer ----
   classname="par_integer",
   inherit = par_hype,
   public=list(

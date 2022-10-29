@@ -27,6 +27,7 @@ par_unordered <- function(name, values) {
 #' p1 <- par_unordered('x1', c('a', 'b', 'c'))
 #' class(p1)
 #' print(p1)
+# R6_par_unordered ----
 R6_par_unordered <- R6::R6Class(
   classname="par_unordered",
   inherit = par_hype,
