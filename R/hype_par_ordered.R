@@ -3,12 +3,12 @@
 #' @param name Name of the parameter, must match the input to `eval_func`.
 #' @param values Vector of values
 #' @examples
-#' p1 <- par_unordered('x1', c('a', 'b', 'c'))
+#' p1 <- par_ordered('x1', c('a', 'b', 'c'))
 #' class(p1)
 #' print(p1)
-# par_unordered ----
-par_unordered <- function(name, values) {
-  R6_par_unordered$new(
+# par_ordered ----
+par_ordered <- function(name, values) {
+  R6_par_ordered$new(
     name=name,
     values=values
   )
@@ -24,11 +24,11 @@ par_unordered <- function(name, values) {
 #' @field lower Lower bound of the parameter
 #' @field upper Upper bound of the parameter
 #' @examples
-#' p1 <- par_unordered('x1', c('a', 'b', 'c'))
+#' p1 <- par_ordered('x1', c('a', 'b', 'c'))
 #' class(p1)
 #' print(p1)
-R6_par_unordered <- R6::R6Class(
-  classname="par_unordered",
+R6_par_ordered <- R6::R6Class(
+  classname="par_ordered",
   inherit = par_hype,
   public=list(
     name=NULL,
@@ -84,7 +84,7 @@ R6_par_unordered <- R6::R6Class(
     #' @description Print details of the object.
     #' @param ... not used
     print = function(...) {
-      s <- paste0("hype par_unordered(name = ", self$name,
+      s <- paste0("hype par_ordered(name = ", self$name,
                   ", values = ", paste(self$values, collapse=" "),
                   ")")
       cat(s)
@@ -93,7 +93,7 @@ R6_par_unordered <- R6::R6Class(
   )
 )
 if (F) {
-  pd <- par_unordered('disc', letters[1:4])
+  pd <- par_ordered('disc', letters[1:4])
   pd
   pd$generate((0:10)/10)
   pd$generate(runif(10))
@@ -101,6 +101,6 @@ if (F) {
   pd$toint(letters[4:1])
   pd$fromint(3)
   pd$fromint(5:1)
-  par_unordered('a', c('a','b','b'))
+  par_ordered('a', c('a','b','b'))
 }
 

@@ -154,7 +154,7 @@ h1$plotX()
 h1$plotinteractions()
 
 
-# Test discrete par
+# Test unordered par
 h1 <- hype(eval_func = function(a, b, c) {-a^2*b^2*ifelse(c=='a', 1, 2)},
            par_unif("a", 6, 8),
            par_log10("b", 1e-8, 1e-2),
@@ -162,6 +162,16 @@ h1 <- hype(eval_func = function(a, b, c) {-a^2*b^2*ifelse(c=='a', 1, 2)},
            n_lhs=6)
 h1$run_all()
 h1$add_EI(1)
+
+# Test unordered and ordered par
+h2 <- hype(eval_func = function(a, b, c, d) {-a^2*b^2*ifelse(c=='a', 1, 2)*ifelse(d=='l',.6,1)},
+           par_unif("a", 6, 8),
+           par_log10("b", 1e-8, 1e-2),
+           par_unordered("c", c('a', 'b')),
+           par_ordered("d", c('j', 'k', 'l')),
+           n_lhs=6)
+h2$run_all()
+h2$add_EI(1)
 
 
 

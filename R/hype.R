@@ -590,8 +590,9 @@ R6_hype <- R6::R6Class(
         }
         # EIout <- list(par=EIout)
         if (just_return) {
+          # GauPro was added, no longer need to do this.
           # Add EI value to list
-          EIout$val <- self$mod$EI(x=EIout$par, minimize=TRUE, eps=eps)
+          # EIout$val <- self$mod$EI(x=EIout$par, minimize=TRUE, eps=eps)
         }
       } else {
         stop(paste("Model given to add_EI is not valid (", model, "), should be one of: DK"))
@@ -664,7 +665,6 @@ R6_hype <- R6::R6Class(
           # All are continuous, so just give name of kernel
           kern <- covtype
         } else {
-          # browser()
           if (FALSE) {
             # Not all are continuous, so set up kernel to match types
             factorindsTF <- sapply(self$parlist,
@@ -719,22 +719,39 @@ R6_hype <- R6::R6Class(
             unorderedinds <- which(sapply(self$parlist, function(par) {
               any(c("par_unordered") %in% class(par))
             }))
-            for (i in 1:length(unorderedinds)) {
-              kernellist <- c(
-                kernellist,
-                GauPro::LatentFactorKernel$new(
-                  D=length(self$parlist),
-                  nlevels=length(self$parlist[[unorderedinds[[i]]]]$values),
-                  xindex=unorderedinds[[i]],
-                  latentdim=if (length(self$parlist[[unorderedinds[[i]]]]$values
-                  ) < 3.5) {1} else {2}
+            if (length(unorderedinds) > .5) {
+              for (i in 1:length(unorderedinds)) {
+                kernellist <- c(
+                  kernellist,
+                  GauPro::LatentFactorKernel$new(
+                    D=length(self$parlist),
+                    nlevels=length(self$parlist[[unorderedinds[[i]]]]$values),
+                    xindex=unorderedinds[[i]],
+                    latentdim=if (length(self$parlist[[unorderedinds[[i]]]]$values
+                    ) < 3.5) {1} else {2}
+                  )
                 )
-              )
+              }
             }
             # Ordered inds (use OrderedFactorKernel)
+            orderedinds <- which(sapply(self$parlist, function(par) {
+              any(c("par_ordered") %in% class(par))
+            }))
+            if (length(orderedinds) > .5) {
+              for (i in 1:length(orderedinds)) {
+                kernellist <- c(
+                  kernellist,
+                  GauPro::OrderedFactorKernel$new(
+                    D=length(self$parlist),
+                    nlevels=length(self$parlist[[orderedinds[[i]]]]$values),
+                    xindex=orderedinds[[i]]
+                  )
+                )
+              }
+            }
 
             # Check that all inds showed up in at least one
-            allindsuseinkernels <- sort(c(numinds, unorderedinds))
+            allindsuseinkernels <- sort(c(numinds, unorderedinds, orderedinds))
             stopifnot(length(allindsuseinkernels) == length(self$parlist),
                       allindsuseinkernels == 1:length(self$parlist))
 
