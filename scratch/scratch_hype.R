@@ -160,6 +160,8 @@ h1 <- hype(eval_func = function(a, b, c) {-a^2*b^2*ifelse(c=='a', 1, 2)},
            par_log10("b", 1e-8, 1e-2),
            par_unordered("c", c('a', 'b')),
            n_lhs=6)
+h1$run_all()
+h1$add_EI(1)
 
 
 

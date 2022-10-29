@@ -73,6 +73,8 @@
 
 -   par_integer: hard part is optim
 
+- par_integer/discrete on log scale
+
 -   Remove unevaluated run. E.g., add EI but want to undo it.
 
 -   Plot run time
@@ -87,9 +89,13 @@
 
 - Only update GauPro model, instead of refit, when no change to spec
 
+- Remove old kernel construction
+
 - discrete should be unordered (latent). Add par_ordered (OrdredFactorKernel)
 and par_orderednum (numeric).
-discrete: unordered, ordered, discretenum
+discrete: unordered, ordered, discretenum.
+Add partype (one of cts, unordered, ordered, orderednum) in initialize,
+then use that to build kernel.
 
 ## MAB: multi-armed bandit
 
