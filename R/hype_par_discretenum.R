@@ -47,6 +47,14 @@ R6_par_discretenum <- R6::R6Class(
       stopifnot(inds>=1, inds <= length(self$values))
       self$values[inds]
     },
+    #' @description Get a sequence, uniform on the transformed scale
+    #' @param n Number of points. Ignored for discrete.
+    getseq = function(n) {
+      list(
+        trans=1:length(self$values),
+        raw=self$values
+      )
+    },
     ggtrans="identity", # ggplot trans to give to scale_x_continuous
     # fromraw=NULL,
     # toraw= NULL,
@@ -56,6 +64,7 @@ R6_par_discretenum <- R6::R6Class(
     #' @param values Numeric values, must be in ascending order
     initialize = function(name, values) {
       self$name <- name
+      stopifnot(is.numeric(values))
       stopifnot(diff(values) > 0)
       self$values <- values
     },

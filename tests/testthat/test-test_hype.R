@@ -1,5 +1,30 @@
 library(testthat)
 
+# Hype par
+test_that("hype par", {
+  # Create params
+  # generic
+  expect_error(p1 <- par_hype$new(), NA)
+  expect_true("par_hype" %in% class(p1))
+  # Uniform
+  expect_error(p1 <- par_unif("a", -1, 1), NA)
+  expect_true("par_unif" %in% class(p1))
+  # Log scale
+  expect_error(plog <- par_log10("a", 1e-8, 1), NA)
+  expect_true("par_log10" %in% class(plog))
+  # Unordered
+  expect_error(pun <- par_unordered("puno", letters), NA)
+  expect_error(capture.output(print(pun)), NA)
+  # Ordered
+  expect_error(por <- par_ordered("puno", letters), NA)
+  expect_error(capture.output(print(por)), NA)
+  # Discrete num
+  expect_error(pdn <- par_discretenum("puno", letters))
+  expect_error(pdn <- par_discretenum("puno", c(1,3,2)))
+  expect_error(pdn <- par_discretenum("puno", c(.1,1,19)), NA)
+  expect_error(capture.output(print(pdn)), NA)
+})
+
 # Hype basics ----
 test_that("hype works", {
   # Create params
@@ -211,3 +236,38 @@ test_that("discrete params", {
   # print('hpZ length is'); print(length(hp$Z))
   expect_equal(length(hp$Z), 22)
 })
+
+
+# hype with all param types ----
+test_that("hype with all params type", {
+  # Test all param types
+  expect_error({
+    hp <- hype(eval_func = function(a, b, c, d, e) {
+      -1e-3*a^2*log(b,10)^2*ifelse(c=='a', 1, 2) +
+        e +
+        rnorm(length(a),0,1e-1)
+    },
+    par_unif("a", 6, 8),
+    par_log10("b", 1e-8, 1e-2),
+    par_unordered("c", c('a', 'b')),
+    par_ordered("d", c('a', 'b')),
+    par_discretenum("e", c(1,3,10)),
+    n_lhs=21)
+  }, NA)
+  expect_true(!hp$par_all_cts)
+  hp$run_all()
+  expect_equal(length(hp$Z), 21)
+  expect_error({
+    hp$plotX(addEIlines = T, addlines = T)
+  }, NA)
+  expect_error({
+    hp$plotXorder()
+  }, NA)
+  expect_error({
+    hp$add_EI(1, model='gaupro')
+    hp$run_all()
+  }, NA)
+  # print('hpZ length is'); print(length(hp$Z))
+  expect_equal(length(hp$Z), 22)
+})
+
