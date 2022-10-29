@@ -511,6 +511,8 @@ test_that('parallel can be run even if initially set to false', {
   f1 <- ffexp$new(a=1:4,
                   eval_func=function(a,b,cc) {},
                   verbose=0, parallel=F,
+                  folder_path = paste0(getwd(), "/test8523-",
+                                       gsub(" ","_",gsub(":","-",Sys.time()))),
                   parallel_cores=1)
   expect_equal(f1$parallel_cores, 1)
   expect_error(f1$run_all(parallel=T, parallel_temp_save = F), NA)
@@ -520,18 +522,23 @@ test_that('parallel can be run even if initially set to false', {
   expect_equal(f1$parallel_cores, 2)
 
   # Delete at end
+  # Sleep so that there is time for the file to show up
+  Sys.sleep(.3)
   for (tmpfile in list.files(f1$folder_path)) {
     unlink(paste0(f1$folder_path, "//", tmpfile))
   }
   # Delete folder
   unlink(f1$folder_path, recursive=T)
 })
+
 test_that('remake cluster if connection doesn\'t work anymore', {
   # Skip tests with parallel=T on Travis, gives error
   testthat::skip_on_travis()
   f1 <- ffexp$new(a=1:4,
                   eval_func=function(a,b,cc) {},
                   verbose=0, parallel=T,
+                  folder_path = paste0(getwd(), "/test7733-",
+                                       gsub(" ","_",gsub(":","-",Sys.time()))),
                   parallel_cores=1)
   # Give it a cluster
   f1$parallel_cluster <- parallel::makeCluster(
@@ -543,11 +550,14 @@ test_that('remake cluster if connection doesn\'t work anymore', {
   expect_error(f1$run_all(to_run = 1:2), NA)
 
   # Delete at end
+  # Sleep so that there is time for the file to show up
+  Sys.sleep(.3)
   for (tmpfile in list.files(f1$folder_path)) {
     unlink(paste0(f1$folder_path, "//", tmpfile))
   }
   unlink(f1$folder_path, recursive=T)
 })
+
 if (F) {
   # Test recover_parallel_temp_save only_reload_new
   f1 <- ffexp$new(a=1:4,

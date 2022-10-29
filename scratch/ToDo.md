@@ -97,6 +97,8 @@ discrete: unordered, ordered, discretenum.
 Add partype (one of cts, unordered, ordered, orderednum) in initialize,
 then use that to build kernel.
 
+- par_discretenum: don't use all values for getseq
+
 ## MAB: multi-armed bandit
 
 -   run batches, easy access function, df/list input, log scale. Check that all have been run. Binary. Pass through args.
