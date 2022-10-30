@@ -242,13 +242,14 @@ test_that("discrete params", {
 })
 
 
-# hype with all param types ----
+# All param types ----
 test_that("hype with all params type", {
   # Test all param types
   expect_error({
-    hp <- hype(eval_func = function(a, b, c, d, e) {
+    hp <- hype(eval_func = function(a, b, c, d, e, f) {
       -1e-3*a^2*log(b,10)^2*ifelse(c=='a', 1, 2) +
         e +
+        .2*f +
         rnorm(length(a),0,1e-1)
     },
     par_unif("a", 6, 8),
@@ -256,6 +257,7 @@ test_that("hype with all params type", {
     par_unordered("c", c('a', 'b')),
     par_ordered("d", c('a', 'b')),
     par_discretenum("e", c(1,3,10)),
+    par_integer('f', 5, 15),
     n_lhs=21)
   }, NA)
   expect_true(!hp$par_all_cts)
@@ -273,5 +275,9 @@ test_that("hype with all params type", {
   }, NA)
   # print('hpZ length is'); print(length(hp$Z))
   expect_equal(length(hp$Z), 22)
+  expect_error({
+    hp$add_EI(2, model='gaupro')
+    hp$run_all()
+  }, NA)
 })
 

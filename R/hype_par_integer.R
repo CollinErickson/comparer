@@ -1,14 +1,11 @@
 #' Parameter with uniform distribution over integer range
 #' for hyperparameter optimization
 #' @export
-#' @field name Name of the parameter, must match the input to `eval_func`.
-#' @field lower Lower bound of the parameter
-#' @field upper Upper bound of the parameter
-# @field fromraw Function to convert from raw scale to transformed scale
-# @field toraw Function to convert from transformed scale to raw scale
-#' @field ggtrans Transformation for ggplot, see ggplot2::scale_x_continuous()
+#' @param name Name of the parameter, must match the input to `eval_func`.
+#' @param lower Lower bound of the parameter
+#' @param upper Upper bound of the parameter
 #' @examples
-#' p1 <- par_integer('x1', 0, 2)
+#' p1 <- par_integer('x1', 3, 8)
 #' class(p1)
 #' print(p1)
 par_integer <- function(name, lower, upper) {
@@ -19,6 +16,19 @@ par_integer <- function(name, lower, upper) {
   )
 }
 
+#' Parameter with uniform distribution over integer range
+#' for hyperparameter optimization
+#' @export
+#' @field name Name of the parameter, must match the input to `eval_func`.
+#' @field lower Lower bound of the parameter
+#' @field upper Upper bound of the parameter
+# @field fromraw Function to convert from raw scale to transformed scale
+# @field toraw Function to convert from transformed scale to raw scale
+#' @field ggtrans Transformation for ggplot, see ggplot2::scale_x_continuous()
+#' @examples
+#' p1 <- R6_par_integer$new('x1', 0, 2)
+#' class(p1)
+#' print(p1)
 R6_par_integer <- R6::R6Class(
   # R6_par_integer ----
   classname="par_integer",
@@ -36,13 +46,10 @@ R6_par_integer <- R6::R6Class(
     #' @description Generate values in the raw space based on quantiles.
     #' @param q In [0,1].
     generate = function(q) {
-      # self$lower + q * (self$upper - self$lower)
+      # Use the 1e-16 to avoid 1 mapping above upper
       self$lower + floor(q*(1-1e-16) * (self$upper + 1 - self$lower))
     },
     ggtrans="identity", # ggplot trans to give to scale_x_continuous
-    # fromraw=NULL,
-    # toraw= NULL,
-    # ggtrans=NULL, # ggplot trans to give to scale_x_continuous
     #' @description Create a hyperparameter with uniform distribution
     #' @param name Name of the parameter, must match the input to `eval_func`.
     #' @param lower Lower bound of the parameter

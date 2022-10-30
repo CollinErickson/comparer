@@ -504,10 +504,11 @@ R6_hype <- R6::R6Class(
         }
         if (n==1) {
           # Suppress "Stopped because hard maximum generation limit was hit"
-          EIout <- suppressWarnings(DiceOptim::max_EI(model=self$mod,
-                                                      lower=self$parlowertrans,
-                                                      upper=self$paruppertrans,
-                                                      control=list(print.level=0)))
+          EIout <- suppressWarnings(DiceOptim::max_EI(
+            model=self$mod,
+            lower=self$parlowertrans,
+            upper=self$paruppertrans,
+            control=list(print.level=0)))
         } else {
           # Select multiple points to be evaluated, useful when running in parallel
           # Suppress "Stopped because hard maximum generation limit was hit."
@@ -595,7 +596,8 @@ R6_hype <- R6::R6Class(
           # EIout$val <- self$mod$EI(x=EIout$par, minimize=TRUE, eps=eps)
         }
       } else {
-        stop(paste("Model given to add_EI is not valid (", model, "), should be one of: DK"))
+        stop(paste("Model given to add_EI is not valid (", model,
+                   "), should be one of: DK"))
       }
       if (just_return) {
         return(EIout)
@@ -603,7 +605,8 @@ R6_hype <- R6::R6Class(
       newXtrans <- EIout$par
       newXraw <- self$convert_trans_to_raw(newXtrans)
       nameoflevel <- "Xdfraw" #if (length(self$parnames) > 1) {"Xdf"} else {self$ffexp$allvars$name[1]}
-      updatedffexp <- self$ffexp$add_level(nameoflevel, newXraw, suppressMessage=TRUE)
+      updatedffexp <- self$ffexp$add_level(nameoflevel, newXraw,
+                                           suppressMessage=TRUE)
       self$ffexp <- updatedffexp
       invisible(self)
     },
@@ -669,7 +672,9 @@ R6_hype <- R6::R6Class(
           kernellist <- list()
           # Numeric indexes first (cts, log, discretenum)
           numinds <- which(sapply(self$parlist, function(par) {
-            any(c("par_unif", "par_log10", "par_discretenum") %in% class(par))
+            any(c("par_unif", "par_log10",
+                  "par_discretenum",
+                  "par_integer") %in% class(par))
           }))
           if (length(numinds) > .5) {
             kern1inner <-  if (covtype=="gauss") {
