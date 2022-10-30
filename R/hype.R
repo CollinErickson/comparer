@@ -605,7 +605,7 @@ R6_hype <- R6::R6Class(
       newXtrans <- EIout$par
       newXraw <- self$convert_trans_to_raw(newXtrans)
       for (i in 1:length(self$parlist)) {
-        i_isvalid <- self$parlist[[i]]$isvalid(newXraw[, i])
+        i_isvalid <- all(self$parlist[[i]]$isvalid(newXraw[, i]))
         if (!i_isvalid) {
           warning(paste0("add_EI returned invalid value for index ", i))
         }
