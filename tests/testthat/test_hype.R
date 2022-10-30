@@ -221,6 +221,10 @@ test_that("discrete params", {
                n_lhs=21)
   }, NA)
   expect_true(!hp$par_all_cts)
+  # plotX doesn't work until something has been evaluated
+  expect_error(hp$plotX())
+  expect_error(hp$plotXorder())
+  expect_error(hp$plotinteractions())
   hp$run_all()
   expect_equal(length(hp$Z), 21)
   expect_error({

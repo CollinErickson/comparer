@@ -89,8 +89,6 @@
 
 - Only update GauPro model, instead of refit, when no change to spec
 
-- Remove old kernel construction
-
 - discrete should be unordered (latent). Add par_ordered (OrdredFactorKernel)
 and par_orderednum (numeric).
 discrete: unordered, ordered, discretenum.
