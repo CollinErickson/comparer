@@ -418,13 +418,15 @@ R6_hype <- R6::R6Class(
       parind <- which(parname == self$parnames)
       stopifnot(length(parind) == 1)
       if (!missing(lower)) {
-        stopifnot(!is.null(lower), !is.na(lower), length(lower) == 1, is.numeric(lower))
+        stopifnot(!is.null(lower), !is.na(lower),
+                  length(lower) == 1, is.numeric(lower))
         self$parlist[[parind]]$lower <- lower
         self$parlowerraw[[parind]] <- lower
         self$parlowertrans[[parind]] <- self$parlist[[parind]]$fromraw(lower)
       }
       if (!missing(upper)) {
-        stopifnot(!is.null(upper), !is.na(upper), length(upper) == 1, is.numeric(upper))
+        stopifnot(!is.null(upper), !is.na(upper),
+                  length(upper) == 1, is.numeric(upper))
         self$parlist[[parind]]$upper <- upper
         self$parupperraw[[parind]] <- upper
         self$paruppertrans[[parind]] <- self$parlist[[parind]]$fromraw(upper)
@@ -512,11 +514,12 @@ R6_hype <- R6::R6Class(
         } else {
           # Select multiple points to be evaluated, useful when running in parallel
           # Suppress "Stopped because hard maximum generation limit was hit."
-          EIout <- suppressWarnings(DiceOptim::max_qEI(model=self$mod,
-                                                       npoints=n,
-                                                       crit="CL", # exact was very slow for more than a couple
-                                                       lower=self$parlowertrans,
-                                                       upper=self$paruppertrans))
+          EIout <- suppressWarnings(DiceOptim::max_qEI(
+            model=self$mod,
+            npoints=n,
+            crit="CL", # exact was very slow for more than a couple
+            lower=self$parlowertrans,
+            upper=self$paruppertrans))
         }
       } else if ("GauPro" %in% class(self$mod)) {#tolower(model) %in% c("gaupro")) {
         # if (self$par_all_cts) {
@@ -656,7 +659,8 @@ R6_hype <- R6::R6Class(
       stopifnot(length(model) == 1, is.character(model))
       if (tolower(model) %in% c('dk', 'dice', 'dicekriging')) {
         if (!self$par_all_cts) {
-          stop("Can only add EI if all parameters are continuous (par_unif, par_log10)")
+          stop(paste0("Can only add EI if all parameters are continuous",
+                      " (par_unif, par_log10)"))
         }
         self$modlist$mod <- DiceKriging::km(formula = ~1,
                                             covtype=covtype,
@@ -754,7 +758,8 @@ R6_hype <- R6::R6Class(
         # self$modlist <- list(model='gaupro')
         self$modlist$type <- "GauPro"
       } else {
-        stop(paste("Model given is not valid (", model, "), should be one of: DK"))
+        stop(paste("Model given is not valid (", model,
+                   "), should be one of: DK"))
       }
 
       self$modlist$needs_update <- FALSE
@@ -803,7 +808,8 @@ R6_hype <- R6::R6Class(
                                model="DK", eps=0,
                                ...) {
       pb <- progress::progress_bar$new(
-        format=paste0("  Running for time (:spin) [:bar] :elapsed / ", sec, "s"),
+        format=paste0("  Running for time (:spin) [:bar] :elapsed / ",
+                      sec, "s"),
         total=sec)
       pb$tick(0)
       start_time <- Sys.time() #proc.time()
@@ -820,12 +826,16 @@ R6_hype <- R6::R6Class(
         self$run_all(verbose=0, ...)
         # Increment
         ncompleted <- ncompleted + batch_size
-        pb$update(ratio=min(1, as.numeric(Sys.time() - start_time, units='secs') / sec))
+        pb$update(ratio=min(1, as.numeric(Sys.time() - start_time,
+                                          units='secs') / sec))
       }
       pb$terminate()
       message(paste0("Completed ", ncompleted, " new points in ",
-                     round(as.numeric(Sys.time() - start_time, units='secs'), 1), " seconds\n",
-                     "Reduced minimum from ", signif(minbefore,5), " to ", signif(min(self$Z),5)))
+                     round(as.numeric(Sys.time() - start_time,
+                                      units='secs'), 1),
+                     " seconds\n",
+                     "Reduced minimum from ", signif(minbefore,5),
+                     " to ", signif(min(self$Z),5)))
       invisible(self)
     },
     #' @description Make a plot to summarize the experiment.
@@ -843,20 +853,27 @@ R6_hype <- R6::R6Class(
           si <- colnames(df)[i]
           sj <- colnames(df)[j]
           if (i == j) {
-            p <- ggplot2::ggplot(df, ggplot2::aes_string(si)) + ggplot2::geom_histogram(bins = 30)
+            p <- ggplot2::ggplot(df, ggplot2::aes_string(si)) +
+              ggplot2::geom_histogram(bins = 30)
             if (i < ncol(df)) {
-              p <- p + ggplot2::scale_x_continuous(trans = self$parlist[[i]]$ggtrans)
+              p <- p +
+                ggplot2::scale_x_continuous(trans = self$parlist[[i]]$ggtrans)
             }
           } else {
-            p <- ggplot2::ggplot(df, ggplot2::aes_string(si, sj, color=colnames(df)[ncol(df)])) +
+            p <- ggplot2::ggplot(df,
+                                 ggplot2::aes_string(
+                                   si, sj,
+                                   color=colnames(df)[ncol(df)])) +
               ggplot2::geom_point() +
               ggplot2::theme(legend.position = "none") +
               ggplot2::scale_color_gradientn(colors=c('green', 'purple'))
             if (i < ncol(df)) {
-              p <- p + ggplot2::scale_x_continuous(trans = self$parlist[[i]]$ggtrans)
+              p <- p +
+                ggplot2::scale_x_continuous(trans = self$parlist[[i]]$ggtrans)
             }
             if (j < ncol(df)) {
-              p <- p + ggplot2::scale_y_continuous(trans = self$parlist[[j]]$ggtrans)
+              p <- p +
+                ggplot2::scale_y_continuous(trans = self$parlist[[j]]$ggtrans)
             }
           }
           if (i > 1) {
@@ -936,7 +953,8 @@ R6_hype <- R6::R6Class(
             predXtransdf <- as.data.frame(predXtrans)
             names(predXtransdf) <- names(self$X)
             if ("km" %in% class(self$mod)) {
-              predout <- DiceKriging::predict.km(self$mod, predXtransdf, type="SK", light.return = T)
+              predout <- DiceKriging::predict.km(self$mod, predXtransdf,
+                                                 type="SK", light.return = T)
             } else if ("GauPro" %in% class(self$mod)) {
               predout <- suppressWarnings({
                 self$mod$pred(as.matrix(predXtransdf), se.fit=TRUE)
@@ -1013,7 +1031,8 @@ R6_hype <- R6::R6Class(
 
       ggs <- list()
       for (i in 1:ncol(Xtrans)) {
-        dfi <- data.frame(value=self$X[, i], Z=self$Z, Rank=order(order(self$Z)))
+        dfi <- data.frame(value=self$X[, i], Z=self$Z,
+                          Rank=order(order(self$Z)))
         # ggi <- ggplot2::ggplot(reshape2::melt(tdf, id.vars=c('Z', 'Rank')),
         #                        ggplot2::aes(value, Z, color=Rank))
         ggi <- ggplot2::ggplot(dfi,
@@ -1038,7 +1057,7 @@ R6_hype <- R6::R6Class(
               ggplot2::geom_line(data=preddfi, ggplot2::aes(valueraw, upper95,color=NULL), alpha=.2)
           } else {
             ggi <- ggi +
-              ggplot2::geom_point(data=preddfi, ggplot2::aes(valueraw,    mean,color=NULL), shape=18, size=3) +
+              ggplot2::geom_point(data=preddfi,ggplot2::aes(valueraw,    mean,color=NULL), shape=18, size=3) +
               ggplot2::geom_point(data=preddfi, ggplot2::aes(valueraw, lower95,color=NULL), shape=18, size=3) +
               ggplot2::geom_point(data=preddfi, ggplot2::aes(valueraw, upper95,color=NULL), shape=18, size=3)
           }
@@ -1053,7 +1072,8 @@ R6_hype <- R6::R6Class(
           #ggplot2::facet_wrap(. ~ variable, scales='free_x') +
           ggplot2::scale_color_gradientn(colors=c('green', 'purple'))
         if (any(c("par_log10") %in% class(self$parlist[[i]]))) {
-          ggi <- ggi + ggplot2::scale_x_continuous(trans=self$parlist[[i]]$ggtrans)
+          ggi <- ggi +
+            ggplot2::scale_x_continuous(trans=self$parlist[[i]]$ggtrans)
         }
         ggi <- ggi + ggplot2::xlab(self$parnames[i])
         if (i > 1) {
@@ -1076,7 +1096,8 @@ R6_hype <- R6::R6Class(
       if (is.null(self$X) || is.null(self$Z)) {
         stop("Nothing has been evaluated yet. Call $run_all() first.")
       }
-      stopifnot(!is.null(self$X), !is.null(self$Z), nrow(self$X) == length(self$Z))
+      stopifnot(!is.null(self$X), !is.null(self$Z),
+                nrow(self$X) == length(self$Z))
       Xtrans <- self$convert_raw_to_trans(self$X)
 
       ggs <- list()
@@ -1104,7 +1125,8 @@ R6_hype <- R6::R6Class(
           #ggplot2::facet_wrap(. ~ variable, scales='free_x') +
           ggplot2::scale_color_gradientn(colors=c('green', 'purple'))
         if (any(c("par_log10") %in% class(self$parlist[[i]]))) {
-          ggi <- ggi + ggplot2::scale_y_continuous(trans=self$parlist[[i]]$ggtrans)
+          ggi <- ggi +
+            ggplot2::scale_y_continuous(trans=self$parlist[[i]]$ggtrans)
         }
         ggi <- ggi + ggplot2::ylab(self$parnames[i])
         if (i > 1) {
@@ -1124,7 +1146,8 @@ R6_hype <- R6::R6Class(
     #' @param nugget.estim Should a nugget be estimated?
     plotinteractions = function(covtype="matern5_2", nugget.estim=TRUE) {
       if (is.null(self$X) || is.null(self$Z)) {
-        stop("Nothing has been evaluated yet. Call $run_all() first. Use $plotX instead.")
+        stop(paste0("Nothing has been evaluated yet.",
+                    " Call $run_all() first. Use $plotX instead."))
       }
       if (ncol(self$X) == 1) {
         stop("Can't plot interactions with single input.")
@@ -1150,20 +1173,26 @@ R6_hype <- R6::R6Class(
       predfunc <- function(X) {
         Xdf <- as.data.frame(X)
         colnames(Xdf) <- colnames(self$X)
-        pred <- DiceKriging::predict.km(mod, Xdf, type="sk", light.return = T, se.compute = F)
+        pred <- DiceKriging::predict.km(mod, Xdf, type="sk",
+                                        light.return = T, se.compute = F)
         pred$mean
       }
       if (ncol(self$X) < 2.5) {
-        ContourFunctions::cf_func(predfunc, batchmax = Inf, bar=T,
-                                  xlim = c(self$parlowertrans[1], self$paruppertrans[1]),
-                                  ylim = c(self$parlowertrans[2], self$paruppertrans[2]),
-                                  pts=self$X, gg=TRUE) #+ ggplot2::xlab("xxxx")
+        ContourFunctions::cf_func(
+          predfunc, batchmax = Inf, bar=T,
+          xlim = c(self$parlowertrans[1], self$paruppertrans[1]),
+          ylim = c(self$parlowertrans[2], self$paruppertrans[2]),
+          pts=self$X, gg=TRUE
+        ) #+ ggplot2::xlab("xxxx")
       } else {
-        ContourFunctions::cf_highdim(predfunc, D=ncol(self$X), baseline=min_Xvectrans,
+        ContourFunctions::cf_highdim(predfunc, D=ncol(self$X),
+                                     baseline=min_Xvectrans,
                                      batchmax = Inf,
-                                     pts=matrix(min_Xvectrans, nrow=1), #pts=as.matrix(self$X),
+                                     pts=matrix(min_Xvectrans, nrow=1),
+                                     #pts=as.matrix(self$X),
                                      var_names = colnames(self$X),
-                                     low = self$parlowertrans, high=self$paruppertrans)
+                                     low = self$parlowertrans,
+                                     high=self$paruppertrans)
       }
     },
     #' @description Print details of the object.
@@ -1171,8 +1200,10 @@ R6_hype <- R6::R6Class(
     print = function(...) {
       ts <- paste0(
         "hype object:",
-        "\n\td = ", if (is.null(self$X)) {ncol(self$ffexp$rungrid2())} else {ncol(self$X)},
-        "\n\tn = ", if (is.null(self$X)) {nrow(self$ffexp$rungrid2())} else {nrow(self$X)},
+        "\n\td = ", if (is.null(self$X)) {
+          ncol(self$ffexp$rungrid2())} else {ncol(self$X)},
+        "\n\tn = ", if (is.null(self$X)) {
+          nrow(self$ffexp$rungrid2())} else {nrow(self$X)},
         if (!all(self$ffexp$completed_runs)) {
           paste0(" (", sum(!self$ffexp$completed_runs)," unevaluated)")
         } else {''},
@@ -1237,7 +1268,8 @@ R6_hype <- R6::R6Class(
       }
       if (!is.null(covtype)) {
         stopifnot(is.character(covtype), length(covtype) == 1)
-        if (!(covtype %in% c("matern5_2", "matern3_2", "exp", "powexp", "gauss"))) {
+        if (!(covtype %in% c("matern5_2", "matern3_2", "exp",
+                             "powexp", "gauss"))) {
           stop(paste0('covtype must be one of: ',
                       '"matern5_2", "matern3_2", "exp", "powexp", "gauss"'))
         }
