@@ -50,6 +50,13 @@ R6_par_unif <- R6::R6Class(
     generate = function(q) {
       self$lower + q * (self$upper - self$lower)
     },
+    #' @description Check if input is valid for parameter
+    #' @param x Parameter value
+    isvalid = function(x) {
+      is.numeric(x) &
+        (x >= self$lower) &
+        (x <= self$upper)
+    },
     ggtrans="identity", # ggplot trans to give to scale_x_continuous
     # fromraw=NULL,
     # toraw= NULL,

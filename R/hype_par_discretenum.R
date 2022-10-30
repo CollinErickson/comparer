@@ -55,6 +55,12 @@ R6_par_discretenum <- R6::R6Class(
         raw=self$values
       )
     },
+    #' @description Check if input is valid for parameter
+    #' @param x Parameter value
+    isvalid = function(x) {
+      is.numeric(x) &
+        sapply(x, function(x) {any(abs(x - self$values) < 1e-15)})
+    },
     ggtrans="identity", # ggplot trans to give to scale_x_continuous
     # fromraw=NULL,
     # toraw= NULL,

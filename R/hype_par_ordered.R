@@ -70,6 +70,21 @@ R6_par_ordered <- R6::R6Class(
         raw=self$values
       )
     },
+    #' @description Check if input is valid for parameter
+    #' @param x Parameter value
+    isvalid = function(x) {
+      if (is.numeric(self$values)) {
+        is.numeric(x) &
+          sapply(x, function(x) {any(abs(x - self$values) < 1e-15)})
+      } else if (is.character(self$values)) {
+        is.character(x) &
+          sapply(x, function(x) {any(x %in% self$values)})
+      } else if (is.logical(self$values)) {
+        rep(is.logical(x), length(x))
+      } else {
+        rep(TRUE, length(x))
+      }
+    },
     ggtrans="identity", # ggplot trans to give to scale_x_continuous
     #' @description Create a hyperparameter with uniform distribution
     #' @param name Name of the parameter, must match the input to `eval_func`.

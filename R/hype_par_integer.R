@@ -8,6 +8,7 @@
 #' p1 <- par_integer('x1', 3, 8)
 #' class(p1)
 #' print(p1)
+#' table(p1$generate(runif(1000)))
 par_integer <- function(name, lower, upper) {
   R6_par_integer$new(
     name=name,
@@ -48,6 +49,14 @@ R6_par_integer <- R6::R6Class(
     generate = function(q) {
       # Use the 1e-16 to avoid 1 mapping above upper
       self$lower + floor(q*(1-1e-16) * (self$upper + 1 - self$lower))
+    },
+    #' @description Check if input is valid for parameter
+    #' @param x Parameter value
+    isvalid = function(x) {
+      is.numeric(x) &
+        (abs(x - round(x)) < 1e-8) &
+        (x >= self$lower) &
+        (x <= self$upper)
     },
     ggtrans="identity", # ggplot trans to give to scale_x_continuous
     #' @description Create a hyperparameter with uniform distribution

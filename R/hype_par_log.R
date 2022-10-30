@@ -46,7 +46,15 @@ R6_par_log10 <- R6::R6Class(
     #' @description Generate values in the raw space based on quantiles.
     #' @param q In [0,1].
     generate = function(q) {
-      self$toraw(self$fromraw(self$lower) + q * (self$fromraw(self$upper) - self$fromraw(self$lower)))
+      self$toraw(self$fromraw(self$lower) +
+                   q * (self$fromraw(self$upper) - self$fromraw(self$lower)))
+    },
+    #' @description Check if input is valid for parameter
+    #' @param x Parameter value
+    isvalid = function(x) {
+      is.numeric(x) &
+        (x >= self$lower) &
+        (x <= self$upper)
     },
     ggtrans="log10", # ggplot trans to give to scale_x_continuous
     #' @description Create a hyperparameter with uniform distribution
