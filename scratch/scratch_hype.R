@@ -21,6 +21,8 @@ h1$run_all()
 # h1$plotX2()
 h1$add_LHS(13)
 h1$run_all()
+h1$add_EI(1)
+h1$run_all()
 h1$plotX()
 h1$plotinteractions()
 

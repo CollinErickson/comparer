@@ -1,6 +1,3 @@
-
-
-
 # hype ----
 #' Hyperparameter optimization
 #'
@@ -607,7 +604,12 @@ R6_hype <- R6::R6Class(
       }
       newXtrans <- EIout$par
       newXraw <- self$convert_trans_to_raw(newXtrans)
-      # TODO: Check here if newXraw isvalid
+      for (i in 1:length(self$parlist)) {
+        i_isvalid <- self$parlist[[i]]$isvalid(newXraw[, i])
+        if (!i_isvalid) {
+          warning(paste0("add_EI returned invalid value for index ", i))
+        }
+      }
       # Add new par to experiment
       nameoflevel <- "Xdfraw" #if (length(self$parnames) > 1) {"Xdf"} else {self$ffexp$allvars$name[1]}
       updatedffexp <- self$ffexp$add_level(nameoflevel, newXraw,

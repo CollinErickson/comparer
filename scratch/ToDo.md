@@ -97,8 +97,6 @@ then use that to build kernel.
 
 - par_discretenum, par_integer: don't use all values for getseq
 
-- After EI, check that chosen par is valid
-
 - Generate: make sure between 0 and 1
 
 ## MAB: multi-armed bandit
