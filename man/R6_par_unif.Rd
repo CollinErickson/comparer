@@ -33,6 +33,7 @@ Parameter with uniform distribution for hyperparameter optimization
 \item \href{#method-par_unif-fromraw}{\code{R6_par_unif$fromraw()}}
 \item \href{#method-par_unif-toraw}{\code{R6_par_unif$toraw()}}
 \item \href{#method-par_unif-generate}{\code{R6_par_unif$generate()}}
+\item \href{#method-par_unif-isvalid}{\code{R6_par_unif$isvalid()}}
 \item \href{#method-par_unif-new}{\code{R6_par_unif$new()}}
 \item \href{#method-par_unif-print}{\code{R6_par_unif$print()}}
 \item \href{#method-par_unif-clone}{\code{R6_par_unif$clone()}}
@@ -92,6 +93,23 @@ Generate values in the raw space based on quantiles.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{q}}{In [0,1].}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-par_unif-isvalid"></a>}}
+\if{latex}{\out{\hypertarget{method-par_unif-isvalid}{}}}
+\subsection{Method \code{isvalid()}}{
+Check if input is valid for parameter
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{R6_par_unif$isvalid(x)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{x}}{Parameter value}
 }
 \if{html}{\out{</div>}}
 }

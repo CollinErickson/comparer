@@ -40,6 +40,7 @@ print(p1)
 \item \href{#method-par_unordered-toint}{\code{R6_par_unordered$toint()}}
 \item \href{#method-par_unordered-generate}{\code{R6_par_unordered$generate()}}
 \item \href{#method-par_unordered-getseq}{\code{R6_par_unordered$getseq()}}
+\item \href{#method-par_unordered-isvalid}{\code{R6_par_unordered$isvalid()}}
 \item \href{#method-par_unordered-new}{\code{R6_par_unordered$new()}}
 \item \href{#method-par_unordered-print}{\code{R6_par_unordered$print()}}
 \item \href{#method-par_unordered-clone}{\code{R6_par_unordered$clone()}}
@@ -143,6 +144,23 @@ Get a sequence, uniform on the transformed scale
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{n}}{Number of points. Ignored for discrete.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-par_unordered-isvalid"></a>}}
+\if{latex}{\out{\hypertarget{method-par_unordered-isvalid}{}}}
+\subsection{Method \code{isvalid()}}{
+Check if input is valid for parameter
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{R6_par_unordered$isvalid(x)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{x}}{Parameter value}
 }
 \if{html}{\out{</div>}}
 }

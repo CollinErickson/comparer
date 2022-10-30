@@ -38,6 +38,7 @@ print(p1)
 \item \href{#method-par_integer-fromraw}{\code{R6_par_integer$fromraw()}}
 \item \href{#method-par_integer-toraw}{\code{R6_par_integer$toraw()}}
 \item \href{#method-par_integer-generate}{\code{R6_par_integer$generate()}}
+\item \href{#method-par_integer-isvalid}{\code{R6_par_integer$isvalid()}}
 \item \href{#method-par_integer-new}{\code{R6_par_integer$new()}}
 \item \href{#method-par_integer-print}{\code{R6_par_integer$print()}}
 \item \href{#method-par_integer-clone}{\code{R6_par_integer$clone()}}
@@ -97,6 +98,23 @@ Generate values in the raw space based on quantiles.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{q}}{In [0,1].}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-par_integer-isvalid"></a>}}
+\if{latex}{\out{\hypertarget{method-par_integer-isvalid}{}}}
+\subsection{Method \code{isvalid()}}{
+Check if input is valid for parameter
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{R6_par_integer$isvalid(x)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{x}}{Parameter value}
 }
 \if{html}{\out{</div>}}
 }

@@ -22,4 +22,5 @@ for hyperparameter optimization
 p1 <- par_integer('x1', 3, 8)
 class(p1)
 print(p1)
+table(p1$generate(runif(1000)))
 }
