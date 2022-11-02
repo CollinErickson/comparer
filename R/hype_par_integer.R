@@ -47,6 +47,7 @@ R6_par_integer <- R6::R6Class(
     #' @description Generate values in the raw space based on quantiles.
     #' @param q In [0,1].
     generate = function(q) {
+      stopifnot(is.numeric(q), q>=0, q<=1)
       # Use the 1e-16 to avoid 1 mapping above upper
       self$lower + floor(q*(1-1e-16) * (self$upper + 1 - self$lower))
     },

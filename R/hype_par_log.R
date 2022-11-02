@@ -46,6 +46,7 @@ R6_par_log10 <- R6::R6Class(
     #' @description Generate values in the raw space based on quantiles.
     #' @param q In [0,1].
     generate = function(q) {
+      stopifnot(is.numeric(q), q>=0, q<=1)
       self$toraw(self$fromraw(self$lower) +
                    q * (self$fromraw(self$upper) - self$fromraw(self$lower)))
     },

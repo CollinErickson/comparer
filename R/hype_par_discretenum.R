@@ -43,6 +43,7 @@ R6_par_discretenum <- R6::R6Class(
     #   self$toraw(self$fromraw(self$lower) + q * (self$fromraw(self$upper) - self$fromraw(self$lower)))
     # },
     generate = function(q) {
+      stopifnot(is.numeric(q), q>=0, q<=1)
       inds <- 1 + floor(q*(1-1e-12)*length(self$values))
       stopifnot(inds>=1, inds <= length(self$values))
       self$values[inds]

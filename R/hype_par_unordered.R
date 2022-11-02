@@ -59,6 +59,7 @@ R6_par_unordered <- R6::R6Class(
     #' @description Generate values in the raw space based on quantiles.
     #' @param q In [0,1].
     generate = function(q) {
+      stopifnot(is.numeric(q), q>=0, q<=1)
       inds <- 1 + floor(q*(1-1e-12)*length(self$values))
       stopifnot(inds>=1, inds <= length(self$values))
       self$values[inds]

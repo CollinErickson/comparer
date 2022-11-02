@@ -48,6 +48,7 @@ R6_par_unif <- R6::R6Class(
     #   self$toraw(self$fromraw(self$lower) + q * (self$fromraw(self$upper) - self$fromraw(self$lower)))
     # },
     generate = function(q) {
+      stopifnot(is.numeric(q), q>=0, q<=1)
       self$lower + q * (self$upper - self$lower)
     },
     #' @description Check if input is valid for parameter
