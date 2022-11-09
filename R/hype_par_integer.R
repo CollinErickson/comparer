@@ -26,6 +26,7 @@ par_integer <- function(name, lower, upper) {
 # @field fromraw Function to convert from raw scale to transformed scale
 # @field toraw Function to convert from transformed scale to raw scale
 #' @field ggtrans Transformation for ggplot, see ggplot2::scale_x_continuous()
+#' @importFrom R6 R6Class
 #' @examples
 #' p1 <- R6_par_integer$new('x1', 0, 2)
 #' class(p1)
@@ -66,6 +67,8 @@ R6_par_integer <- R6::R6Class(
     #' @param upper Upper bound of the parameter
     initialize = function(name, lower, upper) {
       self$name <- name
+      stopifnot(is.numeric(lower), length(lower) == 1)
+      stopifnot(is.numeric(upper), length(upper) == 1)
       lowerint <- as.integer(lower)
       upperint <- as.integer(upper)
       stopifnot(abs(lower - lowerint) < 1e-8)

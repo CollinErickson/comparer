@@ -1042,11 +1042,25 @@ R6_hype <- R6::R6Class(
         # Add EI lines
         if (addEIlines) {
           EIdfi <-  EIdf[[i]] #EIdf[EIdf$index==i, ]
-          ggi <- ggi +
-            ggplot2::geom_line(data=EIdfi,
-                               ggplot2::aes(valueraw, EIrescaled, color=NULL),
-                               color="red",
-                               alpha=.3)
+          if (is.numeric(EIdfi$valueraw)) {
+            ggi <- ggi +
+              ggplot2::geom_line(
+                data=EIdfi,
+                ggplot2::aes(valueraw, EIrescaled, color=NULL),
+                color="red",
+                alpha=.3
+              )
+          } else {
+            # browser()
+            ggi <- ggi +
+              ggplot2::geom_point(
+                data=EIdfi,
+                ggplot2::aes(valueraw, EIrescaled, color=NULL),
+                color="red",
+                alpha=.3
+              )
+
+          }
         }
         # Add prediction lines
         # ggi <- ggi + preddf[preddf$index==i, ]

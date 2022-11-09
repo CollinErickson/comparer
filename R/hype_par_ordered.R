@@ -75,11 +75,15 @@ R6_par_ordered <- R6::R6Class(
     #' @param x Parameter value
     isvalid = function(x) {
       if (is.numeric(self$values)) {
-        is.numeric(x) &
-          sapply(x, function(x) {any(abs(x - self$values) < 1e-15)})
+        unname(
+          is.numeric(x) &
+            sapply(x, function(x) {any(abs(x - self$values) < 1e-15)})
+        )
       } else if (is.character(self$values)) {
-        is.character(x) &
-          sapply(x, function(x) {any(x %in% self$values)})
+        unname(
+          is.character(x) &
+            sapply(x, function(x) {any(x %in% self$values)})
+        )
       } else if (is.logical(self$values)) {
         rep(is.logical(x), length(x))
       } else {
