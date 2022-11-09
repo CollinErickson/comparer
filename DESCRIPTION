@@ -17,8 +17,9 @@ Description: Quickly run experiments to compare the run time and output of
     for long computations.
 License: GPL-3
 Encoding: UTF-8
+Imports:
+    R6
 Suggests:
-    R6,
     plyr,
     progress,
     testthat (>= 2.1.0),
