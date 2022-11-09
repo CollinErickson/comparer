@@ -1,6 +1,6 @@
 library(testthat)
 
-# Hype par
+# Hype par ----
 test_that("hype par", {
   # Create params
   # generic
@@ -9,20 +9,38 @@ test_that("hype par", {
   # Uniform
   expect_error(p1 <- par_unif("a", -1, 1), NA)
   expect_true("par_unif" %in% class(p1))
+  expect_error(capture.output(print(p1)), NA)
   # Log scale
   expect_error(plog <- par_log10("a", 1e-8, 1), NA)
   expect_true("par_log10" %in% class(plog))
+  expect_error(capture.output(print(plog)), NA)
   # Unordered
-  expect_error(pun <- par_unordered("puno", letters), NA)
+  expect_error(pun <- par_unordered("puno", letters[1:10]), NA)
   expect_error(capture.output(print(pun)), NA)
+  expect_equal(pun$isvalid(c('a','e', 'z')), c(T,T,F))
+  expect_error(pun <- par_unordered("puno", 13:19), NA)
+  expect_error(capture.output(print(pun)), NA)
+  expect_equal(pun$isvalid(18:21), c(T,T,F,F))
   # Ordered
-  expect_error(por <- par_ordered("puno", letters), NA)
+  expect_error(por <- par_ordered("puno", letters[3:11]), NA)
   expect_error(capture.output(print(por)), NA)
+  expect_equal(por$isvalid(c('c','d','y','z')), c(T,T,F,F))
+  expect_error(por <- par_ordered("puno", 4:9), NA)
+  expect_error(capture.output(print(por)), NA)
+  expect_equal(por$isvalid(8:11), c(T,T,F,F))
   # Discrete num
   expect_error(pdn <- par_discretenum("puno", letters))
   expect_error(pdn <- par_discretenum("puno", c(1,3,2)))
   expect_error(pdn <- par_discretenum("puno", c(.1,1,19)), NA)
   expect_error(capture.output(print(pdn)), NA)
+  expect_equal(pdn$isvalid(c(1,3,13,19)), c(T,F,F,T))
+  # Integer
+  expect_error(pi <- par_integer('pint', 4,'c'))
+  expect_error(pi <- par_integer('pint', 'c', 9))
+  expect_error(pi <- par_integer('pint', 4:9))
+  expect_error(pi <- par_integer('pint', 4,14), NA)
+  expect_error(capture.output(print(pi)), NA)
+  expect_equal(pi$isvalid(c(8,6,-2,22)), c(T,T,F,F))
 })
 
 # Hype basics ----
