@@ -38,6 +38,7 @@ Suggests:
     lhs,
     DiceKriging,
     DiceOptim,
+    mixopt,
     reshape2,
     microbenchmark
 Remotes: CollinErickson/GauPro
