@@ -25,7 +25,10 @@ test_that("hype par general", {
     expect_equal(c("trans", "raw"), names(ppseq))
     expect_true(all(pp$isvalid(ppseq$raw)))
     # Check conversion to mopar
-    expect_error(mopp <- pp$convert_to_mopar(), NA)
+    expect_error(mopp <- pp$convert_to_mopar(raw_scale = TRUE), NA)
+    expect_true("mixopt_par" %in% class(mopp))
+    expect_true("list" %in% class(mopp))
+    expect_error(mopp <- pp$convert_to_mopar(raw_scale = FALSE), NA)
     expect_true("mixopt_par" %in% class(mopp))
     expect_true("list" %in% class(mopp))
   }
@@ -51,6 +54,11 @@ test_that("hype par", {
   expect_error(pun <- par_unordered("puno", 13:19), NA)
   expect_error(capture.output(print(pun)), NA)
   expect_equal(pun$isvalid(18:21), c(T,T,F,F))
+  # Unordered: logical
+  expect_error(pun <- par_unordered("puno", c(T, F)), NA)
+  expect_true(all(pun$isvalid(c(T, F))))
+  expect_false(pun$isvalid(5))
+  expect_false(pun$isvalid('a'))
   # Ordered
   expect_error(por <- par_ordered("puno", letters[3:11]), NA)
   expect_error(capture.output(print(por)), NA)
@@ -146,6 +154,27 @@ test_that("2 inputs", {
   # Break if n_lhs not given
   expect_error(hype(eval_func = function(a) {a^2}, par_unif('a',1,3)))
 
+})
+
+test_that("4 inputs", {
+  # 4 inputs --
+  expect_error({
+    h2 <- hype(eval_func = function(a, b, c, d) {10*a^2*c -
+        abs(d)^.3*sin(2*pi*b) -.1*c*d},
+               par_unif("a", -1, 1),
+               par_unif("b", -1,1),
+               par_unif("c", -10,1),
+               par_unif("d", -100,100),
+               n_lhs=3)
+  }, NA)
+  expect_error(h2$run_all(), NA)
+  expect_error(h2$add_EI(n=3), NA)
+  expect_error(h2$run_all(), NA)
+  # Add LHS
+  expect_error(h2$add_LHS(n=3), NA)
+  expect_error(h2$run_all(), NA)
+  # Plot interactions
+  expect_error(h2$plotinteractions(), NA)
 })
 
 
