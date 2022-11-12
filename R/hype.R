@@ -1247,7 +1247,12 @@ R6_hype <- R6::R6Class(
       out$evaluated_value <- min(self$Z)
 
       # Best predicted value, probably not seen yet
-
+      # Use mixopt, convert pars to mopars
+      # Function should be evaluated on transformed scale
+      # mopars <- lapply(self$parlist)
+      # moout <- mixopt::mixopt()
+      # out$unevaluated_params <- moout$par
+      # out$unevaluated_value <- moout$val
 
       # Return list
       out

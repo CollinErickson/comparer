@@ -57,6 +57,18 @@ R6_par_log10 <- R6::R6Class(
         (x >= self$lower) &
         (x <= self$upper)
     },
+    #' @description Convert this to a parameter for the
+    #' mixopt R package.
+    #' @param raw_scale Should it be on the raw scale?
+    convert_to_mopar = function(raw_scale=FALSE) {
+      if (raw_scale) {
+        mixopt::mopar_cts(lower=self$lower,
+                          upper=self$upper)
+      } else {
+        mixopt::mopar_cts(lower=self$fromraw(self$lower),
+                          upper=self$fromraw(self$upper))
+      }
+    },
     ggtrans="log10", # ggplot trans to give to scale_x_continuous
     #' @description Create a hyperparameter with uniform distribution
     #' @param name Name of the parameter, must match the input to `eval_func`.

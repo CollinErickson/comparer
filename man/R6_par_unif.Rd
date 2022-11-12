@@ -34,6 +34,7 @@ Parameter with uniform distribution for hyperparameter optimization
 \item \href{#method-par_unif-toraw}{\code{R6_par_unif$toraw()}}
 \item \href{#method-par_unif-generate}{\code{R6_par_unif$generate()}}
 \item \href{#method-par_unif-isvalid}{\code{R6_par_unif$isvalid()}}
+\item \href{#method-par_unif-convert_to_mopar}{\code{R6_par_unif$convert_to_mopar()}}
 \item \href{#method-par_unif-new}{\code{R6_par_unif$new()}}
 \item \href{#method-par_unif-print}{\code{R6_par_unif$print()}}
 \item \href{#method-par_unif-clone}{\code{R6_par_unif$clone()}}
@@ -110,6 +111,24 @@ Check if input is valid for parameter
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{x}}{Parameter value}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-par_unif-convert_to_mopar"></a>}}
+\if{latex}{\out{\hypertarget{method-par_unif-convert_to_mopar}{}}}
+\subsection{Method \code{convert_to_mopar()}}{
+Convert this to a parameter for the
+mixopt R package.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{R6_par_unif$convert_to_mopar(raw_scale = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{raw_scale}}{Should it be on the raw scale?}
 }
 \if{html}{\out{</div>}}
 }

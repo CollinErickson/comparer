@@ -91,6 +91,16 @@ R6_par_unordered <- R6::R6Class(
         rep(TRUE, length(x))
       }
     },
+    #' @description Convert this to a parameter for the
+    #' mixopt R package.
+    #' @param raw_scale Should it be on the raw scale?
+    convert_to_mopar = function(raw_scale=FALSE) {
+      if (raw_scale) {
+        mixopt::mopar_ordered(values=self$values)
+      } else {
+        mixopt::mopar_ordered(values=self$fromraw(self$values))
+      }
+    },
     ggtrans="identity", # ggplot trans to give to scale_x_continuous
     #' @description Create a hyperparameter with uniform distribution
     #' @param name Name of the parameter, must match the input to `eval_func`.
