@@ -1243,16 +1243,38 @@ R6_hype <- R6::R6Class(
       out <- list()
 
       # Best value that was already seen
-      out$evaluated_params <- self$X[which.min(self$Z)[1], ]
-      out$evaluated_value <- min(self$Z)
+      out$evaluated <- list()
+      out$evaluated$par <- self$X[which.min(self$Z)[1], ]
+      out$evaluated$val <- min(self$Z)
 
       # Best predicted value, probably not seen yet
       # Use mixopt, convert pars to mopars
       # Function should be evaluated on transformed scale
-      # mopars <- lapply(self$parlist)
-      # moout <- mixopt::mixopt()
-      # out$unevaluated_params <- moout$par
-      # out$unevaluated_value <- moout$val
+      # browser()
+      mopars <- lapply(self$parlist,
+                       function(p) {
+                         p$convert_to_mopar(raw_scale = FALSE)
+                       })
+      # moout <- mixopt::mixopt(par=mopars, fn=self$mod)
+      fn <- function(x) {
+        # print(x)
+        v <- unlist(x)
+        self$mod$pred(v)
+      }
+      moout <- mixopt::mixopt_coorddesc(par=mopars, fn=fn)
+      # Need to transform par back to raw scale
+      moout_par <- lapply(
+        1:length(self$parlist),
+        function(i) {
+          self$parlist[[i]]$toraw(moout$par[[i]])
+        }
+      )
+      moout_par <- as.data.frame(moout_par)
+      colnames(moout_par) <- self$parnames
+      # Add to output
+      out$unevaluated <- list()
+      out$unevaluated$par <- moout_par
+      out$unevaluated$val <- moout$val
 
       # Return list
       out
