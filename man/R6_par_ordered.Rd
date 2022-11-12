@@ -41,6 +41,7 @@ print(p1)
 \item \href{#method-par_ordered-generate}{\code{R6_par_ordered$generate()}}
 \item \href{#method-par_ordered-getseq}{\code{R6_par_ordered$getseq()}}
 \item \href{#method-par_ordered-isvalid}{\code{R6_par_ordered$isvalid()}}
+\item \href{#method-par_ordered-convert_to_mopar}{\code{R6_par_ordered$convert_to_mopar()}}
 \item \href{#method-par_ordered-new}{\code{R6_par_ordered$new()}}
 \item \href{#method-par_ordered-print}{\code{R6_par_ordered$print()}}
 \item \href{#method-par_ordered-clone}{\code{R6_par_ordered$clone()}}
@@ -161,6 +162,24 @@ Check if input is valid for parameter
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{x}}{Parameter value}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-par_ordered-convert_to_mopar"></a>}}
+\if{latex}{\out{\hypertarget{method-par_ordered-convert_to_mopar}{}}}
+\subsection{Method \code{convert_to_mopar()}}{
+Convert this to a parameter for the
+mixopt R package.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{R6_par_ordered$convert_to_mopar(raw_scale = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{raw_scale}}{Should it be on the raw scale?}
 }
 \if{html}{\out{</div>}}
 }

@@ -39,6 +39,7 @@ print(p1)
 \item \href{#method-par_integer-toraw}{\code{R6_par_integer$toraw()}}
 \item \href{#method-par_integer-generate}{\code{R6_par_integer$generate()}}
 \item \href{#method-par_integer-isvalid}{\code{R6_par_integer$isvalid()}}
+\item \href{#method-par_integer-convert_to_mopar}{\code{R6_par_integer$convert_to_mopar()}}
 \item \href{#method-par_integer-new}{\code{R6_par_integer$new()}}
 \item \href{#method-par_integer-print}{\code{R6_par_integer$print()}}
 \item \href{#method-par_integer-clone}{\code{R6_par_integer$clone()}}
@@ -115,6 +116,24 @@ Check if input is valid for parameter
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{x}}{Parameter value}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-par_integer-convert_to_mopar"></a>}}
+\if{latex}{\out{\hypertarget{method-par_integer-convert_to_mopar}{}}}
+\subsection{Method \code{convert_to_mopar()}}{
+Convert this to a parameter for the
+mixopt R package.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{R6_par_integer$convert_to_mopar(raw_scale = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{raw_scale}}{Should it be on the raw scale?}
 }
 \if{html}{\out{</div>}}
 }

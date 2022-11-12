@@ -1,6 +1,31 @@
 library(testthat)
 
 # Hype par ----
+test_that("hype par general", {
+  parlist <- list(
+    par_unif('a', 1, 3),
+    par_log10('b', 1e-4, 1e2),
+    par_discretenum('c', c(1,3,10,13,30)),
+    par_integer('d', 9, 98),
+    par_ordered('e', letters[5:14]),
+    par_unordered('f', letters[15:18])
+  )
+
+  # All par should have same standard for these functions
+  for (pp in parlist) {
+    expect_true("par_hype" %in% class(pp))
+    expect_true("R6" %in% class(pp))
+    expect_error(spp <- pp$generate(runif(100)), NA)
+    expect_true(all(pp$isvalid(spp)))
+    expect_error(pp$getseq(10), NA)
+    expect_error(capture.output(print(pp)), NA)
+    # Check conversion to mopar
+    expect_error(mopp <- pp$convert_to_mopar(), NA)
+    expect_true("mixopt_par" %in% class(mopp))
+    expect_true("list" %in% class(mopp))
+  }
+})
+
 test_that("hype par", {
   # Create params
   # generic

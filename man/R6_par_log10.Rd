@@ -36,6 +36,7 @@ print(p1)
 \item \href{#method-par_log10-toraw}{\code{R6_par_log10$toraw()}}
 \item \href{#method-par_log10-generate}{\code{R6_par_log10$generate()}}
 \item \href{#method-par_log10-isvalid}{\code{R6_par_log10$isvalid()}}
+\item \href{#method-par_log10-convert_to_mopar}{\code{R6_par_log10$convert_to_mopar()}}
 \item \href{#method-par_log10-new}{\code{R6_par_log10$new()}}
 \item \href{#method-par_log10-print}{\code{R6_par_log10$print()}}
 \item \href{#method-par_log10-clone}{\code{R6_par_log10$clone()}}
@@ -112,6 +113,24 @@ Check if input is valid for parameter
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{x}}{Parameter value}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-par_log10-convert_to_mopar"></a>}}
+\if{latex}{\out{\hypertarget{method-par_log10-convert_to_mopar}{}}}
+\subsection{Method \code{convert_to_mopar()}}{
+Convert this to a parameter for the
+mixopt R package.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{R6_par_log10$convert_to_mopar(raw_scale = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{raw_scale}}{Should it be on the raw scale?}
 }
 \if{html}{\out{</div>}}
 }

@@ -62,6 +62,12 @@ R6_par_discretenum <- R6::R6Class(
       is.numeric(x) &
         sapply(x, function(x) {any(abs(x - self$values) < 1e-15)})
     },
+    #' @description Convert this to a parameter for the
+    #' mixopt R package.
+    #' @param raw_scale Should it be on the raw scale?
+    convert_to_mopar = function(raw_scale=FALSE) {
+      mixopt::mopar_ordered(values=self$values)
+    },
     ggtrans="identity", # ggplot trans to give to scale_x_continuous
     # fromraw=NULL,
     # toraw= NULL,
