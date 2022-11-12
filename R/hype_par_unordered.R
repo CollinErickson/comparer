@@ -30,7 +30,7 @@ par_unordered <- function(name, values) {
 # R6_par_unordered ----
 R6_par_unordered <- R6::R6Class(
   classname="par_unordered",
-  inherit = par_hype,
+  inherit = R6_par_hype,
   public=list(
     name=NULL,
     lower=NULL,

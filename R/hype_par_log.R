@@ -31,7 +31,7 @@ par_log10 <- function(name, lower, upper) {
 #' print(p1)
 R6_par_log10 <- R6::R6Class(
   classname="par_log10",
-  inherit = par_hype,
+  inherit = R6_par_hype,
   public=list(
     name=NULL,
     lower=NULL,

@@ -27,7 +27,7 @@ par_discretenum <- function(name, values) {
 R6_par_discretenum <- R6::R6Class(
   # R6_par_discretenum ----
   classname="par_discretenum",
-  inherit = par_hype,
+  inherit = R6_par_hype,
   public=list(
     name=NULL,
     values=NULL,

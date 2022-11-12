@@ -31,7 +31,7 @@ par_unif <- function(name, lower, upper) {
 R6_par_unif <- R6::R6Class(
   # par_unif ----
   classname="par_unif",
-  inherit = par_hype,
+  inherit = R6_par_hype,
   public=list(
     name=NULL,
     lower=NULL,

@@ -34,7 +34,7 @@ par_integer <- function(name, lower, upper) {
 R6_par_integer <- R6::R6Class(
   # R6_par_integer ----
   classname="par_integer",
-  inherit = par_hype,
+  inherit = R6_par_hype,
   public=list(
     name=NULL,
     lower=NULL,

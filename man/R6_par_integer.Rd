@@ -17,7 +17,7 @@ class(p1)
 print(p1)
 }
 \section{Super class}{
-\code{\link[comparer:par_hype]{comparer::par_hype}} -> \code{par_integer}
+\code{comparer::par_hype} -> \code{par_integer}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

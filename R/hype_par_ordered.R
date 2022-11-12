@@ -29,7 +29,7 @@ par_ordered <- function(name, values) {
 #' print(p1)
 R6_par_ordered <- R6::R6Class(
   classname="par_ordered",
-  inherit = par_hype,
+  inherit = R6_par_hype,
   public=list(
     name=NULL,
     lower=NULL,

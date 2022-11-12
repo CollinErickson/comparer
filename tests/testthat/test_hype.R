@@ -29,7 +29,7 @@ test_that("hype par general", {
 test_that("hype par", {
   # Create params
   # generic
-  expect_error(p1 <- par_hype$new(), NA)
+  expect_error(p1 <- R6_par_hype$new(), NA)
   expect_true("par_hype" %in% class(p1))
   # Uniform
   expect_error(p1 <- par_unif("a", -1, 1), NA)
@@ -71,7 +71,7 @@ test_that("hype par", {
 # Hype basics ----
 test_that("hype works", {
   # Create params
-  p1 <- par_hype$new()
+  p1 <- R6_par_hype$new()
   expect_true("par_hype" %in% class(p1))
   p1 <- par_unif("a", -1, 1)
   expect_true("par_unif" %in% class(p1))

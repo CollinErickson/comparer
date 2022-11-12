@@ -12,7 +12,7 @@ R6 class for Uniform parameter
 Parameter with uniform distribution for hyperparameter optimization
 }
 \section{Super class}{
-\code{\link[comparer:par_hype]{comparer::par_hype}} -> \code{par_unif}
+\code{comparer::par_hype} -> \code{par_unif}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
