@@ -321,6 +321,10 @@ test_that("hype with all params type", {
   expect_error({
     hp$plotXorder()
   }, NA)
+  # Find best_param
+  expect_error(hppb <- hp$best_params(), NA)
+  expect_true(is.list(hppb))
+  expect_true(all(names(hppb) %in% c("unevaluated", "evaluated")))
   # Need to fix EI for discretenum, integer
   # expect_warning({
   #   hp$add_EI(1, model='gaupro')
