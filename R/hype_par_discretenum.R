@@ -51,9 +51,10 @@ R6_par_discretenum <- R6::R6Class(
     #' @description Get a sequence, uniform on the transformed scale
     #' @param n Number of points. Ignored for discrete.
     getseq = function(n) {
+      s <- unique(self$generate(seq(0,1,l=n)))
       list(
-        trans=1:length(self$values),
-        raw=self$values
+        trans=self$fromraw(s),
+        raw=s
       )
     },
     #' @description Check if input is valid for parameter

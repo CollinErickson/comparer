@@ -67,11 +67,9 @@
 
 -   Don't print out all from ffexp, do progress
 
--   par_unordered: fix add LHS, EI search, plot, ...
+-   par_unordered/ordered/discrete/int: EI search, plot, ...
 
 -   Make xgboost param tuning example
-
--   par_integer: hard part is optim
 
 - par_integer/discrete on log scale
 
@@ -81,23 +79,13 @@
 
 - Run EI for time: add based on EI/(exp time to fit)
 
-- Return best params, estimated
-
 - when add data, override runtime to be NA
 
 - Add in verbose printouts
 
 - Only update GauPro model, instead of refit, when no change to spec
 
-- discrete should be unordered (latent). Add par_ordered (OrdredFactorKernel)
-and par_orderednum (numeric).
-discrete: unordered, ordered, discretenum.
-Add partype (one of cts, unordered, ordered, orderednum) in initialize,
-then use that to build kernel.
-
-- par_discretenum, par_integer: don't use all values for getseq
-
-- Change par_hype to R6_par_hype
+- EI/qEI work for discretenum/int. Need to put mixopt into GauPro first.
 
 ## MAB: multi-armed bandit
 

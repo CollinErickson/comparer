@@ -38,6 +38,7 @@ print(p1)
 \item \href{#method-par_integer-fromraw}{\code{R6_par_integer$fromraw()}}
 \item \href{#method-par_integer-toraw}{\code{R6_par_integer$toraw()}}
 \item \href{#method-par_integer-generate}{\code{R6_par_integer$generate()}}
+\item \href{#method-par_integer-getseq}{\code{R6_par_integer$getseq()}}
 \item \href{#method-par_integer-isvalid}{\code{R6_par_integer$isvalid()}}
 \item \href{#method-par_integer-convert_to_mopar}{\code{R6_par_integer$convert_to_mopar()}}
 \item \href{#method-par_integer-new}{\code{R6_par_integer$new()}}
@@ -45,13 +46,6 @@ print(p1)
 \item \href{#method-par_integer-clone}{\code{R6_par_integer$clone()}}
 }
 }
-\if{html}{\out{
-<details open><summary>Inherited methods</summary>
-<ul>
-<li><span class="pkg-link" data-pkg="comparer" data-topic="par_hype" data-id="getseq"><a href='../../comparer/html/par_hype.html#method-par_hype-getseq'><code>comparer::par_hype$getseq()</code></a></span></li>
-</ul>
-</details>
-}}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-par_integer-fromraw"></a>}}
 \if{latex}{\out{\hypertarget{method-par_integer-fromraw}{}}}
@@ -99,6 +93,23 @@ Generate values in the raw space based on quantiles.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{q}}{In [0,1].}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-par_integer-getseq"></a>}}
+\if{latex}{\out{\hypertarget{method-par_integer-getseq}{}}}
+\subsection{Method \code{getseq()}}{
+Get a sequence, uniform on the transformed scale
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{R6_par_integer$getseq(n)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{n}}{Number of points. Ignored for discrete.}
 }
 \if{html}{\out{</div>}}
 }

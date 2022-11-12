@@ -19,6 +19,11 @@ test_that("hype par general", {
     expect_true(all(pp$isvalid(spp)))
     expect_error(pp$getseq(10), NA)
     expect_error(capture.output(print(pp)), NA)
+    # getseq
+    expect_error(ppseq <- pp$getseq(n=30), NA)
+    expect_true("list" %in% class(ppseq))
+    expect_equal(c("trans", "raw"), names(ppseq))
+    expect_true(all(pp$isvalid(ppseq$raw)))
     # Check conversion to mopar
     expect_error(mopp <- pp$convert_to_mopar(), NA)
     expect_true("mixopt_par" %in% class(mopp))
@@ -258,11 +263,14 @@ test_that("Hype add data", {
 test_that("discrete params", {
   # Test discrete par
   expect_error({
-    hp <- hype(eval_func = function(a, b, c) {-1e-3*a^2*log(b,10)^2*ifelse(c=='a', 1, 2) + rnorm(length(a),0,1e-1)},
-               par_unif("a", 6, 8),
-               par_log10("b", 1e-8, 1e-2),
-               par_unordered("c", c('a', 'b')),
-               n_lhs=21)
+    hp <- hype(
+      eval_func = function(a, b, c) {
+        -1e-3*a^2*log(b,10)^2*ifelse(c=='a', 1, 2) + rnorm(length(a),0,1e-1)
+      },
+      par_unif("a", 6, 8),
+      par_log10("b", 1e-8, 1e-2),
+      par_unordered("c", c('a', 'b')),
+      n_lhs=21)
   }, NA)
   expect_true(!hp$par_all_cts)
   # plotX doesn't work until something has been evaluated

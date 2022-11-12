@@ -52,6 +52,15 @@ R6_par_integer <- R6::R6Class(
       # Use the 1e-16 to avoid 1 mapping above upper
       self$lower + floor(q*(1-1e-16) * (self$upper + 1 - self$lower))
     },
+    #' @description Get a sequence, uniform on the transformed scale
+    #' @param n Number of points. Ignored for discrete.
+    getseq = function(n) {
+      s <- unique(self$generate(seq(0,1,l=n)))
+      list(
+        trans=self$fromraw(s),
+        raw=s
+      )
+    },
     #' @description Check if input is valid for parameter
     #' @param x Parameter value
     isvalid = function(x) {
