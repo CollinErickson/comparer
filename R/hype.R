@@ -889,7 +889,7 @@ R6_hype <- R6::R6Class(
           si <- colnames(df)[i]
           sj <- colnames(df)[j]
           if (i == j) {
-            p <- ggplot2::ggplot(df, ggplot2::aes_string(si)) +
+            p <- ggplot2::ggplot(df, ggplot2::aes(.data[[si]])) +
               ggplot2::geom_histogram(bins = 30)
             if (i < ncol(df)) {
               p <- p +
@@ -897,9 +897,9 @@ R6_hype <- R6::R6Class(
             }
           } else {
             p <- ggplot2::ggplot(df,
-                                 ggplot2::aes_string(
-                                   si, sj,
-                                   color=colnames(df)[ncol(df)])) +
+                                 ggplot2::aes(
+                                   .data[[si]], .data[[sj]],
+                                   color=.data[[colnames(df)[ncol(df)]]])) +
               ggplot2::geom_point() +
               ggplot2::theme(legend.position = "none") +
               ggplot2::scale_color_gradientn(colors=c('green', 'purple'))
