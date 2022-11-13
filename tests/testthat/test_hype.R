@@ -354,16 +354,14 @@ test_that("hype with all params type", {
   expect_error(hppb <- hp$best_params(), NA)
   expect_true(is.list(hppb))
   expect_true(all(names(hppb) %in% c("unevaluated", "evaluated")))
-  # Need to fix EI for discretenum, integer
-  # expect_warning({
-  #   hp$add_EI(1, model='gaupro')
-  #   hp$run_all()
-  # }, NA)
-  # expect_equal(length(hp$Z), 22)
-  # Need to fix qEI for factors
-  # expect_error({
-  #   hp$add_EI(2, model='gaupro')
-  #   hp$run_all()
-  # }, NA)
+  expect_warning({
+    hp$add_EI(1, model='gaupro')
+    hp$run_all()
+  }, NA)
+  expect_equal(length(hp$Z), 22)
+  expect_error({
+    hp$add_EI(2, model='gaupro')
+    hp$run_all()
+  }, NA)
 })
 

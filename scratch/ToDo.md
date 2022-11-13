@@ -85,7 +85,11 @@
 
 - Only update GauPro model, instead of refit, when no change to spec
 
-- EI/qEI work for discretenum/int. Need to put mixopt into GauPro first.
+- EI/qEI work for discretenum/int. Make sure it doesn't pick same point twice.
+
+- Reduce print of hype
+
+- EI isn't actually using unevaluated X?
 
 ## MAB: multi-armed bandit
 

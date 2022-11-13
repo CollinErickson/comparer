@@ -450,10 +450,8 @@ R6_hype <- R6::R6Class(
       if (is.null(self$X)) {
         stop('X is null, you need to run_all first.')
       }
-      # if (!self$par_all_cts) {
-      #   stop("Can only add EI if all parameters are continuous (par_unif, par_log10)")
-      # }
-      # If unevaluated points, set lowest value.
+
+      # If unevaluated points, set to lowest value seen so far.
       Xraw <- self$ffexp$rungrid2()
       Xtrans <- self$convert_raw_to_trans(Xraw)
       if (nrow(Xtrans) == length(self$Z)) { # All have been evaluated
@@ -518,7 +516,8 @@ R6_hype <- R6::R6Class(
             lower=self$parlowertrans,
             upper=self$paruppertrans))
         }
-      } else if ("GauPro" %in% class(self$mod)) {#tolower(model) %in% c("gaupro")) {
+      } else if ("GauPro" %in% class(self$mod)) {
+        #tolower(model) %in% c("gaupro")) {
         # if (self$par_all_cts) {
         #   kern <- covtype
         # } else {
@@ -549,6 +548,8 @@ R6_hype <- R6::R6Class(
         #                                             kernel=kern)
         if (missing(eps)) {eps <- 0}
         stopifnot(length(eps)==1, eps>=0)
+
+        # Calculate EI at specific point
         if (!missing(calculate_at) && !is.null(calculate_at)) {
           if (is.matrix(calculate_at) || is.data.frame(calculate_at)) {
             return(apply(calculate_at, 1,
@@ -568,25 +569,58 @@ R6_hype <- R6::R6Class(
                                     upper=self$paruppertrans,
                                     minimize=TRUE,
                                     eps=eps)
-          } else {
-            # Select multiple points to be evaluated, useful when running in parallel
+          } else { # n > 1
+            # Select multiple points to be evaluated,
+            #   useful when running in parallel
             EIout <- self$mod$maxqEI(npoints=n, method="CL",
                                      lower=self$parlowertrans,
                                      upper=self$paruppertrans,
                                      minimize=TRUE,
                                      eps=eps)
           }
-        } else {
+        } else { # Not all cts par, need to use mixopt
           if (n==1) {
+            # browser()
+            # EIout <- suppressWarnings({
+            #   self$mod$maxEIwithfactors(
+            #     lower=self$parlowertrans,
+            #     upper=self$paruppertrans,
+            #     minimize=TRUE,
+            #     eps=eps)
+            # })
+            # Convert pars to mixopt mopars
+            mopars <- lapply(self$parlist,
+                             function(p) {
+                               p$convert_to_mopar(raw_scale = FALSE)
+                             })
             EIout <- suppressWarnings({
-              self$mod$maxEIwithfactors(
-                lower=self$parlowertrans,
-                upper=self$paruppertrans,
+              self$mod$maxEI(
+                lower=NULL,
+                upper=NULL,
                 minimize=TRUE,
-                eps=eps)
+                eps=eps,
+                mopar=mopars)
             })
-          } else {
-            stop("Can't do EI with n>1 with factors")
+          } else { # n > 1
+            # browser()
+            # Convert pars to mixopt mopars
+            mopars <- lapply(self$parlist,
+                             function(p) {
+                               p$convert_to_mopar(raw_scale = FALSE)
+                             })
+            EIout <- suppressWarnings({
+              self$mod$maxqEI(
+                npoints=n,
+                lower=NULL,
+                upper=NULL,
+                minimize=TRUE,
+                eps=eps,
+                mopar=mopars)
+            })
+            if (all(EIout$par[1,] == EIout$par[2,])) {
+              # browser()
+              message("maxqEI picked the same points for the first two")
+            }
           }
         }
         # EIout <- list(par=EIout)
@@ -1250,7 +1284,6 @@ R6_hype <- R6::R6Class(
       # Best predicted value, probably not seen yet
       # Use mixopt, convert pars to mopars
       # Function should be evaluated on transformed scale
-      # browser()
       mopars <- lapply(self$parlist,
                        function(p) {
                          p$convert_to_mopar(raw_scale = FALSE)
