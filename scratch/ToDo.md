@@ -53,8 +53,6 @@
 
 -   Run_all in parallel, does it work?
 
--   Factor levels. Start with binary?
-
 -   Give DK GP info. Plot? Show which inputs are important.
 
 -   Maximize option?
@@ -67,7 +65,7 @@
 
 -   Don't print out all from ffexp, do progress
 
--   par_unordered/ordered/discrete/int: EI search, plot, ...
+-   par_unordered/ordered/discrete/int: plot, pairs, ...
 
 -   Make xgboost param tuning example
 

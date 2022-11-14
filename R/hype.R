@@ -580,7 +580,6 @@ R6_hype <- R6::R6Class(
           }
         } else { # Not all cts par, need to use mixopt
           if (n==1) {
-            # browser()
             # EIout <- suppressWarnings({
             #   self$mod$maxEIwithfactors(
             #     lower=self$parlowertrans,
@@ -602,7 +601,6 @@ R6_hype <- R6::R6Class(
                 mopar=mopars)
             })
           } else { # n > 1
-            # browser()
             # Convert pars to mixopt mopars
             mopars <- lapply(self$parlist,
                              function(p) {
@@ -618,7 +616,6 @@ R6_hype <- R6::R6Class(
                 mopar=mopars)
             })
             if (all(EIout$par[1,] == EIout$par[2,])) {
-              # browser()
               message("maxqEI picked the same points for the first two")
             }
           }
@@ -841,7 +838,7 @@ R6_hype <- R6::R6Class(
     #' @param ... Passed into `ffexp$run_all`.
     run_EI_for_time = function(sec, batch_size, covtype="matern5_2",
                                nugget.estim=TRUE, verbose=0,
-                               model="DK", eps=0,
+                               model="GauPro", eps=0,
                                ...) {
       pb <- progress::progress_bar$new(
         format=paste0("  Running for time (:spin) [:bar] :elapsed / ",
@@ -851,12 +848,17 @@ R6_hype <- R6::R6Class(
       start_time <- Sys.time() #proc.time()
       ncompleted <- 0
       minbefore <- min(self$Z)
+      timespentinEI <- 0
       # while(proc.time()[3] - start_time[3] < sec) {
       while(as.numeric(Sys.time() - start_time, units='secs') < sec) {
         # Only add EI once all existing are run
         if (sum(!self$ffexp$completed_runs) < .5) {
-          self$add_EI(n=batch_size, covtype=covtype, nugget.estim=nugget.estim,
+          EIstarttime <- Sys.time()
+          self$add_EI(n=batch_size, covtype=covtype,
+                      nugget.estim=nugget.estim,
                       model=model, eps=eps)
+          timespentinEI <- timespentinEI + as.numeric(Sys.time() - EIstarttime,
+                                                      units='secs')
         }
         # Run it
         self$run_all(verbose=0, ...)
@@ -869,7 +871,8 @@ R6_hype <- R6::R6Class(
       message(paste0("Completed ", ncompleted, " new points in ",
                      round(as.numeric(Sys.time() - start_time,
                                       units='secs'), 1),
-                     " seconds\n",
+                     " seconds"," (spent ", round(timespentinEI, 1),
+                     " sec in EI)","\n",
                      "Reduced minimum from ", signif(minbefore,5),
                      " to ", signif(min(self$Z),5)))
       invisible(self)
@@ -1085,7 +1088,6 @@ R6_hype <- R6::R6Class(
                 alpha=.3
               )
           } else {
-            # browser()
             ggi <- ggi +
               ggplot2::geom_point(
                 data=EIdfi,

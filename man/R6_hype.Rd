@@ -362,7 +362,7 @@ evaluate them, and repeat until a specified amount of time has passed.
   covtype = "matern5_2",
   nugget.estim = TRUE,
   verbose = 0,
-  model = "DK",
+  model = "GauPro",
   eps = 0,
   ...
 )}\if{html}{\out{</div>}}
