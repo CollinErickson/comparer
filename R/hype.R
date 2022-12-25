@@ -482,12 +482,6 @@ R6_hype <- R6::R6Class(
           stop(paste0("Can only add EI with DiceKriging if all",
                       "parameters are continuous (par_unif, par_log10)"))
         }
-        # self$mod <- DiceKriging::km(formula = ~1,
-        #                             covtype=covtype,
-        #                             design = Xtrans,
-        #                             response = Z,
-        #                             nugget.estim=nugget.estim,
-        #                             control=list(trace=FALSE))
         if (!missing(eps) && !is.null(eps) && eps>0) {
           warning("eps isn't used in add_EI for DiceKriging model")
         }
@@ -517,35 +511,6 @@ R6_hype <- R6::R6Class(
             upper=self$paruppertrans))
         }
       } else if ("GauPro" %in% class(self$mod)) {
-        #tolower(model) %in% c("gaupro")) {
-        # if (self$par_all_cts) {
-        #   kern <- covtype
-        # } else {
-        #   factorindsTF <- sapply(self$parlist, function(p) {"par_unordered" %in% class(p)})
-        #   factorinds <- which(factorindsTF)
-        #   stopifnot(length(factorinds) == 1)
-        #   kern1inner <-  if (covtype=="gauss") {
-        #     GauPro::Gaussian$new(D=sum(!factorindsTF))
-        #   } else if (covtype == "matern5_2") {
-        #     GauPro::Matern52$new(D=sum(!factorindsTF))
-        #   } else {stop("bad covtype for GauPro with discrete par")}
-        #   kern1 <- GauPro::IgnoreIndsKernel$new(k=kern1inner,
-        #                                         ignoreinds = factorinds)
-        #   kern2 <- GauPro::LatentFactorKernel$new(
-        #     D=length(self$parlist),
-        #     nlevels=length(self$parlist[[factorinds]]$values),
-        #     xindex=factorinds,
-        #     latentdim=1
-        #   )
-        #   kern <- kern1*kern2
-        #   # Need to replace factor/chars with integers
-        #   # Xtrans[,factorinds] <- self$parlist[[factorinds]]$toint(Xtrans[,factorinds])
-        # }
-        # self$mod <- GauPro::GauPro_kernel_model$new(X=as.matrix(Xtrans),
-        #                                             Z=Z,
-        #                                             restarts=0, # Speed it up
-        #                                             nug.est=nugget.estim,
-        #                                             kernel=kern)
         if (missing(eps)) {eps <- 0}
         stopifnot(length(eps)==1, eps>=0)
 
@@ -580,13 +545,6 @@ R6_hype <- R6::R6Class(
           }
         } else { # Not all cts par, need to use mixopt
           if (n==1) {
-            # EIout <- suppressWarnings({
-            #   self$mod$maxEIwithfactors(
-            #     lower=self$parlowertrans,
-            #     upper=self$paruppertrans,
-            #     minimize=TRUE,
-            #     eps=eps)
-            # })
             # Convert pars to mixopt mopars
             mopars <- lapply(self$parlist,
                              function(p) {
@@ -620,12 +578,6 @@ R6_hype <- R6::R6Class(
             }
           }
         }
-        # EIout <- list(par=EIout)
-        if (just_return) {
-          # GauPro was added, no longer need to do this.
-          # Add EI value to list
-          # EIout$val <- self$mod$EI(x=EIout$par, minimize=TRUE, eps=eps)
-        }
       } else {
         stop(paste("Model given to add_EI is not valid (", model,
                    "), should be one of: DK"))
@@ -635,10 +587,15 @@ R6_hype <- R6::R6Class(
       }
       newXtrans <- EIout$par
       newXraw <- self$convert_trans_to_raw(newXtrans)
+      # Fix any that aren't valid. This happened when optim picked points
+      #  just outside the bounds and can cause errors.
       for (i in 1:length(self$parlist)) {
         i_isvalid <- all(self$parlist[[i]]$isvalid(newXraw[, i]))
         if (!i_isvalid) {
-          warning(paste0("add_EI returned invalid value for index ", i))
+          replvals <- self$parlist[[i]]$generate(runif(length(newXraw[, i])))
+          warning(paste0("add_EI returned invalid value for index ", i,
+                         ". Replacing ", newXraw[, i], " with ", replvals))
+          newXraw[, i] <- replvals
         }
       }
       # Add new par to experiment
