@@ -1,48 +1,41 @@
-I made some minor updates to the existing functions in the package.
+This packaged was removed from CRAN on 1/17/23 because of unresolved issues.
 
 ## Test environments
-* local Ubuntu 20.04.2 LTS, R 4.0.3
-* Ubuntu 16.04.6 LTS (on travis-ci), R 4.0.2
+* local Windows 11, R 4.2.2
+* Ubuntu 22.04.1 LTS (GitHub Actions), R 4.2.2
 * win-builder (devel and release)
 * R-hub (Windows, Ubuntu Linux, Fedora Linux)
+* mac-builder
 
 ## R CMD check results
 
-On local Ubuntu and Ubuntu on Travis:
+R-hub Windows Server 2022 (2/18/23): NOTE
+R-hub Fedora Linux (2/18/23): 3 NOTEs
+R-hub Ubuntu Linux (2/18/23): 2 NOTEs
 
-0 errors | 0 warnings | 0 note
+On win-builder (release, 2/18/23): 2 NOTEs
+On win-builder (devel, 2/18/23): NOTE
 
-From R-hub, there are 0 errors or warnings,
-only a few notes:
+On Ubuntu (GitHub Actions, 2/18/23) :OK
 
-"
-* checking CRAN incoming feasibility ... NOTE
-Maintainer: 'Collin Erickson <collinberickson@gmail.com>'
-Possibly mis-spelled words in DESCRIPTION:
-  ffexp (13:18)
+On mac-builder (2/18/23): OK
 
-Uses the superseded package: 'snow'
-"
+The NOTEs are all fine:
 
-The first isn't an issue.
-For 'snow', I tried removing it from Suggests since I never actually
+There is a note that the package was archived on CRAN.
+
+There is a note for spelling, but it's fine.
+
+There is a note for "Uses the superseded package: 'snow'"
+
+I tried removing snow from Suggests since I never actually
 call it (I only use the package 'parallel'), but then it gives an error.
 Apparently parallel::makeCluster using type="SOCK" calls snow::makeSOCKcluster,
 requiring 'snow' to be in Suggests.
 Thus I do not think this is an issue and I am leaving 'snow' in Suggests.
 
-On winbuilder, there is one NOTE:
-"
-* checking CRAN incoming feasibility ... NOTE
-Maintainer: 'Collin Erickson <collinberickson@gmail.com>'
+There is a NOTE for a slow example, but only on some systems.
 
-Possibly mis-spelled words in DESCRIPTION:
-  ffexp (13:18)
-
-Uses the superseded package: 'snow'
-"
-
-This is the same as on R-hub and I don't think it's a problem.
 
 ## Reverse dependencies
 

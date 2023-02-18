@@ -1,7 +1,7 @@
 Package: comparer
 Type: Package
 Title: Compare Output and Run Time
-Version: 0.2.2.9001
+Version: 0.2.3
 Authors@R: c(
   person("Collin", "Erickson", , "collinberickson@gmail.com", c("aut", "cre"))
   )
