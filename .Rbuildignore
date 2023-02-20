@@ -8,3 +8,4 @@ scratch
 ^cran-comments\.md$
 ^CRAN-RELEASE$
 ^\.github$
+^CRAN-SUBMISSION$

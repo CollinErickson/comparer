@@ -1,8 +1,12 @@
+# comparer 0.2.3.9000
+
 # comparer 0.2.3
 
 * Added `hype()` for hyperparameter optimization.
 
 * Was removed from CRAN on 1/17/23 due to unresolved error.
+
+* Accepted back on CRAN on 2/19/2023.
 
 # comparer 0.2.2
 
