@@ -39,6 +39,9 @@
 #' process model.
 #' @param nugget.estim Whether a nugget should be estimated when
 #' fitting the Gaussian process model.
+#'
+#' @importFrom GauPro gpkm
+#'
 #' @examples
 #'
 #' # Have df output, but only use one value from it
@@ -104,6 +107,9 @@ hype <- function(eval_func,
 #' @field par_all_cts Are all the parameters continuous?
 #' @field verbose How much should be printed? 0 is none, 1 is standard,
 #' 2 is more, 5+ is a lot
+#'
+#' @importFrom mixopt mixopt_coorddesc
+#'
 #' @examples
 #'
 #' # Have df output, but only use one value from it
@@ -345,7 +351,22 @@ R6_hype <- R6::R6Class(
       #   invisible(self)
       # },
       # add_LHS2 = function(n) {
-      lhs <- lhs::maximinLHS(n=n, k=length(self$parnames))
+      if (requireNamespace("lhs", quietly = TRUE)) {
+        lhs <- lhs::maximinLHS(n=n, k=length(self$parnames))
+      } else {
+        # message("lhs package not available, using worse option. Please install lhs.")
+        # Increasing lhs
+        lhs <- (matrix(data=1:n, byrow=F,
+                       nrow=n, ncol=length(self$parnames)) - 1 +
+                  matrix(data=runif(n*length(self$parnames)),
+                         nrow=n, ncol=length(self$parnames))
+        ) / n
+        # Randomize each column
+        for (i in 1:length(self$parnames)) {
+          lhs[, i] <- lhs[sample(1:n, n, replace=F), i]
+        }
+
+      }
       lst <- rep(list(NULL), length(self$parnames))
       for (i in 1:length(self$parnames)) {
         lst[[i]] <- self$parlist[[i]]$generate(lhs[, i])
@@ -647,6 +668,11 @@ R6_hype <- R6::R6Class(
       #   model <- "GauPro"
       # }
       stopifnot(length(model) == 1, is.character(model))
+      if (tolower(model) %in% c('dk', 'dice', 'dicekriging') &&
+          !requireNamespace("DiceKriging")) {
+        message("DiceKriging R package not available. Changing to use GauPro.")
+        model <- "GauPro"
+      }
       if (tolower(model) %in% c('dk', 'dice', 'dicekriging')) {
         if (!self$par_all_cts) {
           stop(paste0("Can only add EI if all parameters are continuous",
@@ -886,7 +912,13 @@ R6_hype <- R6::R6Class(
         }
       }
       # ggpubr
-      do.call(ggpubr::ggarrange, ggs) #+ ggplot2::ylab("Outer ylab")
+      if (requireNamespace("ggpubr", quietly = TRUE)) {
+        do.call(ggpubr::ggarrange, ggs) #+ ggplot2::ylab("Outer ylab")
+      } else {
+        message(paste0("Only showing one plot, please install R package",
+                       " ggpubr for this to work correctly."))
+        ggs[[1]]
+      }
     },
     #' @description Plot the output of the points evaluated in order.
     plotorder = function() {
@@ -1095,9 +1127,15 @@ R6_hype <- R6::R6Class(
       ggs$common.legend <- T
       ggs$legend <- "right"
       # Gave a warning for a sampler, doesn't seem important
-      suppressWarnings({
-        do.call(ggpubr::ggarrange, ggs) + ggplot2::ylab("Outer ylab")
-      })
+      if (requireNamespace("ggpubr", quietly = TRUE)) {
+        suppressWarnings({
+          do.call(ggpubr::ggarrange, ggs) + ggplot2::ylab("Outer ylab")
+        })
+      } else {
+        message(paste0("Only showing one plot, please install R package",
+                       " ggpubr for this to work correctly."))
+        ggs[[1]]
+      }
     },
     #' @description Plot each input in the order they were chosen.
     #' Colored by quality.
@@ -1146,7 +1184,13 @@ R6_hype <- R6::R6Class(
 
       ggs$common.legend <- T
       ggs$legend <- "right"
-      do.call(ggpubr::ggarrange, ggs) + ggplot2::ylab("Outer ylab")
+      if (requireNamespace("ggpubr", quietly = TRUE)) {
+        do.call(ggpubr::ggarrange, ggs) + ggplot2::ylab("Outer ylab")
+      } else {
+        message(paste0("Only showing one plot, please install R package",
+                       " ggpubr for this to work correctly."))
+        ggs[[1]]
+      }
     },
     #' @description Plot the 2D plots from inputs to the output.
     #' All other variables are held at their values for the best input.
@@ -1154,6 +1198,11 @@ R6_hype <- R6::R6Class(
     #' model.
     #' @param nugget.estim Should a nugget be estimated?
     plotinteractions = function(covtype="matern5_2", nugget.estim=TRUE) {
+      if (!requireNamespace('ContourFunctions', quietly = TRUE)) {
+        stop(paste0("R package ContourFunctions not available, please",
+                    "install it and try again."))
+        # return()
+      }
       if (is.null(self$X) || is.null(self$Z)) {
         stop(paste0("Nothing has been evaluated yet.",
                     " Call $run_all() first. Use $plotX instead."))
@@ -1166,25 +1215,46 @@ R6_hype <- R6::R6Class(
       }
 
       Xtrans <- self$convert_raw_to_trans(self$X)
-      mod <- DiceKriging::km(formula = ~1,
-                             covtype=covtype,
-                             design = Xtrans,
-                             response = self$Z,
-                             nugget.estim=nugget.estim,
-                             control=list(trace=FALSE))
-      # predict(mod, self$X, type='sk', light.compute=T, se.compute=F)
-      min_ind <- which.min(self$Z)[1]
-      min_X <- self$X[min_ind,,drop=TRUE]
-      min_Xvec <- unlist(min_X)
-      Xtrans <- self$convert_raw_to_trans(self$X)
-      min_Xtrans <- Xtrans[min_ind,,drop=TRUE]
-      min_Xvectrans <- unlist(min_Xtrans)
-      predfunc <- function(X) {
-        Xdf <- as.data.frame(X)
-        colnames(Xdf) <- colnames(self$X)
-        pred <- DiceKriging::predict.km(mod, Xdf, type="sk",
-                                        light.return = T, se.compute = F)
-        pred$mean
+      if (requireNamespace('DiceKriging', quietly = TRUE)) {
+        mod <- DiceKriging::km(formula = ~1,
+                               covtype=covtype,
+                               design = Xtrans,
+                               response = self$Z,
+                               nugget.estim=nugget.estim,
+                               control=list(trace=FALSE))
+        # predict(mod, self$X, type='sk', light.compute=T, se.compute=F)
+        min_ind <- which.min(self$Z)[1]
+        min_X <- self$X[min_ind,,drop=TRUE]
+        min_Xvec <- unlist(min_X)
+        Xtrans <- self$convert_raw_to_trans(self$X)
+        min_Xtrans <- Xtrans[min_ind,,drop=TRUE]
+        min_Xvectrans <- unlist(min_Xtrans)
+        predfunc <- function(X) {
+          Xdf <- as.data.frame(X)
+          colnames(Xdf) <- colnames(self$X)
+          pred <- DiceKriging::predict.km(mod, Xdf, type="sk",
+                                          light.return = T, se.compute = F)
+          pred$mean
+        }
+      } else { # Use GauPro
+        mod <- suppressMessages(
+          GauPro::gpkm(kernel=covtype,
+                       X = Xtrans,
+                       Z = self$Z,
+                       nug.est=nugget.estim)
+        )
+        # predict(mod, self$X, type='sk', light.compute=T, se.compute=F)
+        min_ind <- which.min(self$Z)[1]
+        min_X <- self$X[min_ind,,drop=TRUE]
+        min_Xvec <- unlist(min_X)
+        Xtrans <- self$convert_raw_to_trans(self$X)
+        min_Xtrans <- Xtrans[min_ind,,drop=TRUE]
+        min_Xvectrans <- unlist(min_Xtrans)
+        predfunc <- function(X) {
+          Xdf <- as.data.frame(X)
+          colnames(Xdf) <- colnames(self$X)
+          mod$predict(Xdf)
+        }
       }
       if (ncol(self$X) < 2.5) {
         ContourFunctions::cf_func(

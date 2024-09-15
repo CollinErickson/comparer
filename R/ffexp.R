@@ -94,6 +94,11 @@ NULL
 #' a data frame. E.g., if the output is a list, but you want a single
 #' item to show up in the output data frame.
 #' @field hashvalue A value used to make sure inputs match when reloading.
+#'
+#' @importFrom plyr ddply
+#' @importFrom progress progress_bar
+# @importFrom reshape expand.grid.df
+#' @importFrom rmarkdown html_vignette
 ffexp <- R6::R6Class(
   classname = "ffexp",
   public = list(
@@ -195,7 +200,8 @@ ffexp <- R6::R6Class(
                                        }
                                      }
                               ))
-      self$rungrid <- do.call(reshape::expand.grid.df,
+      # self$rungrid <- do.call(reshape::expand.grid.df,
+      self$rungrid <- do.call(expand_grid_df,
                               lapply(1:ncol(self$nvars),
                                      function(i){
                                        x <- self$nvars[2,i]
@@ -293,8 +299,19 @@ ffexp <- R6::R6Class(
         } else {
           to_run <- to_run
         }
-      } else {stop(paste("run_order not recognized, should be one of inorder,",
-                         "reverse, or random #567128"))}
+      } else {
+        stop(paste("run_order not recognized, should be one of 'inorder',",
+                   "'reverse', or 'random' (error #567128)"))
+      }
+
+      if (parallel &&
+          (!requireNamespace("parallel", quietly = TRUE) ||
+          !requireNamespace("snow", quietly=TRUE))) {
+        message(paste0("parallel==TRUE, but either parallel or snow ",
+                       "is not available. Please install both to run",
+                       " in parallel."))
+        parallel <- FALSE
+      }
 
       if (parallel && length(to_run > 0)) {
         if (parallel_cores!=self$parallel_cores) {
@@ -956,7 +973,13 @@ ffexp <- R6::R6Class(
     plot_pairs = function() {
       nvar <- ncol(self$rungrid)
       tdf <- self$outcleandf[, 1:(ncol(self$outcleandf) - 3)]
-      GGally::ggpairs(data=tdf)
+      if (requireNamespace("GGally", quietly = TRUE)) {
+        GGally::ggpairs(data=tdf)
+      } else {
+        message(paste0("R package GGally not available, please install ",
+                       "and try again."))
+        return(NULL)
+      }
     },
     #' @description Calling `plot` on an `ffexp` object calls `plot_pairs()`
     plot = function() {
@@ -1295,7 +1318,8 @@ ffexp <- R6::R6Class(
                                 }
                               }
       )
-      new_exp$rungrid <- do.call(reshape::expand.grid.df,
+      # new_exp$rungrid <- do.call(reshape::expand.grid.df,
+      new_exp$rungrid <- do.call(expand_grid_df,
                                  lapply(1:ncol(new_exp$nvars),
                                         function(i){
                                           x <- new_exp$nvars[2,i]
@@ -1356,7 +1380,8 @@ ffexp <- R6::R6Class(
                                 }
                               }
       )
-      new_exp$rungrid <- do.call(reshape::expand.grid.df,
+      # new_exp$rungrid <- do.call(reshape::expand.grid.df,
+      new_exp$rungrid <- do.call(expand_grid_df,
                                  lapply(1:ncol(new_exp$nvars),
                                         function(i){
                                           x <- new_exp$nvars[2,i]

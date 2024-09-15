@@ -103,10 +103,10 @@ test_that("hype works", {
   expect_equal(length(h1$Z), 3)
 
   # Check add EI
-  expect_error(h1$add_EI(1), NA)
-  expect_error(h1$add_EI(1), NA)
+  expect_error(suppressWarnings(h1$add_EI(1)), NA)
+  expect_error(suppressWarnings(h1$add_EI(1)), NA)
   expect_error(h1$run_all(), NA)
-  expect_error({h1$run_EI_for_time(1, 1)}, NA)
+  expect_error({suppressWarnings(h1$run_EI_for_time(1, 1))}, NA)
 
   # Check plots
   expect_error(plotorder <- h1$plotorder(), NA)
@@ -128,14 +128,16 @@ test_that("2 inputs", {
                n_lhs=3)
   }, NA)
   expect_error(h2$run_all(), NA)
-  expect_error(h2$add_EI(n=3), NA)
+  expect_error(suppressWarnings(h2$add_EI(n=3)), NA)
   expect_error(h2$run_all(), NA)
   # Add LHS
   expect_error(h2$add_LHS(n=3), NA)
   expect_error(h2$run_all(), NA)
   # Plot interaction
-  expect_error(plotint <- h2$plotinteractions(), NA)
-  expect_is(plotint, 'ggplot')
+  if (requireNamespace('ContourFunctions', quietly = TRUE)) {
+    expect_error(plotint <- h2$plotinteractions(), NA)
+    expect_is(plotint, 'ggplot')
+  }
   # Plot pairs
   expect_error(plotpairs <- h2$pairs(), NA)
   expect_is(plotpairs, 'ggplot')
@@ -168,13 +170,15 @@ test_that("4 inputs", {
                n_lhs=3)
   }, NA)
   expect_error(h2$run_all(), NA)
-  expect_error(h2$add_EI(n=3), NA)
+  expect_error(suppressWarnings(h2$add_EI(n=3)), NA)
   expect_error(h2$run_all(), NA)
   # Add LHS
   expect_error(h2$add_LHS(n=3), NA)
   expect_error(h2$run_all(), NA)
   # Plot interactions
-  expect_error(h2$plotinteractions(), NA)
+  if (requireNamespace('ContourFunctions', quietly = TRUE)) {
+    expect_error(h2$plotinteractions(), NA)
+  }
 })
 
 
@@ -211,10 +215,10 @@ test_that("Hype add data", {
   }, NA)
   # x9
   # x9$plotX2()
-  expect_error({
+  expect_error(suppressWarnings({
     x9$add_EI(1)
     x9$run_all()
-  }, NA)
+  }), NA)
   # x9$plotorder()
   # x9$plotX()
   # x9$plotinteractions()

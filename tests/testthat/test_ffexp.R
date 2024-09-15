@@ -31,7 +31,11 @@ test_that("ffexp", {
   prt <- f1$plot_run_times()
   expect_is(prt, "gg")
   pp <- f1$plot_pairs()
-  expect_is(pp, "gg")
+  if (requireNamespace("GGally", quietly = TRUE)) {
+    expect_is(pp, "gg")
+  } else {
+    expect_true(is.null(pp))
+  }
   calc.eff <- f1$calculate_effects()
   expect_is(calc.eff, "list")
   expect_true(length(calc.eff) == 2)
@@ -199,43 +203,45 @@ test_that("ffexp with list", {
   expect_error({rm(f1); gc()}, NA)
 })
 
-test_that("ffexp with error", {
+test_that("ffexp with error, only when parallel is available", {
   # Skip tests with parallel=T on Travis, gives error
   testthat::skip_on_travis()
+  if (requireNamespace("parallel", quietly = TRUE) &&
+      requireNamespace("snow", quietly = TRUE)) {
+    expect_error(f1 <- ffexp$new(x=list(a=list(r=1,s=2,t=3),b=list(r=4,s=6,t=8)),
+                                 y=1:4,
+                                 eval_func=function(a, b, y) {
+                                   if (y>2) stop()
+                                   samp <- rnorm(b)
+                                   data.frame(mean=mean(samp), se=sd(samp)/sqrt(b))},
+                                 save_output=T,parallel = T, parallel_cores = 1,
+                                 folder_path = paste0(tempdir(), "//ffexp5//")
+    ), NA)
+    expect_error(f1$run_all(run_order = "inorder", redo = T, parallel_temp_save = T,
+                            write_error_files=T, verbose=0))
+    expect_true(sum(f1$completed_runs)==0)
+    # print(paste('folder path is', f1$folder_path))
+    # print(list.files(f1$folder_path))
+    expect_error(f1$recover_parallel_temp_save(delete_after = T), NA)
+    # print(list.files(f1$folder_path))
+    # Sys.sleep(2)
+    # print(f1)
+    # print(paste("Completed runs is", sum(f1$completed_runs)))
+    expect_true(sum(f1$completed_runs)==6)
 
-  expect_error(f1 <- ffexp$new(x=list(a=list(r=1,s=2,t=3),b=list(r=4,s=6,t=8)),
-                               y=1:4,
-                               eval_func=function(a, b, y) {
-                                 if (y>2) stop()
-                                 samp <- rnorm(b)
-                                 data.frame(mean=mean(samp), se=sd(samp)/sqrt(b))},
-                               save_output=T,parallel = T, parallel_cores = 1,
-                               folder_path = paste0(tempdir(), "//ffexp5//")
-  ), NA)
-  expect_error(f1$run_all(run_order = "inorder", redo = T, parallel_temp_save = T,
-                          write_error_files=T, verbose=0))
-  expect_true(sum(f1$completed_runs)==0)
-  # print(paste('folder path is', f1$folder_path))
-  # print(list.files(f1$folder_path))
-  expect_error(f1$recover_parallel_temp_save(delete_after = T), NA)
-  # print(list.files(f1$folder_path))
-  # Sys.sleep(2)
-  # print(f1)
-  # print(paste("Completed runs is", sum(f1$completed_runs)))
-  expect_true(sum(f1$completed_runs)==6)
+    prt <- f1$plot_run_times()
+    expect_is(prt, "gg")
+    calc.eff <- f1$calculate_effects()
+    expect_is(calc.eff, "list")
+    expect_true(length(calc.eff) == 2)
 
-  prt <- f1$plot_run_times()
-  expect_is(prt, "gg")
-  calc.eff <- f1$calculate_effects()
-  expect_is(calc.eff, "list")
-  expect_true(length(calc.eff) == 2)
-
-  # Delete at end
-  for (tmpfile in list.files(f1$folder_path)) {
-    unlink(paste0(f1$folder_path, tmpfile))
+    # Delete at end
+    for (tmpfile in list.files(f1$folder_path)) {
+      unlink(paste0(f1$folder_path, tmpfile))
+    }
+    unlink(f1$folder_path, recursive=T)
+    expect_error({rm(f1); gc()}, NA)
   }
-  unlink(f1$folder_path, recursive=T)
-  expect_error({rm(f1); gc()}, NA)
 })
 
 
@@ -519,7 +525,10 @@ test_that('parallel can be run even if initially set to false', {
   # Check you can change number of pcores
   expect_error(f1$run_all(parallel=T, parallel_cores=2, redo=T, warn_repeat = F,
                           parallel_temp_save = F), NA)
-  expect_equal(f1$parallel_cores, 2)
+  if (requireNamespace("parallel", quietly = TRUE) &&
+      requireNamespace("snow", quietly = TRUE)) {
+    expect_equal(f1$parallel_cores, 2)
+  }
 
   # Delete at end
   # Sleep so that there is time for the file to show up
@@ -540,11 +549,14 @@ test_that('remake cluster if connection doesn\'t work anymore', {
                   folder_path = paste0(getwd(), "/test7733-",
                                        gsub(" ","_",gsub(":","-",Sys.time()))),
                   parallel_cores=1)
-  # Give it a cluster
-  f1$parallel_cluster <- parallel::makeCluster(
-    spec=1, type = "SOCK")
-  # Then kill the cluster
-  parallel::stopCluster(f1$parallel_cluster)
+  if (requireNamespace("parallel", quietly = TRUE) &&
+      requireNamespace("snow", quietly = TRUE)) {
+    # Give it a cluster
+    f1$parallel_cluster <- parallel::makeCluster(
+      spec=1, type = "SOCK")
+    # Then kill the cluster
+    parallel::stopCluster(f1$parallel_cluster)
+  }
   # It should realize cluster is dead and start a new one.
   # print(f1$parallel_cluster)
   expect_error(f1$run_all(to_run = 1:2), NA)
