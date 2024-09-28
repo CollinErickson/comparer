@@ -1,4 +1,6 @@
-# comparer 0.2.3.9000
+# comparer 0.2.4
+
+Fixed issue with Suggests to get back on CRAN.
 
 # comparer 0.2.3
 
