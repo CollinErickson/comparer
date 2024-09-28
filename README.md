@@ -3,16 +3,16 @@
 
 # comparer
 
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/comparer)](https://cran.r-project.org/package=comparer)
-[![Travis-CI Build
-Status](https://travis-ci.org/CollinErickson/comparer.svg?branch=master)](https://travis-ci.org/CollinErickson/comparer)
+<!-- badges: start -->
+<!-- [![Travis-CI Build Status](https://travis-ci.org/CollinErickson/comparer.svg?branch=master)](https://app.travis-ci.org/CollinErickson/comparer) -->
 <!-- [![Coverage Status](https://img.shields.io/codecov/c/github/CollinErickson/comparer/master.svg)](https://codecov.io/github/CollinErickson/comparer?branch=master) -->
-[![Coverage
-Status](https://codecov.io/gh/CollinErickson/comparer/branch/master/graph/badge.svg)](https://codecov.io/github/CollinErickson/comparer?branch=master)
 <!-- [![Coverage Status](https://img.shields.io/coveralls/CollinErickson/comparer.svg)](https://coveralls.io/r/CollinErickson/comparer?branch=master) -->
+
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/comparer)](https://cran.r-project.org/package=comparer)
+[![Coverage
+Status](https://codecov.io/gh/CollinErickson/comparer/branch/master/graph/badge.svg)](https://app.codecov.io/github/CollinErickson/comparer?branch=master)
 [![Coverage
 Status](https://coveralls.io/repos/github/CollinErickson/comparer/badge.svg?branch=master)](https://coveralls.io/github/CollinErickson/comparer?branch=master)
-<!-- badges: start -->
 [![R-CMD-check](https://github.com/CollinErickson/comparer/workflows/R-CMD-check/badge.svg)](https://github.com/CollinErickson/comparer/actions)
 <!-- badges: end -->
 
@@ -53,14 +53,55 @@ the median is near 0.6.
 ``` r
 ## basic example code
 library(comparer)
+#> Loading required package: GauPro
+#> Loading required package: mixopt
+#> Loading required package: dplyr
+#> 
+#> Attaching package: 'dplyr'
+#> The following objects are masked from 'package:stats':
+#> 
+#>     filter, lag
+#> The following objects are masked from 'package:base':
+#> 
+#>     intersect, setdiff, setequal, union
+#> Loading required package: ggplot2
+#> Loading required package: splitfngr
+#> Loading required package: numDeriv
+#> Loading required package: rmarkdown
+#> Loading required package: tidyr
+#> Loading required package: reshape
+#> 
+#> Attaching package: 'reshape'
+#> The following objects are masked from 'package:tidyr':
+#> 
+#>     expand, smiths
+#> The following object is masked from 'package:dplyr':
+#> 
+#>     rename
+#> Loading required package: plyr
+#> ------------------------------------------------------------------------------
+#> You have loaded plyr after dplyr - this is likely to cause problems.
+#> If you need functions from both plyr and dplyr, please load plyr first, then dplyr:
+#> library(plyr); library(dplyr)
+#> ------------------------------------------------------------------------------
+#> 
+#> Attaching package: 'plyr'
+#> The following objects are masked from 'package:reshape':
+#> 
+#>     rename, round_any
+#> The following objects are masked from 'package:dplyr':
+#> 
+#>     arrange, count, desc, failwith, id, mutate, rename, summarise,
+#>     summarize
+#> Loading required package: progress
 mbc(mean(x), median(x), input=rexp(100))
 #> Run times (sec)
 #>    Function        Sort1        Sort2        Sort3        Sort4        Sort5
-#> 1   mean(x) 1.072884e-05 1.096725e-05 1.120567e-05 1.454353e-05 0.0001285076
-#> 2 median(x) 4.792213e-05 4.911423e-05 5.006790e-05 6.866455e-05 0.0002224445
+#> 1   mean(x) 5.006790e-06 5.960464e-06 7.152557e-06 8.106232e-06 5.602837e-05
+#> 2 median(x) 2.098083e-05 2.312660e-05 2.479553e-05 4.196167e-05 8.988380e-05
 #>           mean           sd neval
-#> 1 3.519058e-05 5.218906e-05     5
-#> 2 8.764267e-05 7.583821e-05     5
+#> 1 1.645088e-05 2.215562e-05     5
+#> 2 4.014969e-05 2.902476e-05     5
 #> 
 #> Output summary
 #>        Func Stat     Sort1     Sort2     Sort3     Sort4     Sort5      mean sd
@@ -79,11 +120,11 @@ different for each trial.
 mbc(mean(x), median(x), inputi=rexp(100))
 #> Run times (sec)
 #>    Function        Sort1        Sort2        Sort3        Sort4        Sort5
-#> 1   mean(x) 9.775162e-06 1.072884e-05 1.168251e-05 2.121925e-05 3.576279e-05
-#> 2 median(x) 6.175041e-05 6.675720e-05 6.937981e-05 8.654594e-05 1.425743e-04
+#> 1   mean(x) 5.960464e-06 5.960464e-06 5.960464e-06 6.914139e-06 1.692772e-05
+#> 2 median(x) 2.288818e-05 2.503395e-05 2.503395e-05 2.980232e-05 4.911423e-05
 #>           mean           sd neval
-#> 1 1.783371e-05 1.102464e-05     5
-#> 2 8.540154e-05 3.329309e-05     5
+#> 1 8.344650e-06 4.815819e-06     5
+#> 2 3.037453e-05 1.077721e-05     5
 #> 
 #> Output summary
 #>        Func Stat        V1        V2        V3        V4        V5     mean
@@ -102,11 +143,11 @@ which can then be called by the expressions to be compared.
 mbc(mean(a+b), mean(a-b), inputi={a=rexp(100);b=runif(100)})
 #> Run times (sec)
 #>      Function        Sort1        Sort2        Sort3        Sort4        Sort5
-#> 1 mean(a + b) 1.096725e-05 1.120567e-05 1.478195e-05 1.573563e-05 1.788139e-05
-#> 2 mean(a - b) 9.775162e-06 9.775162e-06 1.335144e-05 1.549721e-05 1.621246e-05
+#> 1 mean(a + b) 5.960464e-06 5.960464e-06 6.198883e-06 6.914139e-06 1.788139e-05
+#> 2 mean(a - b) 5.960464e-06 5.960464e-06 6.198883e-06 8.106232e-06 1.001358e-05
 #>           mean           sd neval
-#> 1 1.411438e-05 2.984521e-06     5
-#> 2 1.292229e-05 3.059757e-06     5
+#> 1 8.583069e-06 5.212596e-06     5
+#> 2 7.247925e-06 1.788934e-06     5
 #> 
 #> Output summary
 #>          Func Stat        V1        V2        V3       V4        V5      mean
@@ -143,68 +184,6 @@ After creating the `ffexp` object, we can call `f1$run_all` to run
 
 ``` r
 f1$run_all()
-#> Running 1, completed 0/9 Fri Mar 18 09:05:50 AM 2022
-#> $a
-#> [1] 1
-#> 
-#> $b
-#> [1] "a"
-#> 
-#> Running 2, completed 1/9 Fri Mar 18 09:05:50 AM 2022
-#> $a
-#> [1] 2
-#> 
-#> $b
-#> [1] "a"
-#> 
-#> Running 3, completed 2/9 Fri Mar 18 09:05:50 AM 2022
-#> $a
-#> [1] 3
-#> 
-#> $b
-#> [1] "a"
-#> 
-#> Running 4, completed 3/9 Fri Mar 18 09:05:50 AM 2022
-#> $a
-#> [1] 1
-#> 
-#> $b
-#> [1] "b"
-#> 
-#> Running 5, completed 4/9 Fri Mar 18 09:05:50 AM 2022
-#> $a
-#> [1] 2
-#> 
-#> $b
-#> [1] "b"
-#> 
-#> Running 6, completed 5/9 Fri Mar 18 09:05:50 AM 2022
-#> $a
-#> [1] 3
-#> 
-#> $b
-#> [1] "b"
-#> 
-#> Running 7, completed 6/9 Fri Mar 18 09:05:50 AM 2022
-#> $a
-#> [1] 1
-#> 
-#> $b
-#> [1] "c"
-#> 
-#> Running 8, completed 7/9 Fri Mar 18 09:05:50 AM 2022
-#> $a
-#> [1] 2
-#> 
-#> $b
-#> [1] "c"
-#> 
-#> Running 9, completed 8/9 Fri Mar 18 09:05:50 AM 2022
-#> $a
-#> [1] 3
-#> 
-#> $b
-#> [1] "c"
 ```
 
 Now to see the results in a clean format, look at `f1$outcleandf`.
@@ -212,13 +191,23 @@ Now to see the results in a clean format, look at `f1$outcleandf`.
 ``` r
 f1$outcleandf
 #>   a b  V1 runtime          start_time            end_time run_number
-#> 1 1 a 1 a       0 2022-03-18 09:05:50 2022-03-18 09:05:50          1
-#> 2 2 a 2 a       0 2022-03-18 09:05:50 2022-03-18 09:05:50          2
-#> 3 3 a 3 a       0 2022-03-18 09:05:50 2022-03-18 09:05:50          3
-#> 4 1 b 1 b       0 2022-03-18 09:05:50 2022-03-18 09:05:50          4
-#> 5 2 b 2 b       0 2022-03-18 09:05:50 2022-03-18 09:05:50          5
-#> 6 3 b 3 b       0 2022-03-18 09:05:50 2022-03-18 09:05:50          6
-#> 7 1 c 1 c       0 2022-03-18 09:05:50 2022-03-18 09:05:50          7
-#> 8 2 c 2 c       0 2022-03-18 09:05:50 2022-03-18 09:05:50          8
-#> 9 3 c 3 c       0 2022-03-18 09:05:50 2022-03-18 09:05:50          9
+#> 1 1 a 1 a       0 2024-09-28 11:17:53 2024-09-28 11:17:53          1
+#> 2 2 a 2 a       0 2024-09-28 11:17:53 2024-09-28 11:17:53          2
+#> 3 3 a 3 a       0 2024-09-28 11:17:53 2024-09-28 11:17:53          3
+#> 4 1 b 1 b       0 2024-09-28 11:17:53 2024-09-28 11:17:53          4
+#> 5 2 b 2 b       0 2024-09-28 11:17:53 2024-09-28 11:17:53          5
+#> 6 3 b 3 b       0 2024-09-28 11:17:53 2024-09-28 11:17:53          6
+#> 7 1 c 1 c       0 2024-09-28 11:17:53 2024-09-28 11:17:53          7
+#> 8 2 c 2 c       0 2024-09-28 11:17:53 2024-09-28 11:17:53          8
+#> 9 3 c 3 c       0 2024-09-28 11:17:53 2024-09-28 11:17:53          9
 ```
+
+## `hype`: Hyperparameter Optimization
+
+`hype` uses Bayesian optimization to find the best parameters/inputs for
+a function that is slow to evaluate. (If the function can be evaluated
+quickly, then you can use standard optimization methods.) A common use
+case is for hyperparameter tuning: when fitting a model that has
+multiple hyperparameters, you want to find the best values to set the
+hyperparameters to but can only evaluate a small number of settings
+since each is slow.
