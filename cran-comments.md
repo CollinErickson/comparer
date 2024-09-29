@@ -4,7 +4,7 @@ or rewrote the code to eliminate the Suggests package.
 
 ## Test environments
 * local Windows 11, R 4.4.1 (regular and _R_CHECK_DEPENDS_ONLY_)
-* Ubuntu 22.04.1 LTS (GitHub Actions)
+* Ubuntu 22.04.5 LTS, R 4.4.1 (GitHub Actions)
 * win-builder (devel and release)
 * R-hub (Windows, Ubuntu Linux, Fedora Linux)
 * mac-builder
@@ -20,9 +20,10 @@ R-hub Fedora Linux (2/18/23): 3 NOTEs
 R-hub Ubuntu Linux (2/18/23): 2 NOTEs
 
 On win-builder (release, 2/18/23): 2 NOTEs
-On win-builder (devel, 2/18/23): NOTE
+On win-builder (devel, 9/28/24): 1 NOTE for new submission, previous version
+was archived, possibly misspelled word that is fine.
 
-On Ubuntu (GitHub Actions, 2/18/23) :OK
+On Ubuntu 22.04.5 LTS, R 4.4.1 (GitHub Actions, 9/28/24): OK
 
 On mac-builder (9/28/24): 1 WARNING, not an issue.
 Found the following significant warnings:
