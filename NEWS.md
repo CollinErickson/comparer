@@ -1,6 +1,10 @@
+# comparer 0.2.4.9000
+
 # comparer 0.2.4
 
 Fixed issue with Suggests to get back on CRAN.
+
+Accepted to CRAN on 10/2/24.
 
 # comparer 0.2.3
 
