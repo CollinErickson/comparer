@@ -32,7 +32,7 @@ test_that("ffexp", {
   expect_is(prt, "gg")
   pp <- f1$plot_pairs()
   if (requireNamespace("GGally", quietly = TRUE)) {
-    expect_is(pp, "gg")
+    expect_is(pp, "ggmatrix")
   } else {
     expect_true(is.null(pp))
   }
