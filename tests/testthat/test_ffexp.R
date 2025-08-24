@@ -32,7 +32,7 @@ test_that("ffexp", {
   expect_is(prt, "gg")
   pp <- f1$plot_pairs()
   if (requireNamespace("GGally", quietly = TRUE)) {
-    expect_is(pp, "gg")
+    expect_true(inherits(pp, "ggmatrix"))
   } else {
     expect_true(is.null(pp))
   }
@@ -89,7 +89,7 @@ test_that("ffexp parallel", {
   expect_error(f1$run_all(parallel_temp_save = T, write_start_files = T, write_error_files = T,
                           delete_parallel_temp_save_after = F, verbose=0), NA)
   expect_error(f1$save_self(), NA)
-  expect_error(f1$recover_parallel_temp_save(), NA)
+  expect_no_error(capture.output(f1$recover_parallel_temp_save()))
 
   # Delete at end
   for (tmpfile in list.files(f1$folder_path)) {
@@ -241,6 +241,8 @@ test_that("ffexp with error, only when parallel is available", {
     }
     unlink(f1$folder_path, recursive=T)
     expect_error({rm(f1); gc()}, NA)
+  } else {
+    expect_true(TRUE)
   }
 })
 
